@@ -9,11 +9,11 @@ email: "whitecherry1123@gmail.com"
 
 # username.github.io 형태의 User Page는 url/baseurl을 비워두면 됩니다.
 # 프로젝트 페이지(예: github.com/USER/portfolio)로 쓸 경우에만 baseurl을 "/portfolio"로.
-url: "https://l_hyunji_im.github.io"
+url: "https://limhyun-ji.github.io"
 baseurl: ""
 
 # 소셜 / 연락처 링크
-github_username: "l_hyunji_im"
+github_username: "LimHyun-ji"
 # linkedin_username: ""
 # blog_url: ""
 
