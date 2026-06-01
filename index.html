@@ -1,0 +1,84 @@
+---
+layout: default
+title: null
+---
+{% assign p = site.data.profile %}
+
+<!-- ───────────── HERO ───────────── -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">{{ p.role }}</p>
+    <h1>{{ p.name }}</h1>
+    <p class="headline">{{ p.headline }}</p>
+    <p class="intro">{{ p.intro }}</p>
+    <div class="actions">
+      {% if p.links.github %}<a class="btn" href="{{ p.links.github }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
+      {% if p.links.email %}<a class="btn ghost" href="mailto:{{ p.links.email }}">Email</a>{% endif %}
+      {% if p.links.linkedin %}<a class="btn ghost" href="{{ p.links.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+      {% if p.links.blog %}<a class="btn ghost" href="{{ p.links.blog }}" target="_blank" rel="noopener">Blog</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── SKILLS ───────────── -->
+{% if p.skills %}
+<section class="block">
+  <h2>Skills</h2>
+  <div class="skills">
+    {% for group in p.skills %}
+    <div class="skill-group">
+      <h3>{{ group.category }}</h3>
+      <ul class="chips">
+        {% for item in group.items %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ───────────── PROJECTS ───────────── -->
+{% if p.projects %}
+<section class="block">
+  <h2>Projects</h2>
+  <div class="projects">
+    {% for proj in p.projects %}
+    <article class="card">
+      <header>
+        <h3>{% if proj.link %}<a href="{{ proj.link }}" target="_blank" rel="noopener">{{ proj.title }}</a>{% else %}{{ proj.title }}{% endif %}</h3>
+        <span class="meta">{{ proj.role }}{% if proj.period %} · {{ proj.period }}{% endif %}</span>
+      </header>
+      <p class="summary">{{ proj.summary }}</p>
+      {% if proj.highlights %}
+      <ul class="highlights">
+        {% for h in proj.highlights %}<li>{{ h }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      {% if proj.tags %}
+      <ul class="chips small">
+        {% for t in proj.tags %}<li>{{ t }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ───────────── EXPERIENCE ───────────── -->
+{% if p.experience %}
+<section class="block">
+  <h2>Experience</h2>
+  <div class="timeline">
+    {% for e in p.experience %}
+    <div class="tl-item">
+      <div class="tl-period">{{ e.period }}</div>
+      <div class="tl-body">
+        <h3>{{ e.title }} <span class="org">@ {{ e.org }}</span></h3>
+        <p>{{ e.desc }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
