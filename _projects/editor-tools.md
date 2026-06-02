@@ -58,3 +58,35 @@ flowchart LR
   VAL --> GEN["Generated 메타데이터<br/>(RidType 키)"]
   GEN --> RT["런타임<br/>MetaDataSubsystem"]
 </div>
+
+## 핵심 구현
+
+### Commandlet 기반 CI
+레벨/비주얼 데이터 export를 **에디터 UI 없이 Commandlet으로** 실행해 Jenkins CI에 물렸습니다 — 사람이 잊어도 빌드가 데이터를 검증·생성합니다.
+```cpp
+// SolEditor/AreaTool/Commandlet/AreaToolExportCommandlet.h
+class UAreaToolExportCommandlet : public UCommandlet {
+    virtual int32 Main(const FString& FullCommandLine) override; // → AreaToolSubsystem::ExportAllLevels()
+};
+// VisualDataExportCommandlet → FVisualDataExport::Execute_ExportAllJson()
+```
+
+### 검증자 체인 (데이터 무결성)
+export 전에 **검증자 체인**으로 리소스ID/이름 중복/네비메시/폴더구조/리전을 통과시켜, 잘못된 데이터가 런타임으로 새는 걸 차단했습니다.
+```cpp
+// SolEditor/AreaTool/AreaToolValidator.h — 인터페이스 + 구현체 체인
+class IAreaToolValidator { virtual bool Validate(const AAreaToolActor&, const FString& ErrorScope); };
+// FRidValidator / FNameValidator(TSet 중복검사) / FNavMeshValidator / FFolderValidator / FRegionValidator
+```
+
+### Export + 소스컨트롤 연동
+월드 액터를 JSON으로 직렬화하고, **P4와 reconcile**해 변경분만 체크아웃/추가되도록 했습니다(수동 체크아웃 실수 방지).
+```cpp
+// SolEditor/AreaTool/AreaToolGenerator.h — FAreaToolJsonGenerator
+void Export() override;
+void SaveAndReconcile(const TMap<FString, TArray<TSharedPtr<FJsonValue>>>& ExportedFileDatas); // P4 연동
+TArray<TSharedPtr<IAreaToolValidator>> Validators;
+```
+`FVisualDataExport`는 NPC/갓아머/정령/필드오브젝트 매핑과 액션 메타데이터를 JSON으로 내보냅니다(`Execute_ExportAssetType(..., bUseP4v)`).
+
+> 참고: 미니맵은 별도 전용 매니저 클래스 없이, 퀘스트 데이터의 텍스처 변환·인디케이터 처리와 NavigationScreenShot 파이프라인의 일부로 다뤘습니다.

@@ -76,3 +76,49 @@ flowchart TD
   PGL --> SEQ["UI.Layer.Sequence"]
   PGL --> SYS["UI.Layer.SystemMessageLayer"]
 </div>
+
+## 시스템별 핵심 설계
+
+모든 콘텐츠 매니저는 **`USolGameInstanceSubsystem` + `INetworkNotiClientListener`** 라는 공통 골격을 따릅니다 — 세션 단위 싱글톤으로 서버 Noti를 직접 수신해 상태를 갱신하고, 멀티캐스트 델리게이트로 UI에 전파합니다. (UI는 `NativeConstruct`에서 구독, `NativeDestruct`에서 해제)
+
+### 길드 / 아지트
+```cpp
+// System/Guild/GuildManager.h — 서버 Noti 수신 + 길드 상태 델리게이트
+class UGuildManager : public USolGameInstanceSubsystem, public INetworkNotiClientListener {
+    static UGuildManager& Get(const UObject* WorldContextObject);
+    FOnMyGuildInfoUpdated  OnMyGuildInfoUpdated;
+    FOnJoinApplierList     OnJoinApplierList;
+};
+```
+자금 입금·분배는 별도 `UGuildDistributionManager`(`DepositFund` / `Distribute` / `RequestFundBalance`)로 분리해 길드 운영 로직과 분배 정산을 모듈화했습니다.
+
+### 순례 (Pilgrimage) — 시스템/연출 분리
+보드 진행·주사위 정산은 `UTravelManager`(시스템)가, 카메라·시퀀스 연출은 `ACinePilgrimageManager`(액터)가 담당하도록 **로직과 연출을 분리**했습니다.
+```cpp
+// System/Travel/TravelManager.h
+bool TryRollDice(const ETravelEventCategory InCategory);
+FOnRollDiceResultEvt      OnRollDiceResultEvt;     // 주사위 결과
+FOnPilgrimageLapCompleted OnPilgrimageLapCompleted; // 완주 정산
+```
+
+### 별자리 (Constellation) — LevelSequence 입력/연출
+```cpp
+// Cinema/Constellation/CineConstellation.h — 액터 클릭 입력 → 델리게이트
+virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
+FOnConstellationStarClicked OnConstellationStarClicked;
+```
+`UCinemaConstellationManager`가 `TSoftObjectPtr<ULevelSequence>`를 바인딩해 별 선택/포커스 이동 애니메이션을 재생하고 PocketLevel 인스턴스를 관리합니다.
+
+### 연구/연성 · 수집
+```cpp
+// System/Research/ResearchManager.h
+void RequestResearch(int32 ResearchRid);
+bool CanResearch(int32 ResearchRid) const;
+FOnResearchForgedEvt OnResearchForgedEvt;          // 연성 완료(성공/실패)
+```
+```cpp
+// System/ItemCollection/ItemCollectionManager.h
+void RequestRegisterItemCollection(const TArray<FItemCollectionRegisterParam>&);
+void RequestBookmarkItemCollection(const TArray<int32>& CollectionRids, bool IsSetBookmark);
+// + 거래소 검색 연동 / 레시피 메타데이터 검증
+```
