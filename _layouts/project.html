@@ -35,10 +35,10 @@ layout: default
   const blocks = Array.from(document.querySelectorAll('.mermaid'));
   const sources = blocks.map(function (b) { return b.textContent; });
   function render() {
-    const isDark = !document.documentElement.getAttribute('data-theme');
+    // 다이어그램 배경은 항상 흰색이므로 라이트 테마로 고정
     mermaid.initialize({
       startOnLoad: false,
-      theme: isDark ? 'dark' : 'neutral',
+      theme: 'default',
       securityLevel: 'loose',
       flowchart: { curve: 'basis', useMaxWidth: true }
     });
