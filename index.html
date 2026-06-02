@@ -38,28 +38,25 @@ title: null
 {% endif %}
 
 <!-- ───────────── PROJECTS ───────────── -->
-{% if p.projects %}
+{% if site.projects.size > 0 %}
 <section class="block">
   <h2>Projects</h2>
   <div class="projects">
-    {% for proj in p.projects %}
-    <article class="card">
+    {% assign sorted_projects = site.projects | sort: 'order' %}
+    {% for proj in sorted_projects %}
+    <a class="card card-link" href="{{ proj.url | relative_url }}">
       <header>
-        <h3>{% if proj.link %}<a href="{{ proj.link }}" target="_blank" rel="noopener">{{ proj.title }}</a>{% else %}{{ proj.title }}{% endif %}</h3>
+        <h3>{{ proj.title }}<span class="arrow" aria-hidden="true">→</span></h3>
         <span class="meta">{{ proj.role }}{% if proj.period %} · {{ proj.period }}{% endif %}</span>
       </header>
       <p class="summary">{{ proj.summary }}</p>
-      {% if proj.highlights %}
-      <ul class="highlights">
-        {% for h in proj.highlights %}<li>{{ h }}</li>{% endfor %}
-      </ul>
-      {% endif %}
       {% if proj.tags %}
       <ul class="chips small">
         {% for t in proj.tags %}<li>{{ t }}</li>{% endfor %}
       </ul>
       {% endif %}
-    </article>
+      <span class="more">자세히 보기 →</span>
+    </a>
     {% endfor %}
   </div>
 </section>

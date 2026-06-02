@@ -1,0 +1,30 @@
+---
+layout: default
+---
+<article class="project-detail">
+  <a class="back" href="{{ '/#projects' | relative_url }}">← 프로젝트 목록</a>
+
+  <header class="detail-head">
+    <p class="eyebrow">{{ page.role }}{% if page.period %} · {{ page.period }}{% endif %}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.summary %}<p class="headline">{{ page.summary }}</p>{% endif %}
+    {% if page.tags %}
+    <ul class="chips small">
+      {% for t in page.tags %}<li>{{ t }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </header>
+
+  {% if page.highlights %}
+  <h2>주요 작업</h2>
+  <ul class="highlights big">
+    {% for h in page.highlights %}<li>{{ h }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="detail-body">
+    {{ content }}
+  </div>
+
+  <a class="back bottom" href="{{ '/#projects' | relative_url }}">← 프로젝트 목록으로</a>
+</article>

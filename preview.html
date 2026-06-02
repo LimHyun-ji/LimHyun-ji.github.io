@@ -39,50 +39,37 @@
 
     <section class="block">
       <h2>Projects</h2>
+      <!-- preview는 정적이라 상세 링크는 라이브 사이트로 연결됩니다. -->
       <div class="projects">
-        <article class="card">
+        <a class="card card-link" href="https://limhyun-ji.github.io/projects/sol-content/">
           <header>
-            <h3>Sol — MMORPG 콘텐츠 시스템 (Unreal Engine 5)</h3>
+            <h3>Sol — MMORPG 콘텐츠 시스템 (Unreal Engine 5)<span class="arrow" aria-hidden="true">→</span></h3>
             <span class="meta">Client Developer · 2023.02 — 현재</span>
           </header>
           <p class="summary">커스텀 UE5 엔진 브랜치 기반 모바일/PC MMORPG. 다수의 게임 콘텐츠 시스템을 장기 오너십으로 설계·개발·라이브 운영.</p>
-          <ul class="highlights">
-            <li>길드/아지트 시스템 클라이언트 전반 담당 (생성·권한·기부·PvP·신권 연계) — 출시 전후 지속 고도화</li>
-            <li>별자리(천체)·순례·연구/연성 등 고유 콘텐츠 시스템을 기획 연동부터 연출·확률 표기까지 구현</li>
-            <li>도감/수집 시스템: 컬렉션 등록, 거래소 연동, 일괄구매, 상품화 흐름 구축</li>
-            <li>채팅/소셜·리텐션 리워드·재화별 세금 정산 등 라이브 서비스 시스템 신규 도입</li>
-            <li>CommonUI 기반 레이어 스택 UI(HUD/Popup/FullScreen)와 Protobuf 기반 서버 동기화 작업</li>
-          </ul>
           <ul class="chips small"><li>Unreal Engine 5</li><li>C++</li><li>Gameplay</li><li>UI</li><li>Live Ops</li></ul>
-        </article>
+          <span class="more">자세히 보기 →</span>
+        </a>
 
-        <article class="card">
+        <a class="card card-link" href="https://limhyun-ji.github.io/projects/editor-tools/">
           <header>
-            <h3>에디터 툴 &amp; 데이터 파이프라인</h3>
+            <h3>에디터 툴 &amp; 데이터 파이프라인<span class="arrow" aria-hidden="true">→</span></h3>
             <span class="meta">Tools / Pipeline · 2023.02 — 현재</span>
           </header>
           <p class="summary">콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발.</p>
-          <ul class="highlights">
-            <li>레벨/스폰 데이터 AreaTool 및 Commandlet 기반 CI 자동화(레벨데이터 검증·export)</li>
-            <li>메타데이터 Generator·VisualData Editor 등 데이터 주도 에디터 툴 개발</li>
-            <li>미니맵 데이터 텍스처 변환·퀘스트 인디케이터 파이프라인 구축</li>
-            <li>Python 기반 P4 자동화·단위계 변환·검증 스크립트로 데이터 워크플로 개선</li>
-          </ul>
           <ul class="chips small"><li>Editor Tooling</li><li>Python</li><li>Commandlet</li><li>CI</li><li>Metadata</li></ul>
-        </article>
+          <span class="more">자세히 보기 →</span>
+        </a>
 
-        <article class="card">
+        <a class="card card-link" href="https://limhyun-ji.github.io/projects/optimization/">
           <header>
-            <h3>퍼포먼스 최적화 &amp; 라이브 품질 대응</h3>
+            <h3>퍼포먼스 최적화 &amp; 라이브 품질 대응<span class="arrow" aria-hidden="true">→</span></h3>
             <span class="meta">Client Developer · 상시</span>
           </header>
           <p class="summary">모바일 타겟 성능 개선과 라이브 빌드 안정성 확보. 전체 작업의 약 30%가 버그·크래시·현상 수정.</p>
-          <ul class="highlights">
-            <li>UI Invalidation·Culling·Mipmap 스트리밍 동적 제어로 렌더링 비용 절감</li>
-            <li>다수의 클라이언트 크래시·동기화 이슈 분석 및 수정 (Jira 연계)</li>
-          </ul>
           <ul class="chips small"><li>Optimization</li><li>Mobile</li><li>Debugging</li></ul>
-        </article>
+          <span class="more">자세히 보기 →</span>
+        </a>
       </div>
     </section>
 

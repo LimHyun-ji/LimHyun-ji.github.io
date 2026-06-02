@@ -22,6 +22,12 @@ markdown: kramdown
 highlighter: rouge
 permalink: pretty
 
+# 프로젝트 상세 페이지 컬렉션 (각 _projects/*.md 가 /projects/<slug>/ 로 생성됨)
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
 # GitHub Pages 안전 플러그인만 사용
 plugins:
   - jekyll-seo-tag

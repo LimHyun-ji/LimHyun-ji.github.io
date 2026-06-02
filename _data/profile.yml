@@ -32,38 +32,9 @@ skills:
     items: ["콘텐츠 시스템", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "라이브 운영 대응"]
 
 # 대표 프로젝트
-projects:
-  - title: "Sol — MMORPG 콘텐츠 시스템 (Unreal Engine 5)"
-    period: "2023.02 — 현재"
-    role: "Client Developer"
-    summary: "커스텀 UE5 엔진 브랜치 기반 모바일/PC MMORPG. 다수의 게임 콘텐츠 시스템을 장기 오너십으로 설계·개발·라이브 운영."
-    highlights:
-      - "길드/아지트 시스템 클라이언트 전반 담당 (생성·권한·기부·PvP·신권 연계) — 출시 전후 지속 고도화"
-      - "별자리(천체)·순례·연구/연성 등 고유 콘텐츠 시스템을 기획 연동부터 연출·확률 표기까지 구현"
-      - "도감/수집 시스템: 컬렉션 등록, 거래소 연동, 일괄구매, 상품화 흐름 구축"
-      - "채팅/소셜·리텐션 리워드·재화별 세금 정산 등 라이브 서비스 시스템 신규 도입"
-      - "CommonUI 기반 레이어 스택 UI(HUD/Popup/FullScreen)와 Protobuf 기반 서버 동기화 작업"
-    tags: ["Unreal Engine 5", "C++", "Gameplay", "UI", "Live Ops"]
-
-  - title: "에디터 툴 & 데이터 파이프라인"
-    period: "2023.02 — 현재"
-    role: "Tools / Pipeline"
-    summary: "콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
-    highlights:
-      - "레벨/스폰 데이터 AreaTool 및 Commandlet 기반 CI 자동화(레벨데이터 검증·export)"
-      - "메타데이터 Generator·VisualData Editor 등 데이터 주도 에디터 툴 개발"
-      - "미니맵 데이터 텍스처 변환·퀘스트 인디케이터 파이프라인 구축"
-      - "Python 기반 P4 자동화·단위계 변환·검증 스크립트로 데이터 워크플로 개선"
-    tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
-
-  - title: "퍼포먼스 최적화 & 라이브 품질 대응"
-    period: "상시"
-    role: "Client Developer"
-    summary: "모바일 타겟 성능 개선과 라이브 빌드 안정성 확보. 전체 작업의 약 30%가 버그·크래시·현상 수정."
-    highlights:
-      - "UI Invalidation·Culling·Mipmap 스트리밍 동적 제어로 렌더링 비용 절감"
-      - "다수의 클라이언트 크래시·동기화 이슈 분석 및 수정 (Jira 연계)"
-    tags: ["Optimization", "Mobile", "Debugging"]
+# ※ 프로젝트는 이제 _projects/*.md 파일로 관리합니다 (클릭 시 상세 페이지로 이동).
+#    카드 순서는 각 파일의 front matter `order` 값으로 정렬됩니다.
+#    새 프로젝트 추가: _projects/ 에 .md 파일을 만들고 title/role/period/summary/tags/highlights/order 작성.
 
 # 경력 / 타임라인 (선택)
 experience:
