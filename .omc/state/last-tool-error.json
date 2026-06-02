@@ -1,7 +1,7 @@
 {
   "tool_name": "PowerShell",
-  "tool_input_preview": "{\"command\":\"& \\\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\\\" auth status 2>&1 | Select-Object -First 8\",\"description\":\"Check gh auth status\"}",
-  "error": "Exit code 1\ngh.exe : You are not logged into any GitHub hosts. To log in, run: gh auth login\r\nAt line:1 char:1\r\n+ & \"C:\\Program Files\\GitHub CLI\\gh.exe\" auth status 2>&1 | Select-Obje ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (You are not log...: gh auth login:String) [], RemoteException\r\n    + FullyQualifiedErrorId : NativeCommandError",
-  "timestamp": "2026-06-01T13:37:24.842Z",
+  "tool_input_preview": "{\"command\":\"Set-Location \\\"E:\\\\WorkSpaces\\\\LHJ_Dev1Next_New\\\\github-portfolio\\\"\\n& \\\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\\\" repo create \\\"LimHyun-ji.github.io\\\" --public --source=. --remote=origin --...",
+  "error": "Exit code 1\ngh.exe : GraphQL: Name already exists on this account (createRepository)\r\nAt line:2 char:1\r\n+ & \"C:\\Program Files\\GitHub CLI\\gh.exe\" repo create \"LimHyun-ji.github ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (GraphQL: Name a...eateRepository):String) [], RemoteException\r\n    + FullyQualifiedErrorId : NativeCommandError",
+  "timestamp": "2026-06-01T13:44:58.299Z",
   "retry_count": 1
 }

@@ -7,8 +7,9 @@ name: "임현지"
 role: "Game Client Developer"
 headline: "Unreal Engine으로 MMORPG 클라이언트를 만듭니다."
 intro: >
-  Unreal Engine(C++) 기반 게임 클라이언트 개발자입니다.
-  네트워크 동기화, 엔티티/UI 시스템, 퍼포먼스 최적화에 관심이 많습니다.
+  Unreal Engine 5(C++) 기반 MMORPG 클라이언트 개발자입니다.
+  길드·별자리·순례·연구·수집 등 다수의 게임 콘텐츠 시스템을 장기간 오너십으로 담당하며,
+  에디터 툴·데이터 파이프라인부터 UI·네트워크 동기화·퍼포먼스 최적화까지 폭넓게 작업합니다.
 
 # 연락 / 링크 (비워두면 버튼이 표시되지 않습니다)
 links:
@@ -26,34 +27,51 @@ skills:
   - category: "Networking"
     items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync"]
   - category: "Tools"
-    items: ["Perforce", "Git", "Visual Studio", "RenderDoc"]
+    items: ["Perforce", "Git", "Visual Studio", "RenderDoc", "Jenkins CI"]
+  - category: "Domains"
+    items: ["콘텐츠 시스템", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "라이브 운영 대응"]
 
 # 대표 프로젝트
 projects:
-  - title: "Sol — MMORPG (Unreal Engine 5)"
-    period: "2023 — 현재"
+  - title: "Sol — MMORPG 콘텐츠 시스템 (Unreal Engine 5)"
+    period: "2023.02 — 현재"
     role: "Client Developer"
-    summary: "커스텀 UE5 엔진 브랜치 기반 모바일/PC MMORPG. 엔티티 동기화, UI 레이어 시스템, CDN 리소스 파이프라인 담당."
+    summary: "커스텀 UE5 엔진 브랜치 기반 모바일/PC MMORPG. 다수의 게임 콘텐츠 시스템을 장기 오너십으로 설계·개발·라이브 운영."
     highlights:
-      - "서버 엔티티 데이터를 액터 컴포넌트로 브리지하는 Entity Proxy 시스템 개발"
-      - "CommonUI 기반 레이어 스택 UI 아키텍처 구현 (HUD/Popup/FullScreen)"
-      - "ChunkDownloader 기반 CDN 리소스 다운로드 파이프라인 최적화"
-    tags: ["Unreal Engine 5", "C++", "Networking", "UI"]
-    # link: "https://github.com/__GITHUB_USERNAME__/..."
+      - "길드/아지트 시스템 클라이언트 전반 담당 (생성·권한·기부·PvP·신권 연계) — 출시 전후 지속 고도화"
+      - "별자리(천체)·순례·연구/연성 등 고유 콘텐츠 시스템을 기획 연동부터 연출·확률 표기까지 구현"
+      - "도감/수집 시스템: 컬렉션 등록, 거래소 연동, 일괄구매, 상품화 흐름 구축"
+      - "채팅/소셜·리텐션 리워드·재화별 세금 정산 등 라이브 서비스 시스템 신규 도입"
+      - "CommonUI 기반 레이어 스택 UI(HUD/Popup/FullScreen)와 Protobuf 기반 서버 동기화 작업"
+    tags: ["Unreal Engine 5", "C++", "Gameplay", "UI", "Live Ops"]
 
-  - title: "(프로젝트 제목)"
-    period: "20XX — 20XX"
-    role: "역할"
-    summary: "프로젝트 한 줄 설명을 적어주세요."
+  - title: "에디터 툴 & 데이터 파이프라인"
+    period: "2023.02 — 현재"
+    role: "Tools / Pipeline"
+    summary: "콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
     highlights:
-      - "핵심 기여 1"
-      - "핵심 기여 2"
-    tags: ["태그1", "태그2"]
-    # link: ""
+      - "레벨/스폰 데이터 AreaTool 및 Commandlet 기반 CI 자동화(레벨데이터 검증·export)"
+      - "메타데이터 Generator·VisualData Editor 등 데이터 주도 에디터 툴 개발"
+      - "미니맵 데이터 텍스처 변환·퀘스트 인디케이터 파이프라인 구축"
+      - "Python 기반 P4 자동화·단위계 변환·검증 스크립트로 데이터 워크플로 개선"
+    tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
+
+  - title: "퍼포먼스 최적화 & 라이브 품질 대응"
+    period: "상시"
+    role: "Client Developer"
+    summary: "모바일 타겟 성능 개선과 라이브 빌드 안정성 확보. 전체 작업의 약 30%가 버그·크래시·현상 수정."
+    highlights:
+      - "UI Invalidation·Culling·Mipmap 스트리밍 동적 제어로 렌더링 비용 절감"
+      - "다수의 클라이언트 크래시·동기화 이슈 분석 및 수정 (Jira 연계)"
+    tags: ["Optimization", "Mobile", "Debugging"]
 
 # 경력 / 타임라인 (선택)
 experience:
-  - org: "회사명"
-    title: "Client Programmer"
-    period: "20XX.XX — 현재"
-    desc: "주요 업무 요약을 적어주세요."
+  # org(회사명)는 확인 후 채워주세요. (Netmarble 계열 MMORPG 프로젝트)
+  - org: "Netmarble (Sol 프로젝트)"
+    title: "Game Client Developer"
+    period: "2023.02 — 현재"
+    desc: >
+      UE5 기반 MMORPG 'Sol' 클라이언트 개발. 길드·별자리·순례·연구·수집 등 핵심 콘텐츠 시스템을
+      오너십으로 담당하고, 에디터 툴·데이터 파이프라인·UI·네트워크 동기화·성능 최적화를 폭넓게 수행.
+      3년여간 3,000건 이상의 변경을 반영하며 출시 전후 라이브 운영까지 대응.
