@@ -5,3 +5,7 @@ _site/
 vendor/
 Gemfile.lock
 .bundle/
+
+# OMC 상태 / 임시 분석 파일 (포트폴리오와 무관)
+.omc/
+.p4*
