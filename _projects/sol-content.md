@@ -37,8 +37,42 @@ highlights:
 채팅/소셜·파티, 리텐션 리워드(출석/보상), 재화별 세금 정산, 랭킹 등
 라이브 운영에 필요한 시스템을 신규 도입하고 운영 이슈에 대응했습니다.
 
-## 기술
+## 기술 요약
 
-- **UI**: CommonUI 기반 레이어 스택(HUD / Popup / FullScreen / Sequence) 위에서 다수 화면·위젯 구현
-- **네트워크**: Protobuf 직렬화 기반 서버 동기화, 패킷/Schema 변경 대응
-- **데이터**: 메타데이터 주도 설계 — 데이터 테이블/Generated 구조와 연동
+| 영역 | 내용 |
+|------|------|
+| 언어 / 엔진 | C++ · Unreal Engine 5 (커스텀 브랜치) |
+| 매니저 | `USolGameInstanceSubsystem` 기반 Manager (예: `UGuildManager`) — `Get()` 싱글톤, 서버 푸시 수신(`INetworkNotiClientListener`) |
+| 네트워크 | `USolGeoSubsystem` (TCP NetworkClient · WebSocket Noti) · Protobuf 직렬화 |
+| UI | CommonUI(`UCommonActivatableWidget`) · `UPrimaryGameLayout` 레이어 스택 |
+| 데이터 | `MetaDataSubsystem` 메타데이터 테이블 · `RidType` 키 |
+| 엔티티 | `FEntityProxyComponent_*` 로 서버 엔티티 ↔ 액터 컴포넌트 브리지 |
+
+## Manager 구조
+
+서버 푸시(Noti)는 Manager가 수신해 상태를 갱신하고 델리게이트로 UI에 전파합니다.
+사용자 입력은 **UI → Manager → 서버 요청** 순으로 흐릅니다.
+
+<div class="mermaid">
+flowchart TD
+  SV["게임 서버 / API"] -->|"패킷 · Proto · Noti"| GEO["USolGeoSubsystem<br/>NetworkClient · Noti"]
+  GEO -->|"Noti 이벤트"| MGR["Feature Manager<br/>예: UGuildManager<br/>(USolGameInstanceSubsystem)"]
+  META["MetaDataSubsystem"] -->|"메타데이터"| MGR
+  MGR -->|"상태 · 델리게이트"| UI["Feature Screen / Widgets"]
+  UI -->|"사용자 입력"| MGR
+  MGR -->|"요청 전송"| GEO
+</div>
+
+## UI 구조
+
+각 화면은 `UCommonActivatableWidget` 으로, `FGameplayTag` 기반 레이어 스택에 push/pop 됩니다.
+
+<div class="mermaid">
+flowchart TD
+  PGL["UPrimaryGameLayout<br/>(UI 루트)"] --> HUD["UI.Layer.HUD<br/>GeoHUD"]
+  PGL --> FULL["UI.Layer.Full<br/>전체화면 스크린"]
+  PGL --> POPUP["UI.Layer.Popup"]
+  PGL --> MODAL["UI.Layer.Modal<br/>다이얼로그"]
+  PGL --> SEQ["UI.Layer.Sequence"]
+  PGL --> SYS["UI.Layer.SystemMessageLayer"]
+</div>

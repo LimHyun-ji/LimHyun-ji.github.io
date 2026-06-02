@@ -35,3 +35,26 @@ highlights:
 ### Python 자동화
 프로젝트 초기부터 **Python 기반 P4 자동화·단위계 변환·데이터 검증 스크립트**를 작성해
 반복 작업과 휴먼 에러를 줄이고 데이터 워크플로를 정비했습니다.
+
+## 기술 요약
+
+| 영역 | 내용 |
+|------|------|
+| 언어 | C++ · Python |
+| 에디터 | UE5 Editor Module(`SolEditor`) · `UDeveloperSettings` |
+| 자동화 | Commandlet 기반 CI(Jenkins) · P4 자동화 스크립트 |
+| 데이터 | 메타데이터 Generator · VisualData Editor · `RidType` 키 |
+| 출력 | 검증된 Generated 메타데이터 → 런타임 `MetaDataSubsystem` |
+
+## 파이프라인 구조
+
+원본 데이터가 에디터 툴·Commandlet을 거쳐 **검증·생성·배포**되는 자동화 흐름입니다.
+
+<div class="mermaid">
+flowchart LR
+  SRC["원본 데이터<br/>Excel · 에셋 · 레벨"] --> TOOL["에디터 툴<br/>AreaTool · Generator"]
+  TOOL --> CMD["Commandlet<br/>(CI 자동 실행)"]
+  CMD --> VAL["검증 · Export"]
+  VAL --> GEN["Generated 메타데이터<br/>(RidType 키)"]
+  GEN --> RT["런타임<br/>MetaDataSubsystem"]
+</div>

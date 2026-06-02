@@ -26,3 +26,26 @@ highlights:
 ### 라이브 품질 대응
 - 미니맵 깜빡임, 채팅 RichText, 순례 보상 정산, 장비 중복 착용 등 **다수의 현상·크래시 이슈** 분석·수정
 - **Jira 티켓 연계** 워크플로로 라이브 빌드의 회귀를 추적하고 핫픽스를 반영
+
+## 기술 요약
+
+| 영역 | 내용 |
+|------|------|
+| UI 성능 | Slate Invalidation Panel · UIParticle `volatile` 제어 · Side Effect 정리 |
+| 렌더링 | Actor Culling · Mipmap(ForceMipStreaming) 동적 제어 |
+| 코드 | 최적화 BP → C++ 이전 · Tweener 의존 제거 |
+| 품질 | Jira 연계 크래시·회귀 추적 (전체 변경의 약 30%) |
+
+## 최적화 흐름
+
+증가하는 렌더링·갱신 비용을 세 갈래로 나눠 절감했습니다.
+
+<div class="mermaid">
+flowchart TD
+  COST["렌더링 / 갱신 비용 증가"] --> A["UI Invalidation<br/>위젯 갱신 최소화"]
+  COST --> B["Culling<br/>화면 밖 액터 제외"]
+  COST --> C["Mipmap 스트리밍<br/>동적 제어"]
+  A --> RES["프레임 비용 절감"]
+  B --> RES
+  C --> RES
+</div>
