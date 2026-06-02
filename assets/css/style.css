@@ -177,7 +177,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 /* ───────────── Mermaid diagram ───────────── */
 .mermaid {
   margin: 18px 0 28px; padding: 18px;
-  background: #ffffff;
+  background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 12px;
   text-align: center; overflow-x: auto;
