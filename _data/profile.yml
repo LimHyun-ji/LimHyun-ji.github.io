@@ -5,11 +5,13 @@
 # 상단 히어로 영역
 name: "임현지"
 role: "Game Client Developer"
-headline: "Unreal Engine으로 MMORPG 클라이언트를 만듭니다."
+headline: "신입 툴 개발자에서 출발해 콘텐츠 오너십·인게임 연출·라이브 최적화까지 영역을 넓혀온 UE5 클라이언트 개발자입니다."
 intro: >
   Unreal Engine 5(C++) 기반 MMORPG 클라이언트 개발자입니다.
-  길드·별자리·순례·연구·수집 등 다수의 게임 콘텐츠 시스템을 장기간 오너십으로 담당하며,
-  에디터 툴·데이터 파이프라인부터 UI·네트워크 동기화·퍼포먼스 최적화까지 폭넓게 작업합니다.
+  신입 합류 직후 데이터 파이프라인을 단독으로 구축한 것을 시작으로, 길드·별자리·순례·연구·수집 등
+  다수의 콘텐츠 시스템을 여러 해에 걸쳐 반복 소유하며 설계 → 구현 → 리팩토링 → 라이브 운영 전 주기를 책임졌습니다.
+  RenderTarget·SceneCapture·LevelSequence 기반 인게임 연출 렌더링과 UI·메모리 최적화까지,
+  엔진 표준 패턴을 이해하고 그 위에 모바일용 보강을 설계하는 방식으로 일합니다.
 
 # 연락 / 링크 (비워두면 버튼이 표시되지 않습니다)
 links:
@@ -21,15 +23,17 @@ links:
 # 보유 기술 — 카테고리별
 skills:
   - category: "Languages"
-    items: ["C++", "C#", "Python", "HLSL"]
+    items: ["C++", "C#", "Python"]
   - category: "Engine / Framework"
-    items: ["Unreal Engine 5", "CommonUI", "Gameplay Ability System", "Slate/UMG"]
+    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence"]
+  - category: "Rendering / FX"
+    items: ["RenderTarget / SceneCapture", "Material / Shader Parameter", "Significance / Tick 관리", "Object Pooling"]
   - category: "Networking"
     items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync"]
   - category: "Tools"
-    items: ["Perforce", "Git", "Visual Studio", "RenderDoc", "Jenkins CI"]
+    items: ["Perforce", "Git", "Visual Studio", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
   - category: "Domains"
-    items: ["콘텐츠 시스템", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "라이브 운영 대응"]
+    items: ["콘텐츠 시스템", "인게임 연출 / 렌더링", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "비동기 디버깅 / 라이브 안정화"]
 
 # 대표 프로젝트
 # ※ 프로젝트는 이제 _projects/*.md 파일로 관리합니다 (클릭 시 상세 페이지로 이동).
@@ -43,6 +47,30 @@ experience:
     title: "Game Client Developer"
     period: "2023.02 — 현재"
     desc: >
-      UE5 기반 MMORPG 'Sol' 클라이언트 개발. 길드·별자리·순례·연구·수집 등 핵심 콘텐츠 시스템을
-      오너십으로 담당하고, 에디터 툴·데이터 파이프라인·UI·네트워크 동기화·성능 최적화를 폭넓게 수행.
-      3년여간 3,000건 이상의 변경을 반영하며 출시 전후 라이브 운영까지 대응.
+      UE5 기반 MMORPG 'Sol' 클라이언트 개발. 신입 합류 → 콘텐츠 오너 → 렌더링/연출 아키텍트 →
+      최적화·라이브까지 매년 영역을 넓히며, 약 1,500건 이상의 변경(CL)을 누적하고 길드 등 핵심 시스템을
+      여러 해에 걸쳐 단독 오너십으로 담당했습니다.
+  - org: "2023 — 신입 / 툴·데이터 + 콘텐츠 오너"
+    title: ""
+    period: "2023"
+    desc: >
+      합류 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 Python 파이프라인을 단독 구축.
+      이후 길드 시스템(130+ CL) 단독 소유, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
+  - org: "2024 — 렌더링 / 시퀀서 연출 아키텍처"
+    title: ""
+    period: "2024"
+    desc: >
+      별자리 룰렛 LevelSequenceActor 동적 생성/파괴, 순례 주사위 RenderTarget·SceneCapture 파이프라인,
+      미니맵 퀘스트 텍스처 렌더링까지 인게임 연출 렌더링을 직접 설계. AreaTool 검증 체인을 Commandlet CI로 전환.
+  - org: "2025 — 에디터 리팩토링 + 신규 시스템 + 최적화"
+    title: ""
+    period: "2025"
+    desc: >
+      VisualData 에디터 대규모 리팩토링(타입별 클래스 분리·AssetMigration 자동화), 세금/리텐션 리워드/액션 카메라 신규 소유,
+      Slate Global Invalidation 동적 제어·위젯 풀링 상한 등 퍼포먼스/메모리 최적화로 영역 확장.
+  - org: "2026 — 라이브 정산 / 안정화"
+    title: ""
+    period: "2026 상반기"
+    desc: >
+      길드 자금 분배(int64 오버플로 대응), 신권 세율, 갓아머 연출 TransformBones, 패킷 압축 최적화 등
+      출시 전후 라이브 운영의 시스템 정밀도와 안정화 작업에 집중.

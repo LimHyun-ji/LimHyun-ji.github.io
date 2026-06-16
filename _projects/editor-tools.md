@@ -1,16 +1,16 @@
 ---
 layout: project
-order: 2
+order: 5
 title: "에디터 툴 & 데이터 파이프라인"
 role: "Tools / Pipeline"
-period: "2023.02 — 현재"
-summary: "콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
+period: "2023.02 — 현재 (입사 직후 ~ 상시)"
+summary: "입사 직후 데이터 코드 생성 파이프라인을 단독 구축한 것을 시작으로, 콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
 tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
 highlights:
-  - "레벨/스폰 데이터 AreaTool 및 Commandlet 기반 CI 자동화(레벨데이터 검증·export)"
-  - "메타데이터 Generator·VisualData Editor 등 데이터 주도 에디터 툴 개발"
-  - "미니맵 데이터 텍스처 변환·퀘스트 인디케이터 파이프라인 구축"
-  - "Python 기반 P4 자동화·단위계 변환·검증 스크립트로 데이터 워크플로 개선"
+  - "입사 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 Python 파이프라인을 단독 구축 (P4 체크인/아웃 자동화·JSON Schema URI 검증·한글 인코딩, CL 2377~3056)"
+  - "레벨/스폰 데이터 AreaTool을 Commandlet 기반 CI로 자동화 — 검증자 체인(RID·이름·NavMesh·폴더·리전)으로 잘못된 데이터의 런타임 유입 차단"
+  - "메타데이터 Generator·VisualData Editor 등 데이터 주도 에디터 툴 개발, VisualData 에디터는 타입별 클래스 분리·AssetMigration 자동화로 대규모 리팩토링"
+  - "Export 시 P4 reconcile로 변경분만 체크아웃되게 연동 — 수동 체크아웃 실수 방지"
 ---
 
 ## 개요
@@ -21,20 +21,24 @@ highlights:
 
 ## 주요 작업
 
+### 데이터 코드 생성 파이프라인 — 입사 첫 3개월, 단독 구축
+합류 직후 가장 먼저 맡은 일이 **데이터 파이프라인 전체를 세우는 것**이었습니다.
+**Excel 원본 → JSON → C++ enum/struct 자동 생성** 흐름을 Python으로 단독 구축하면서,
+Perforce 체크인/아웃 자동화, JSON Schema URI 기반 검증, 리스트 형식(`use_effect[0]/[1]`)·한글 인코딩 처리까지
+직접 정의했습니다(CL 2377~3056). 기획이 Excel만 고치면 검증된 C++ 코드가 자동으로 떨어지는 구조라
+반복 작업과 휴먼 에러를 크게 줄였고, 이후 모든 메타데이터 작업의 토대가 됐습니다.
+
 ### 레벨 / 스폰 데이터 파이프라인 (AreaTool)
 레벨 영역·NPC 스폰·순찰(Patrol) 데이터를 다루는 AreaTool을 개선하고,
 **Commandlet 기반 CI**로 레벨데이터 검증과 export를 자동화해 수작업과 누락을 줄였습니다.
+스폰 데이터는 2D Polygon 편집에서 **3D Point Actor** 편집으로 전환해 저작 UX를 개선했습니다(CL 16683).
 
 ### 데이터 주도 에디터 툴
 메타데이터 Generator, VisualData Editor(캐릭터 외형/소켓 프리뷰) 등
-데이터 주도 설계를 지원하는 에디터 도구를 개발했습니다.
-
-### 미니맵 파이프라인
-미니맵 데이터를 텍스처로 변환하고 퀘스트 인디케이터를 거리 비례로 표시하는 파이프라인을 구축했습니다.
-
-### Python 자동화
-프로젝트 초기부터 **Python 기반 P4 자동화·단위계 변환·데이터 검증 스크립트**를 작성해
-반복 작업과 휴먼 에러를 줄이고 데이터 워크플로를 정비했습니다.
+데이터 주도 설계를 지원하는 에디터 도구를 개발했습니다. VisualData 에디터는 2025년
+EditorModule 이전·PreviewActor 병합·타입별(PC/NPC/FieldObject/Item/Spirit) 클래스 분리·
+`VisualDataInterface` 제거, 구 에셋을 신 타입으로 자동 변환하는 **AssetMigration 툴**까지
+대규모로 리팩토링해 에디터 아키텍처 부채를 일괄 해소했습니다.
 
 ## 기술 요약
 
@@ -89,4 +93,4 @@ TArray<TSharedPtr<IAreaToolValidator>> Validators;
 ```
 `FVisualDataExport`는 NPC/갓아머/정령/필드오브젝트 매핑과 액션 메타데이터를 JSON으로 내보냅니다(`Execute_ExportAssetType(..., bUseP4v)`).
 
-> 참고: 미니맵은 별도 전용 매니저 클래스 없이, 퀘스트 데이터의 텍스처 변환·인디케이터 처리와 NavigationScreenShot 파이프라인의 일부로 다뤘습니다.
+> 미니맵의 RenderTarget 텍스처 변환·퀘스트 인디케이터는 '인게임 연출 & GPU 렌더링 파이프라인' 페이지에서 다룹니다.
