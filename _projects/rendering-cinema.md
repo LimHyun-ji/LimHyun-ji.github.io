@@ -1,6 +1,6 @@
 ---
 layout: project
-order: 2
+order: 3
 title: "인게임 연출 & GPU 렌더링 파이프라인"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"

@@ -8,9 +8,9 @@ role: "Game Client Developer"
 headline: "신입 툴 개발자에서 출발해 콘텐츠 오너십·인게임 연출·라이브 최적화까지 영역을 넓혀온 UE5 클라이언트 개발자입니다."
 intro: >
   Unreal Engine 5(C++) 기반 MMORPG 클라이언트 개발자입니다.
-  신입 합류 직후 데이터 파이프라인을 단독으로 구축한 것을 시작으로, 길드·별자리·순례·연구·수집 등
-  다수의 콘텐츠 시스템을 여러 해에 걸쳐 반복 소유하며 설계 → 구현 → 리팩토링 → 라이브 운영 전 주기를 책임졌습니다.
-  RenderTarget·SceneCapture·LevelSequence 기반 인게임 연출 렌더링과 UI·메모리 최적화까지,
+  전투/액션 데이터와 결합해 각 캐릭터에 외형을 세팅·로드하는 VisualData 캐릭터 비주얼 데이터 시스템을 핵심으로 담당하고,
+  길드·별자리·순례·수집 등 다수의 콘텐츠 시스템을 여러 해에 걸쳐 반복 소유하며 설계 → 구현 → 리팩토링 → 라이브 운영 전 주기를 책임졌습니다.
+  RenderTarget·SceneCapture·LevelSequence 기반 인게임 연출 렌더링과 UI·메모리·틱 최적화까지,
   엔진 표준 패턴을 이해하고 그 위에 모바일용 보강을 설계하는 방식으로 일합니다.
 
 # 연락 / 링크 (비워두면 버튼이 표시되지 않습니다)
@@ -25,7 +25,9 @@ skills:
   - category: "Languages"
     items: ["C++", "C#", "Python"]
   - category: "Engine / Framework"
-    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence"]
+    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / SkeletalMesh"]
+  - category: "VisualData / 캐릭터"
+    items: ["캐릭터 비주얼 데이터 시스템", "파츠·Override Material·어태치먼트", "액션/전투 데이터 연동", "비동기 로드 · LOD 제어"]
   - category: "Rendering / FX"
     items: ["RenderTarget / SceneCapture", "Material / Shader Parameter", "Significance / Tick 관리", "Object Pooling"]
   - category: "Networking"
@@ -33,7 +35,7 @@ skills:
   - category: "Tools"
     items: ["Perforce", "Git", "Visual Studio", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
   - category: "Domains"
-    items: ["콘텐츠 시스템", "인게임 연출 / 렌더링", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "비동기 디버깅 / 라이브 안정화"]
+    items: ["VisualData / 캐릭터 데이터", "콘텐츠 시스템", "인게임 연출 / 렌더링", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "비동기 디버깅 / 라이브 안정화"]
 
 # 대표 프로젝트
 # ※ 프로젝트는 이제 _projects/*.md 파일로 관리합니다 (클릭 시 상세 페이지로 이동).

@@ -1,6 +1,6 @@
 ---
 layout: project
-order: 4
+order: 5
 title: "UI 아키텍처 분석 — Layer · Container · WidgetPool"
 role: "Client Developer"
 period: "구조 분석 문서"

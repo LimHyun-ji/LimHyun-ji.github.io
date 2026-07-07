@@ -1,6 +1,6 @@
 ---
 layout: project
-order: 5
+order: 6
 title: "에디터 툴 & 데이터 파이프라인"
 role: "Tools / Pipeline"
 period: "2023.02 — 현재 (입사 직후 ~ 상시)"
