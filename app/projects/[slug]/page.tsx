@@ -1,0 +1,48 @@
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import { getProject, getSlugs } from '@/lib/content';
+import Mermaid from '@/components/Mermaid';
+
+export function generateStaticParams() {
+  return getSlugs().map((slug) => ({ slug }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }) {
+  const proj = getProject(params.slug);
+  return { title: `${proj.title} · 임현지`, robots: { index: false, follow: false } };
+}
+
+export default function ProjectPage({ params }: { params: { slug: string } }) {
+  const proj = getProject(params.slug);
+
+  return (
+    <article className="project-detail">
+      <Link className="back" href="/#projects">← 프로젝트 목록</Link>
+
+      <header className="detail-head">
+        <p className="eyebrow">{proj.role}{proj.period ? ` · ${proj.period}` : ''}</p>
+        <h1>{proj.title}</h1>
+        {proj.summary && <p className="headline">{proj.summary}</p>}
+        {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
+      </header>
+
+      {proj.highlights && (
+        <>
+          <h2>주요 작업</h2>
+          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{h}</li>)}</ul>
+        </>
+      )}
+
+      <div className="detail-body">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+          {proj.body}
+        </ReactMarkdown>
+      </div>
+
+      <Link className="back bottom" href="/#projects">← 프로젝트 목록으로</Link>
+      <Mermaid />
+    </article>
+  );
+}

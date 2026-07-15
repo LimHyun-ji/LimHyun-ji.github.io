@@ -1,14 +1,22 @@
+# dependencies / build
+node_modules/
+.next/
+out/
+
+# misc
+.DS_Store
+*.log
+.env*
+
+# 구 Jekyll 잔재 (푸시 제외)
 _site/
 .jekyll-cache/
-.jekyll-metadata
-.sass-cache/
 vendor/
-Gemfile.lock
 .bundle/
+Gemfile
+Gemfile.lock
 
-# OMC 상태 / 임시 분석 파일 (포트폴리오와 무관)
+# OMC 상태 / 로컬 스크립트
 .omc/
 .p4*
-
-# 로컬 운영 스크립트 (공개/잠금 토글 — 커밋·서빙 금지)
 site-*.bat

@@ -1,0 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap');
+@import './base.css';
+
+/* react-markdown 출력이 Jekyll(kramdown)과 동일 클래스(.detail-body) 아래에서 렌더되도록 보강 */
+.detail-body img { max-width: 100%; height: auto; }
+.detail-body pre { overflow-x: auto; }
+.detail-body table { display: block; overflow-x: auto; }
+.mermaid { overflow-x: auto; }
