@@ -53,22 +53,23 @@ export default function Home() {
       {/* SIDE PROJECTS (하단, 이미지 포함) */}
       <section className="side" id="side">
         <h2 className="section-h">Side Projects</h2>
+        <p className="section-note">개인·학습·팀 프로젝트 ({sideProjects.length}) — Notion 포트폴리오 기반</p>
         <div className="side-grid">
           {sideProjects.map((sp) => (
             <article className="sp-card" key={sp.title}>
               <div className="sp-hero">
-                <img src={sp.images[0]} alt={sp.title} loading="lazy" />
+                <img src={sp.image} alt={sp.title} loading="lazy" />
+                <span className="sp-engine">{sp.engine}</span>
               </div>
               <div className="sp-body">
-                <div className="sp-head">
-                  <h3>{sp.title}</h3>
-                  <span className="sp-meta">{sp.engine} · {sp.meta}</span>
-                </div>
+                <h3>{sp.title}</h3>
                 <p className="sp-sub">{sp.subtitle}</p>
                 <p className="sp-desc">{sp.desc}</p>
                 <ul className="chips small">{sp.tags.map((t) => <li key={t}>{t}</li>)}</ul>
-                <div className="sp-thumbs">
-                  {sp.images.slice(1).map((img) => <img key={img} src={img} alt="" loading="lazy" />)}
+                <div className="sp-links">
+                  {sp.links.video && <a href={sp.links.video} target="_blank" rel="noopener">▶ 영상</a>}
+                  {sp.links.git && <a href={sp.links.git} target="_blank" rel="noopener">GitHub</a>}
+                  {sp.links.doc && <a href={sp.links.doc} target="_blank" rel="noopener">기술소개서</a>}
                 </div>
               </div>
             </article>
