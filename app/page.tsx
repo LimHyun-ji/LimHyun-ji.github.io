@@ -1,32 +1,85 @@
 import Link from 'next/link';
 import { getProfile, getProjects } from '@/lib/content';
+import { sideProjects } from '@/lib/sideProjects';
 
 export default function Home() {
   const p = getProfile();
-  const projects = getProjects();
+  const areas = getProjects(); // Sol 내 세부 영역(5)
 
   return (
     <>
+      {/* NAV */}
+      <nav className="nav">
+        <a className="nav-brand" href="#top">임현지</a>
+        <div className="nav-links">
+          <a href="#sol">Sol</a>
+          <a href="#side">Side Projects</a>
+          <a href="#skills">Skills</a>
+          {p.links?.github && <a href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
+        </div>
+      </nav>
+
       {/* HERO */}
-      <section className="hero">
-        <div className="hero-inner">
-          <p className="eyebrow">{p.role}</p>
-          <h1>{p.name}</h1>
-          <p className="headline">{p.headline}</p>
-          <p className="intro">{p.intro}</p>
-          <div className="actions">
-            {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
-            {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
-            {p.links?.linkedin && <a className="btn ghost" href={p.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>}
-            {p.links?.blog && <a className="btn ghost" href={p.links.blog} target="_blank" rel="noopener">Blog</a>}
-          </div>
+      <header className="lead" id="top">
+        <p className="lead-eyebrow">{p.role}</p>
+        <h1 className="lead-name">{p.name}</h1>
+        <p className="lead-headline">{p.headline}</p>
+        <p className="lead-intro">{p.intro}</p>
+        <div className="lead-actions">
+          {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
+          {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
+        </div>
+      </header>
+
+      {/* FEATURED — SOL (메인 프로젝트, 크게) */}
+      <section className="featured" id="sol">
+        <div className="featured-tag">Featured Project</div>
+        <h2 className="featured-title">Sol — UE5 MMORPG</h2>
+        <p className="featured-sub">
+          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 데이터 시스템, 인게임 연출 렌더링,
+          퍼포먼스 최적화, 다수 콘텐츠 시스템을 <strong>4년간 오너십</strong>으로 담당.
+        </p>
+        <div className="area-grid">
+          {areas.map((a) => (
+            <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>
+              <h3>{a.title}<span className="arrow"> →</span></h3>
+              <p>{a.summary}</p>
+              {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* SIDE PROJECTS (하단, 이미지 포함) */}
+      <section className="side" id="side">
+        <h2 className="section-h">Side Projects</h2>
+        <div className="side-grid">
+          {sideProjects.map((sp) => (
+            <article className="sp-card" key={sp.title}>
+              <div className="sp-hero">
+                <img src={sp.images[0]} alt={sp.title} loading="lazy" />
+              </div>
+              <div className="sp-body">
+                <div className="sp-head">
+                  <h3>{sp.title}</h3>
+                  <span className="sp-meta">{sp.engine} · {sp.meta}</span>
+                </div>
+                <p className="sp-sub">{sp.subtitle}</p>
+                <p className="sp-desc">{sp.desc}</p>
+                <ul className="chips small">{sp.tags.map((t) => <li key={t}>{t}</li>)}</ul>
+                <div className="sp-thumbs">
+                  {sp.images.slice(1).map((img) => <img key={img} src={img} alt="" loading="lazy" />)}
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       {/* SKILLS */}
       {p.skills && (
-        <section className="block">
-          <h2>Skills</h2>
+        <section className="block" id="skills">
+          <h2 className="section-h">Skills</h2>
           <div className="skills">
             {p.skills.map((g) => (
               <div className="skill-group" key={g.category}>
@@ -38,30 +91,10 @@ export default function Home() {
         </section>
       )}
 
-      {/* PROJECTS */}
-      {projects.length > 0 && (
-        <section className="block" id="projects">
-          <h2>Projects</h2>
-          <div className="projects">
-            {projects.map((proj) => (
-              <Link className="card card-link" href={`/projects/${proj.slug}/`} key={proj.slug}>
-                <header>
-                  <h3>{proj.title}<span className="arrow" aria-hidden="true"> →</span></h3>
-                  <span className="meta">{proj.role}{proj.period ? ` · ${proj.period}` : ''}</span>
-                </header>
-                <p className="summary">{proj.summary}</p>
-                {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
-                <span className="more">자세히 보기 →</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* EXPERIENCE */}
       {p.experience && (
-        <section className="block">
-          <h2>Experience</h2>
+        <section className="block" id="exp">
+          <h2 className="section-h">Experience</h2>
           <div className="timeline">
             {p.experience.map((e, i) => (
               <div className="tl-item" key={i}>
