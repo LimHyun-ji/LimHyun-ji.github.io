@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getProfile, getProjects } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
+import HeroParticles from '@/components/HeroParticles';
 
 export default function Home() {
   const p = getProfile();
@@ -20,16 +21,19 @@ export default function Home() {
       </nav>
 
       {/* HERO */}
-      <header className="lead" id="top">
-        <p className="lead-eyebrow">{p.role}</p>
-        <h1 className="lead-name">{p.name}</h1>
-        <p className="lead-headline">{p.headline}</p>
-        <p className="lead-intro">{p.intro}</p>
-        <div className="lead-actions">
-          {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
-          {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
-        </div>
-      </header>
+      <div className="hero-wrap">
+        <HeroParticles />
+        <header className="lead" id="top">
+          <p className="lead-eyebrow">{p.role}</p>
+          <h1 className="lead-name">{p.name}</h1>
+          <p className="lead-headline">{p.headline}</p>
+          <p className="lead-intro">{p.intro}</p>
+          <div className="lead-actions">
+            {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
+            {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
+          </div>
+        </header>
+      </div>
 
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
