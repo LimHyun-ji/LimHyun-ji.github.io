@@ -32,8 +32,18 @@
 .lead-intro { font-size: 16px; line-height: 1.75; opacity: .8; margin: 0 0 26px; }
 .lead-actions { display: flex; gap: 12px; }
 
+/* ───────────── 풀 와이드 레이아웃 ───────────── */
+main { max-width: none; width: 100%; margin: 0; padding: 0; }
+.block { max-width: 1600px; margin: 0 auto; padding: 44px clamp(20px, 5vw, 48px); }
+.project-detail { max-width: 1080px; margin: 0 auto; padding: 100px clamp(20px, 5vw, 40px) 40px; }
+
+/* 코드 분석 기반 아키텍처 다이어그램 (draw.io → SVG) */
+.detail-body img.diagram, img.diagram { display: block; width: 100%; max-width: 880px;
+  margin: 10px auto 26px; border-radius: 14px; }
+.arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px 0 14px; }
+
 /* FEATURED — Sol */
-.featured { max-width: 1360px; margin: 0 auto; padding: 40px clamp(20px, 5vw, 48px);
+.featured { max-width: 1600px; margin: 0 auto; padding: 40px clamp(20px, 5vw, 48px);
   border-top: 1px solid var(--line); }
 .featured-tag { display: inline-block; color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
 .featured-title { font-size: clamp(30px, 5vw, 46px); margin: 0 0 14px; font-weight: 800; letter-spacing: -.5px; }
@@ -47,7 +57,7 @@
 .area-card .arrow { color: var(--accent); }
 
 /* SIDE PROJECTS (12개 컴팩트 그리드) */
-.side { max-width: 1360px; margin: 0 auto; padding: 50px clamp(20px, 5vw, 48px); border-top: 1px solid var(--line); }
+.side { max-width: 1600px; margin: 0 auto; padding: 50px clamp(20px, 5vw, 48px); border-top: 1px solid var(--line); }
 .section-h { font-size: clamp(24px, 4vw, 34px); font-weight: 800; margin: 0 0 6px; letter-spacing: -.5px; }
 .section-note { margin: 0 0 24px; font-size: 13px; opacity: .6; }
 .side-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }

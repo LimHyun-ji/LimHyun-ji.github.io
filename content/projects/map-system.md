@@ -80,12 +80,4 @@ CurrentStrategy->ApplyMapTexture(WisMapViewer->GetActiveWidget(), MapTexture);
 
 ## 맵 표시 흐름
 
-<div class="mermaid">
-flowchart LR
-  POS["플레이어 위치"] --> MPC["MPC SetScalar(X/Y/Zoom)"]
-  MPC --> MAT["미니맵 머티리얼<br/>(위치·퀘스트 GPU 표시)"]
-  IN["터치 · 마우스휠"] --> IP["FSolWidgetInputProcessor"]
-  IP --> ZD["Zoom / Drag (경계 제한)"]
-  ZD --> IMG["영역 이미지 SoftObjectPtr 로드"]
-  IMG --> VIEW["월드맵 표시"]
-</div>
+<img class="diagram" src="/images/diagrams/map-system.svg" alt="실시간 위치 기반 맵: 플레이어 위치 → MPC SetScalar(X/Y/Zoom) → 미니맵 머티리얼, 터치·마우스휠 → FSolWidgetInputProcessor → Zoom/Drag → 영역 이미지 로드 → 월드맵 표시" />

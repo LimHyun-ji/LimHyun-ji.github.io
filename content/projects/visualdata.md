@@ -141,13 +141,4 @@ private:
 
 ## 데이터 흐름
 
-<div class="mermaid">
-flowchart LR
-  VGD["VisualGameData<br/>(액션·전투 데이터)"] --> COMP["UVisualDataModuleComponent<br/>(전 엔티티 공통)"]
-  COMP --> MOD["타입별 모듈<br/>PC · NPC · Spirit · Item …"]
-  MOD --> LOAD["비동기 로드<br/>(StreamableManager)"]
-  LOAD --> RULE["전이 규칙<br/>Full / Partial / No"]
-  RULE --> APPLY["파츠·어태치먼트·FX 적용"]
-  APPLY --> VIS["로드 완료 → EntityVisibility 표시"]
-  EVT["전투/액션 이벤트"] -. OnEvent .-> MOD
-</div>
+<img class="diagram" src="/images/diagrams/visualdata-flow.svg" alt="VisualData 데이터 흐름: VisualGameData → 컴포넌트 → 타입별 모듈 → 비동기 로드 → 전이 규칙 → 적용 → EntityVisibility 표시, 전투 이벤트는 OnEvent로 모듈에 전달" />

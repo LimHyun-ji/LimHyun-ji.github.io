@@ -100,11 +100,4 @@ Source/SolEditor/VisualDataEditor/EditorTransformBonesComponent  // 에디터 �
 
 ## 연출 렌더링 흐름
 
-<div class="mermaid">
-flowchart LR
-  DATA["연출 트리거<br/>(룰렛 결과 · 주사위 · 퀘스트)"] --> SEQ["LevelSequenceActor<br/>런타임 생성 + binding"]
-  SEQ --> CAP["SceneCapture2D<br/>3D → RenderTarget"]
-  CAP --> UI["UI 위젯에 합성"]
-  SEQ --> DONE["연출 종료"]
-  DONE --> FREE["시퀀스 액터 파괴 · 캡처 Visible off"]
-</div>
+<img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
