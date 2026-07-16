@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 774 504" width="774" height="504" font-family="Inter, 'Malgun Gothic', sans-serif">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7787a2"/></marker><marker id="arrowo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#7787a2" stroke-width="1.3"/></marker></defs>
+<rect x="0.5" y="0.5" width="773" height="503" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">아웃게임 — 서버 Noti → Manager → UI (Manager 패턴)</text>
+<line x1="83.0" y1="90" x2="83.0" y2="484" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="266.0" y1="90" x2="266.0" y2="484" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="458.5" y1="90" x2="458.5" y2="484" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="638.5" y1="90" x2="638.5" y2="484" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<rect x="24" y="52" width="118" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="83.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">서버</text>
+<rect x="176" y="52" width="180" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="266.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">UNetworkNotiClient</text>
+<rect x="390" y="52" width="137" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="458.5" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">UGuildManager</text>
+<rect x="561" y="52" width="155" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="638.5" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">CommonUI Widget</text>
+<line x1="83.0" y1="108.0" x2="266.0" y2="108.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="174.5" y="102.0" text-anchor="middle" font-size="10.5" fill="#475569">NotifyEvt 푸시 (WebSocket)</text>
+<line x1="266.0" y1="154.0" x2="458.5" y2="154.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="362.2" y="148.0" text-anchor="middle" font-size="10.5" fill="#475569">OnNotiServerEventReceived()</text>
+<path d="M 458.5 200.0 h 46 v 20 h -46" fill="none" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="512.5" y="203.0" font-size="10.5" fill="#475569">상태 갱신 (GuildNotify)</text>
+<line x1="458.5" y1="246.0" x2="638.5" y2="246.0" stroke="#7787a2" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#arrowo)"/>
+<text x="548.5" y="240.0" text-anchor="middle" font-size="10.5" fill="#475569">OnGuildDonation.Broadcast()</text>
+<line x1="638.5" y1="292.0" x2="458.5" y2="292.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="548.5" y="286.0" text-anchor="middle" font-size="10.5" fill="#475569">RequestGuildDonation() 사용자 입력</text>
+<line x1="458.5" y1="338.0" x2="266.0" y2="338.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="362.2" y="332.0" text-anchor="middle" font-size="10.5" fill="#475569">ProcessRequest() 요청 전송</text>
+<line x1="266.0" y1="384.0" x2="83.0" y2="384.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="174.5" y="378.0" text-anchor="middle" font-size="10.5" fill="#475569">요청</text>
+<line x1="83.0" y1="430.0" x2="266.0" y2="430.0" stroke="#7787a2" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#arrowo)"/>
+<text x="174.5" y="424.0" text-anchor="middle" font-size="10.5" fill="#475569">결과 재푸시</text>
+</svg>

@@ -137,6 +137,87 @@ def emit(slug, title, nodes, edges):
         f.write(build_drawio(title, nodes, edges))
     print("emitted", slug)
 
+# ── 시퀀스 다이어그램 (participants + 순서 있는 messages) ─────────
+# participants: [label, ...]  (left→right)
+# messages: [{"frm","to","label","ret"(bool)}]
+HEAD_Y, HEAD_H, MSG_TOP, MSG_STEP = 52, 38, 108, 46
+
+def _seq_layout(participants):
+    xs, cx, boxes = 24, [], []
+    for p in participants:
+        w = max(int(len(p) * 8.6) + 26, 118)
+        boxes.append((xs, w)); cx.append(xs + w / 2); xs += w + 34
+    return boxes, cx, xs + 24  # boxes, centers, total width
+
+def seq_svg(title, participants, messages):
+    boxes, cx, W = _seq_layout(participants)
+    H = MSG_TOP + max(1, len(messages)) * MSG_STEP + 28
+    life_bottom = H - 20
+    P = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="Inter, \'Malgun Gothic\', sans-serif">']
+    P.append('<defs>'
+             f'<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="{EDGE}"/></marker>'
+             f'<marker id="arrowo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="{EDGE}" stroke-width="1.3"/></marker>'
+             '</defs>')
+    P.append(f'<rect x="0.5" y="0.5" width="{W-1}" height="{H-1}" rx="14" fill="{CARD_BG}" stroke="{CARD_BORDER}"/>')
+    P.append(f'<text x="20" y="30" font-size="14" font-weight="700" fill="{TITLE}">{esc(title)}</text>')
+    # lifelines
+    for c in cx:
+        P.append(f'<line x1="{c:.1f}" y1="{HEAD_Y+HEAD_H}" x2="{c:.1f}" y2="{life_bottom}" stroke="{CARD_BORDER}" stroke-width="1.3" stroke-dasharray="4 5"/>')
+    # participant headers
+    fill, stroke = PAL["core"]
+    for (x, w), p in zip(boxes, participants):
+        P.append(f'<rect x="{x}" y="{HEAD_Y}" width="{w}" height="{HEAD_H}" rx="8" fill="{fill}" stroke="{stroke}" stroke-width="1.5"/>')
+        P.append(f'<text x="{x+w/2:.1f}" y="{HEAD_Y+HEAD_H/2+4:.1f}" text-anchor="middle" font-size="12" font-weight="600" fill="{TEXT}">{esc(p)}</text>')
+    # messages
+    for i, m in enumerate(messages):
+        y = MSG_TOP + i * MSG_STEP
+        a = participants.index(m["frm"]); b = participants.index(m["to"])
+        ret = m.get("ret"); dash = ' stroke-dasharray="6 4"' if ret else ""
+        mk = "url(#arrowo)" if ret else "url(#arrow)"
+        if a == b:  # self message loop
+            x = cx[a]
+            P.append(f'<path d="M {x:.1f} {y:.1f} h 46 v 20 h -46" fill="none" stroke="{EDGE}" stroke-width="1.4"{dash} marker-end="{mk}"/>')
+            P.append(f'<text x="{x+54:.1f}" y="{y+3:.1f}" font-size="10.5" fill="#475569">{esc(m["label"])}</text>')
+        else:
+            x1, x2 = cx[a], cx[b]
+            P.append(f'<line x1="{x1:.1f}" y1="{y:.1f}" x2="{x2:.1f}" y2="{y:.1f}" stroke="{EDGE}" stroke-width="1.4"{dash} marker-end="{mk}"/>')
+            P.append(f'<text x="{(x1+x2)/2:.1f}" y="{y-6:.1f}" text-anchor="middle" font-size="10.5" fill="#475569">{esc(m["label"])}</text>')
+    P.append("</svg>")
+    return "\n".join(P)
+
+def seq_drawio(name, participants, messages):
+    boxes, cx, W = _seq_layout(participants)
+    H = MSG_TOP + max(1, len(messages)) * MSG_STEP + 28
+    life_bottom = H - 20
+    fill, stroke = PAL["core"]
+    cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
+    for i, ((x, w), p) in enumerate(zip(boxes, participants)):
+        cells.append(f'<mxCell id="p{i}" value="{esc(p)}" style="rounded=1;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};fontColor={TEXT};fontSize=12;" vertex="1" parent="1"><mxGeometry x="{x}" y="{HEAD_Y}" width="{w}" height="{HEAD_H}" as="geometry"/></mxCell>')
+        c = cx[i]
+        cells.append(f'<mxCell id="l{i}" style="endArrow=none;dashed=1;html=1;strokeColor={CARD_BORDER};" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="{c:.0f}" y="{HEAD_Y+HEAD_H}" as="sourcePoint"/><mxPoint x="{c:.0f}" y="{life_bottom:.0f}" as="targetPoint"/></mxGeometry></mxCell>')
+    for i, m in enumerate(messages):
+        y = MSG_TOP + i * MSG_STEP
+        a = participants.index(m["frm"]); b = participants.index(m["to"])
+        ret = m.get("ret")
+        style = f"html=1;endArrow={'open' if ret else 'block'};{'dashed=1;' if ret else ''}strokeColor={EDGE};fontSize=10;fontColor=#475569;"
+        if a == b:
+            x = cx[a]
+            cells.append(f'<mxCell id="m{i}" value="{esc(m["label"])}" style="{style}" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="{x:.0f}" y="{y}" as="sourcePoint"/><mxPoint x="{x+46:.0f}" y="{y+20}" as="targetPoint"/></mxGeometry></mxCell>')
+        else:
+            cells.append(f'<mxCell id="m{i}" value="{esc(m["label"])}" style="{style}" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="{cx[a]:.0f}" y="{y}" as="sourcePoint"/><mxPoint x="{cx[b]:.0f}" y="{y}" as="targetPoint"/></mxGeometry></mxCell>')
+    body = "".join(cells)
+    return (f'<mxfile host="app.diagrams.net"><diagram name="{esc(name)}">'
+            f'<mxGraphModel dx="900" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" '
+            f'arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">'
+            f'<root>{body}</root></mxGraphModel></diagram></mxfile>')
+
+def emit_seq(slug, title, participants, messages):
+    with open(os.path.join(OUT_SVG, slug + ".svg"), "w", encoding="utf-8") as f:
+        f.write(seq_svg(title, participants, messages))
+    with open(os.path.join(OUT_DRAWIO, slug + ".drawio"), "w", encoding="utf-8") as f:
+        f.write(seq_drawio(title, participants, messages))
+    print("emitted (seq)", slug)
+
 # ═══════════════════════════════════════════════════════════════
 # D1. Sol 클라이언트 전체 아키텍처
 # ═══════════════════════════════════════════════════════════════
@@ -165,45 +246,100 @@ emit("sol-architecture", "Sol 클라이언트 아키텍처 — 서버 · 코어 
 # ═══════════════════════════════════════════════════════════════
 # D2. VisualData 데이터 흐름
 # ═══════════════════════════════════════════════════════════════
-d2_nodes = [
-    N("vgd",  "VisualGameData\n액션·전투 데이터",          60, 64, 200, 54, "data"),
-    N("comp", "UVisualDataModuleComponent\n전 엔티티 공통", 320, 64, 260, 54, "entity"),
-    N("mod",  "타입별 모듈\nPC · NPC · Spirit · Item …",    320, 158, 260, 54, "core"),
-    N("load", "비동기 로드\nStreamableManager",             60, 158, 200, 54, "core"),
-    N("rule", "전이 규칙\nFull / Partial / No",             60, 252, 200, 54, "manager"),
-    N("apply","파츠·어태치먼트·FX 적용",                    320, 252, 260, 54, "manager"),
-    N("vis",  "로드 완료 → EntityVisibility 표시",          320, 346, 260, 50, "ui"),
-    N("evt",  "전투/액션 이벤트",                           60, 346, 200, 50, "server"),
-]
-d2_edges = [
-    dict(src="vgd", dst="comp", label="세팅"),
-    dict(src="comp", dst="mod", label="생성"),
-    dict(src="mod", dst="load", label="에셋"),
-    dict(src="load", dst="rule"),
-    dict(src="rule", dst="apply", label="갱신 범위"),
-    dict(src="apply", dst="vis"),
-    dict(src="evt", dst="mod", label="OnEvent", dashed=True),
-]
-emit("visualdata-flow", "VisualData — 데이터 → 모듈 → 부분 갱신 → 표시", d2_nodes, d2_edges)
+emit_seq("visualdata-flow", "VisualData — 캐릭터 비주얼 데이터 로드 흐름",
+  ["AppearanceComponent", "VisualDataModuleComponent", "FVisualDataModulePC", "USolAssetManager", "SkeletalMeshComponent", "FPCModuleAttachment"],
+  [
+    {"frm":"AppearanceComponent","to":"VisualDataModuleComponent","label":"SetVisualGameData()"},
+    {"frm":"VisualDataModuleComponent","to":"VisualDataModuleComponent","label":"EvaluateTransitionRule / CreateModule"},
+    {"frm":"VisualDataModuleComponent","to":"FVisualDataModulePC","label":"ApplyModule(TransitionRule)"},
+    {"frm":"FVisualDataModulePC","to":"USolAssetManager","label":"LoadAssets() 비동기"},
+    {"frm":"USolAssetManager","to":"FVisualDataModulePC","label":"OnPCAsyncAssetsLoaded","ret":True},
+    {"frm":"FVisualDataModulePC","to":"SkeletalMeshComponent","label":"SetSkeletalMesh (파츠·머티리얼)"},
+    {"frm":"FVisualDataModulePC","to":"FPCModuleAttachment","label":"Attach (무기·방어구·헬멧)"},
+    {"frm":"FVisualDataModulePC","to":"VisualDataModuleComponent","label":"OnCompleted.Broadcast","ret":True},
+    {"frm":"VisualDataModuleComponent","to":"AppearanceComponent","label":"OnModuleLoaded.Broadcast","ret":True},
+  ])
 
 # ═══════════════════════════════════════════════════════════════
 # D4. 인게임 연출 파이프라인
 # ═══════════════════════════════════════════════════════════════
-d4_nodes = [
-    N("trig", "연출 트리거\n룰렛 · 주사위 · 퀘스트",   60, 150, 200, 56, "server"),
-    N("pl",   "PocketLevel Instance\n인게임과 분리된 공간", 320, 64, 250, 56, "core"),
-    N("seq",  "LevelSequenceActor\n런타임 생성 + binding",  320, 158, 250, 56, "core"),
-    N("cap",  "SceneCapture2D → RenderTarget",             320, 252, 250, 50, "entity"),
-    N("uic",  "UI 위젯에 합성",                            630, 252, 190, 50, "ui"),
-    N("end",  "연출 종료 → Actor 파괴 · 캡처 off",         320, 346, 250, 50, "manager"),
+emit_seq("cinema-pipeline", "인게임 연출 — 별자리 룰렛/순례 연출 라이프사이클",
+  ["CinemaConstellationManager", "CineConstellationRoulette", "PocketLevelSubsystem", "ALevelSequenceActor", "SceneCapture2D"],
+  [
+    {"frm":"CinemaConstellationManager","to":"PocketLevelSubsystem","label":"SpawnPocketLevel (연출 공간 구성)"},
+    {"frm":"CinemaConstellationManager","to":"CineConstellationRoulette","label":"Appear(PointRid) 트리거"},
+    {"frm":"CineConstellationRoulette","to":"CinemaConstellationManager","label":"CreateLevelSeqActor(SoftObjectPtr)"},
+    {"frm":"CinemaConstellationManager","to":"ALevelSequenceActor","label":"SetSequence(LoadSynchronous) 비동기"},
+    {"frm":"CineConstellationRoulette","to":"ALevelSequenceActor","label":"Play() (PlaySequence)"},
+    {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(true) → RenderTarget → UI 합성"},
+    {"frm":"ALevelSequenceActor","to":"CineConstellationRoulette","label":"OnFinished","ret":True},
+    {"frm":"CineConstellationRoulette","to":"CinemaConstellationManager","label":"DestroyLevelSeqActors()"},
+    {"frm":"CinemaConstellationManager","to":"ALevelSequenceActor","label":"Stop() + Destroy() (메모리 해제)"},
+    {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(false) 연출 종료"},
+  ])
+
+# ── 최적화: 오브젝트 풀 대여→반납 (freed-tick 방지) ─────────────
+emit_seq("optimization-pool", "퍼포먼스 — 오브젝트 풀 대여→반납 (Tick 제어 크래시 방지)",
+  ["호출부(Gameplay)", "UObjectPoolSubsystem", "Subpool", "풀 Actor(IObjectPooledActor)"],
+  [
+    {"frm":"호출부(Gameplay)","to":"UObjectPoolSubsystem","label":"Pull(Class)"},
+    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"Inactive에서 최근 사용 우선 탐색"},
+    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"SetPoolActorHidden(false) — Tick 복원"},
+    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"OnPulledFromPool()"},
+    {"frm":"UObjectPoolSubsystem","to":"호출부(Gameplay)","label":"Actor 반환","ret":True},
+    {"frm":"호출부(Gameplay)","to":"UObjectPoolSubsystem","label":"Push(Actor)"},
+    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"Active→Inactive 이동"},
+    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"SetPoolActorHidden(true) — Tick 先비활성화 (freed-tick 방지)"},
+    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"ShrinkPool() — 초과분 Destroy"},
+  ])
+
+# ── 아웃게임: 서버 Noti → Manager → UI (Manager 패턴) ──────────
+emit_seq("outgame-noti", "아웃게임 — 서버 Noti → Manager → UI (Manager 패턴)",
+  ["서버", "UNetworkNotiClient", "UGuildManager", "CommonUI Widget"],
+  [
+    {"frm":"서버","to":"UNetworkNotiClient","label":"NotifyEvt 푸시 (WebSocket)"},
+    {"frm":"UNetworkNotiClient","to":"UGuildManager","label":"OnNotiServerEventReceived()"},
+    {"frm":"UGuildManager","to":"UGuildManager","label":"상태 갱신 (GuildNotify)"},
+    {"frm":"UGuildManager","to":"CommonUI Widget","label":"OnGuildDonation.Broadcast()","ret":True},
+    {"frm":"CommonUI Widget","to":"UGuildManager","label":"RequestGuildDonation() 사용자 입력"},
+    {"frm":"UGuildManager","to":"UNetworkNotiClient","label":"ProcessRequest() 요청 전송"},
+    {"frm":"UNetworkNotiClient","to":"서버","label":"요청"},
+    {"frm":"서버","to":"UNetworkNotiClient","label":"결과 재푸시","ret":True},
+  ])
+
+# ── 라이브: 별자리 룰렛 결과 불일치 레이스와 해결 ──────────────
+emit_seq("live-race", "라이브 — 별자리 룰렛 결과 불일치 레이스와 해결",
+  ["서버(Notify)", "NetworkNotiClient", "ConstellationManager", "룰렛 연출", "결과 확정"],
+  [
+    {"frm":"룰렛 연출","to":"서버(Notify)","label":"point/grow 요청 + 로컬 연출 선진행"},
+    {"frm":"서버(Notify)","to":"NetworkNotiClient","label":"WebSocket 결과 비동기 도착 (시점 불확정)","ret":True},
+    {"frm":"NetworkNotiClient","to":"ConstellationManager","label":"OnNotiServerEventReceived(kPointGrow)","ret":True},
+    {"frm":"ConstellationManager","to":"룰렛 연출","label":"SetResultWithAngle()","ret":True},
+    {"frm":"룰렛 연출","to":"룰렛 연출","label":"[경합] 전이 전 도착=미반영 / Spinning 중=각도 튐"},
+    {"frm":"룰렛 연출","to":"결과 확정","label":"[버그] 로컬 착지 슬롯으로 산정 → 불일치","ret":True},
+    {"frm":"룰렛 연출","to":"결과 확정","label":"[수정] 확정 기준을 서버 SelectedSlotIndex 단일화"},
+    {"frm":"결과 확정","to":"룰렛 연출","label":"Notify 수신까지 Spinning 유지 후 확정","ret":True},
+    {"frm":"룰렛 연출","to":"ConstellationManager","label":"OnRouletteSpinFinished(서버 결과)","ret":True},
+  ])
+
+# ── 데이터 파이프라인 (관계도) ────────────────────────────────
+dp_nodes = [
+    N("cmdlet","Export Commandlet\n(UAreaToolExport · CI/Jenkins)", 40, 64, 210, 56, "core"),
+    N("src",   "원본 데이터\nExcel · 에셋 · 레벨",                  40, 150, 210, 56, "data"),
+    N("gen",   "AreaTool Generator\n(FAreaToolJsonGenerator)",       300, 107, 190, 56, "ui"),
+    N("val",   "검증자 체인\nRid·Name·NavMesh·Folder·Region",       300, 214, 220, 56, "core"),
+    N("exp",   "Export + P4 Reconcile\n(SaveAndReconcile)",          560, 214, 200, 56, "core"),
+    N("out",   "Generated 메타데이터\n(RidType 키)",                 560, 107, 200, 56, "data"),
+    N("rt",    "런타임\nUMetadataSubsystem",                         800, 107, 180, 56, "manager"),
 ]
-d4_edges = [
-    dict(src="trig", dst="pl"),
-    dict(src="pl", dst="seq", label="레벨 구성"),
-    dict(src="seq", dst="cap", label="SoftObjectPtr 로드"),
-    dict(src="cap", dst="uic", label="3D→UI"),
-    dict(src="seq", dst="end", dashed=True),
+dp_edges = [
+    dict(src="cmdlet", dst="gen", label="Main() 실행"),
+    dict(src="src", dst="gen", label="원본 로드"),
+    dict(src="gen", dst="val", label="Validate()"),
+    dict(src="val", dst="exp", label="통과 시 Export()"),
+    dict(src="exp", dst="out", label="JSON·P4"),
+    dict(src="out", dst="rt", label="기동 시 로드"),
 ]
-emit("cinema-pipeline", "인게임 연출 — PocketLevel · Sequence · SceneCapture", d4_nodes, d4_edges)
+emit("pipeline-flow", "데이터 파이프라인 — 검증·생성·배포 자동화", dp_nodes, dp_edges)
 
 print("\nDONE. SVG →", os.path.normpath(OUT_SVG), "| drawio →", os.path.normpath(OUT_DRAWIO))

@@ -37,13 +37,8 @@ highlights:
 
 증상 대응에서 끝내지 않고 **Jira 티켓과 연계해 회귀까지 추적**했습니다. 출시 전후 라이브 국면에서 전체 변경의 평균 약 1/3을 버그·크래시·현상 수정에 투입하며 라이브 안정성에 상시 기여했습니다.
 
-## 안정화 흐름
+## 별자리 룰렛 레이스 — 시퀀스로 본 원인과 해결
 
-<div class="mermaid">
-flowchart LR
-  RUN["라이브 / 다양한 환경"] --> SYMP["증상 · 크래시 리포트"]
-  SYMP --> TRACE["로그 타임라인 대조<br/>(비동기·순서 의존성 특정)"]
-  TRACE --> FIX["원인 단위 구조적 차단"]
-  FIX --> JIRA["Jira 회귀 추적 · 핫픽스"]
-  JIRA --> STABLE["동일 유형 재발 방지"]
-</div>
+WebSocket Notify 도착 시점과 연출 상태 전이의 순서 의존성이 만든 레이스, 그리고 **결과 확정을 서버 기준으로 일원화**한 해결을 시퀀스로 정리했습니다.
+
+<img class="diagram" src="/images/diagrams/live-race.svg" alt="별자리 룰렛 결과 불일치 레이스 시퀀스: 로컬 연출 선진행 vs 서버 Notify 비동기 도착 순서 의존성 → 로컬 착지 슬롯 산정 버그 → 서버 SelectedSlotIndex 단일 기준으로 확정 수정" />

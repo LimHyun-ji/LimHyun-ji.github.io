@@ -62,14 +62,7 @@ EditorModule 이전·PreviewActor 병합·타입별(PC/NPC/FieldObject/Item/Spir
 
 원본 데이터가 에디터 툴·Commandlet을 거쳐 **검증·생성·배포**되는 자동화 흐름입니다.
 
-<div class="mermaid">
-flowchart LR
-  SRC["원본 데이터<br/>Excel · 에셋 · 레벨"] --> TOOL["에디터 툴<br/>AreaTool · Generator"]
-  TOOL --> CMD["Commandlet<br/>(CI 자동 실행)"]
-  CMD --> VAL["검증 · Export"]
-  VAL --> GEN["Generated 메타데이터<br/>(RidType 키)"]
-  GEN --> RT["런타임<br/>MetaDataSubsystem"]
-</div>
+<img class="diagram" src="/images/diagrams/pipeline-flow.svg" alt="데이터 파이프라인 관계도: 원본(Excel·에셋·레벨)→AreaTool Generator→검증자 체인→Export+P4 Reconcile→Generated 메타데이터(RidType)→런타임 MetadataSubsystem, Commandlet(CI)이 실행" />
 
 ## 핵심 구현
 

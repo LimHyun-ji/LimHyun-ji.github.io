@@ -174,9 +174,23 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .detail-body p { color: var(--text); margin: 0 0 14px; }
 .detail-body ul { color: var(--text); padding-left: 20px; }
 .detail-body li { margin-bottom: 6px; }
-.detail-body code {
+/* 인라인 코드 */
+.detail-body :not(pre) > code {
   background: var(--accent-soft); color: var(--accent);
-  padding: 2px 6px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+  padding: 2px 6px; border-radius: 5px;
+  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 0.9em;
+}
+
+/* 코드 블록 — Rider 기본 폰트(JetBrains Mono), 다크 에디터 스타일 */
+.detail-body pre {
+  margin: 16px 0 26px; padding: 16px 18px; overflow-x: auto;
+  background: #0B1512; border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(63,214,154,.04);
+}
+.detail-body pre code {
+  display: block; background: none; color: #d7e2db; padding: 0; border-radius: 0;
+  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.82rem; line-height: 1.75; white-space: pre; tab-size: 4;
 }
 
 /* ───────────── Mermaid diagram ───────────── */

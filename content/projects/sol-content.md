@@ -56,15 +56,7 @@ highlights:
 
 서버 푸시(Noti)는 Manager가 단일 창구로 수신해 상태를 갱신하고 델리게이트로 UI에 전파합니다. 사용자 입력은 **UI → Manager → 서버 요청** 순으로 흐릅니다.
 
-<div class="mermaid">
-flowchart TD
-  SV["게임 서버 / API"] -->|"패킷 · Proto · Noti"| GEO["USolGeoSubsystem"]
-  GEO -->|"Noti 이벤트"| MGR["Feature Manager<br/>예: UGuildManager"]
-  META["MetaDataSubsystem"] -->|"메타데이터"| MGR
-  MGR -->|"상태 · 델리게이트"| UI["Feature Screen / Widgets"]
-  UI -->|"사용자 입력"| MGR
-  MGR -->|"요청 전송"| GEO
-</div>
+<img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="아웃게임 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
 ## 시스템별 핵심 설계
 
