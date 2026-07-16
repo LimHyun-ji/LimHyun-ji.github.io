@@ -153,8 +153,8 @@ NewHandle = UAssetManager::GetStreamableManager().RequestSyncLoad(Path, false);
 
 > 풀링·비동기 로드가 맞물려 발생하는 freed-tick 크래시 등 **재현 어려운 라이브 크래시의 추적·차단**은 [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/)에서 다룹니다.
 
-## 오브젝트 풀 대여→반납 시퀀스
+## 최적화 기법 한눈에
 
-가장 신경 쓴 액터 풀링의 런타임 흐름입니다. 반납 시 **Tick을 먼저 비활성화**해 freed-tick 크래시를 구조적으로 차단합니다.
+프레임·메모리 비용을 UI 렌더링 · Tick 제어 · 메모리 관리 세 축으로 나눠 접근했습니다.
 
-<img class="diagram" src="/images/diagrams/optimization-pool.svg" alt="오브젝트 풀 대여→반납 시퀀스: Pull→SetPoolActorHidden(false)·Tick 복원→반환, Push→SetPoolActorHidden(true)·Tick 先비활성화→ShrinkPool" />
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·풀스크린 렌더링 중지), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC·약참조·지연로드)" />

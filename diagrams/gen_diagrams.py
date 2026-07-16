@@ -246,19 +246,24 @@ emit("sol-architecture", "Sol 클라이언트 아키텍처 — 서버 · 코어 
 # ═══════════════════════════════════════════════════════════════
 # D2. VisualData 데이터 흐름
 # ═══════════════════════════════════════════════════════════════
-emit_seq("visualdata-flow", "VisualData — 캐릭터 비주얼 데이터 로드 흐름",
-  ["AppearanceComponent", "VisualDataModuleComponent", "FVisualDataModulePC", "USolAssetManager", "SkeletalMeshComponent", "FPCModuleAttachment"],
-  [
-    {"frm":"AppearanceComponent","to":"VisualDataModuleComponent","label":"SetVisualGameData()"},
-    {"frm":"VisualDataModuleComponent","to":"VisualDataModuleComponent","label":"EvaluateTransitionRule / CreateModule"},
-    {"frm":"VisualDataModuleComponent","to":"FVisualDataModulePC","label":"ApplyModule(TransitionRule)"},
-    {"frm":"FVisualDataModulePC","to":"USolAssetManager","label":"LoadAssets() 비동기"},
-    {"frm":"USolAssetManager","to":"FVisualDataModulePC","label":"OnPCAsyncAssetsLoaded","ret":True},
-    {"frm":"FVisualDataModulePC","to":"SkeletalMeshComponent","label":"SetSkeletalMesh (파츠·머티리얼)"},
-    {"frm":"FVisualDataModulePC","to":"FPCModuleAttachment","label":"Attach (무기·방어구·헬멧)"},
-    {"frm":"FVisualDataModulePC","to":"VisualDataModuleComponent","label":"OnCompleted.Broadcast","ret":True},
-    {"frm":"VisualDataModuleComponent","to":"AppearanceComponent","label":"OnModuleLoaded.Broadcast","ret":True},
-  ])
+vd_nodes = [
+    N("vgd",   "VisualGameData\n액션·전투 데이터",                        40, 66, 210, 56, "data"),
+    N("comp",  "UVisualDataModuleComponent\n전 엔티티 부착",              300, 66, 280, 58, "entity"),
+    N("parts", "파츠 SkeletalMesh 맵\nMaster·Face·Torso·Helmet·Wing·Cape", 630, 60, 250, 66, "data"),
+    N("base",  "FVisualDataModuleBase\n경량 TSharedPtr · ModuleCast RTTI", 300, 182, 280, 56, "core"),
+    N("pc",    "FVisualDataModulePC",                                     170, 296, 210, 50, "core"),
+    N("others","NPC · Spirit · Item · FieldObject · Totem 모듈",           430, 296, 300, 50, "core"),
+    N("attach","FPCModuleAttachment\nWeapon · Armor · Helmet (소켓)",      170, 400, 250, 56, "manager"),
+]
+vd_edges = [
+    dict(src="vgd", dst="comp", label="세팅"),
+    dict(src="comp", dst="parts", label="TMap"),
+    dict(src="comp", dst="base", label="현재 모듈 보유"),
+    dict(src="base", dst="pc", label="상속"),
+    dict(src="base", dst="others", label="상속"),
+    dict(src="pc", dst="attach", label="소켓 부착"),
+]
+emit("visualdata-flow", "VisualData — 컴포넌트 · 타입별 모듈 · 어태치먼트 구조", vd_nodes, vd_edges)
 
 # ═══════════════════════════════════════════════════════════════
 # D4. 인게임 연출 파이프라인
@@ -278,20 +283,26 @@ emit_seq("cinema-pipeline", "인게임 연출 — 별자리 룰렛/순례 연출
     {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(false) 연출 종료"},
   ])
 
-# ── 최적화: 오브젝트 풀 대여→반납 (freed-tick 방지) ─────────────
-emit_seq("optimization-pool", "퍼포먼스 — 오브젝트 풀 대여→반납 (Tick 제어 크래시 방지)",
-  ["호출부(Gameplay)", "UObjectPoolSubsystem", "Subpool", "풀 Actor(IObjectPooledActor)"],
-  [
-    {"frm":"호출부(Gameplay)","to":"UObjectPoolSubsystem","label":"Pull(Class)"},
-    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"Inactive에서 최근 사용 우선 탐색"},
-    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"SetPoolActorHidden(false) — Tick 복원"},
-    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"OnPulledFromPool()"},
-    {"frm":"UObjectPoolSubsystem","to":"호출부(Gameplay)","label":"Actor 반환","ret":True},
-    {"frm":"호출부(Gameplay)","to":"UObjectPoolSubsystem","label":"Push(Actor)"},
-    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"Active→Inactive 이동"},
-    {"frm":"UObjectPoolSubsystem","to":"풀 Actor(IObjectPooledActor)","label":"SetPoolActorHidden(true) — Tick 先비활성화 (freed-tick 방지)"},
-    {"frm":"UObjectPoolSubsystem","to":"Subpool","label":"ShrinkPool() — 초과분 Destroy"},
-  ])
+# ── 최적화: 기법 맵 (관계도) ──────────────────────────────────
+opt_nodes = [
+    N("root",  "퍼포먼스 / 메모리 최적화",                          310, 48, 250, 46, "manager"),
+    N("ui",    "UI 렌더링 (Slate)",                                 40, 132, 240, 46, "ui"),
+    N("tick",  "Tick 제어",                                         310, 132, 240, 46, "core"),
+    N("mem",   "메모리 관리",                                       580, 132, 260, 46, "entity"),
+    N("ui1",   "Global Invalidation 동적 토글 · ForceVolatile",     40, 212, 240, 52, "data"),
+    N("ui2",   "풀스크린 시 인게임 렌더링 중지",                     40, 282, 240, 48, "data"),
+    N("tick1", "Significance 거리별 Tick",                          310, 212, 240, 48, "data"),
+    N("tick2", "상태별 Tick 비활성화",                              310, 278, 240, 48, "data"),
+    N("mem1",  "오브젝트 풀링 — Tick 先비활성화\n(freed-tick 방지)", 580, 212, 260, 56, "data"),
+    N("mem2",  "명시적 GC · 약참조 · 지연 로드",                     580, 286, 260, 48, "data"),
+]
+opt_edges = [
+    dict(src="root", dst="ui"), dict(src="root", dst="tick"), dict(src="root", dst="mem"),
+    dict(src="ui", dst="ui1"), dict(src="ui1", dst="ui2"),
+    dict(src="tick", dst="tick1"), dict(src="tick1", dst="tick2"),
+    dict(src="mem", dst="mem1"), dict(src="mem1", dst="mem2"),
+]
+emit("optimization-map", "퍼포먼스 최적화 — 기법 한눈에", opt_nodes, opt_edges)
 
 # ── 아웃게임: 서버 Noti → Manager → UI (Manager 패턴) ──────────
 emit_seq("outgame-noti", "아웃게임 — 서버 Noti → Manager → UI (Manager 패턴)",
