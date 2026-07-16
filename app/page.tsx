@@ -37,7 +37,7 @@ export default function Home() {
 
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
-        <div className="featured-tag">Featured Project</div>
+        <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
         <h2 className="featured-title">Sol — UE5 MMORPG</h2>
         <p className="featured-sub">
           커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템·퍼포먼스 최적화·
@@ -56,8 +56,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SIDE PROJECTS (하단, 이미지 포함) */}
-      <section className="side" id="side">
+      {/* SIDE PROJECTS (하단, 별도 밴드로 명확히 분리) */}
+      <section className="side-band" id="side">
+       <div className="side-inner">
+        <div className="featured-tag">▚ Side Projects · 사이드 프로젝트</div>
         <h2 className="section-h">Side Projects</h2>
         <p className="section-note">개인·학습·팀 프로젝트 ({sideProjects.length}) — Notion 포트폴리오 기반</p>
         <div className="side-grid">
@@ -81,6 +83,7 @@ export default function Home() {
             </article>
           ))}
         </div>
+       </div>
       </section>
 
       {/* SKILLS */}
