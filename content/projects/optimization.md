@@ -1,21 +1,21 @@
 ---
 layout: project
-order: 4
-title: "퍼포먼스 최적화 & 메모리 관리"
-role: "Client Developer"
+order: 2
+title: "퍼포먼스 / 메모리 최적화 (핵심 담당)"
+role: "Client Developer · 핵심 담당"
 period: "상시"
-summary: "모바일 타겟 성능과 라이브 빌드 안정성을 위해 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화. 라이브 안정화에 상시 비중을 두어 전체 변경의 평균 약 1/3(연도별 30~38%, Perforce CL 커밋 분류 기준)이 버그·크래시·현상 수정."
-tags: ["Optimization", "Memory", "Mobile", "Slate", "Debugging"]
+summary: "‘보이지 않는 것은 그리지 않는다’를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
+tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling"]
 highlights:
-  - "Global Invalidation을 UI 레이어 단위로 동적 토글해 Slate 재계산 비용 절감"
-  - "Significance 기반 거리별 Tick 제어 + 상태별 Tick 비활성화로 런타임 비용 축소"
-  - "액터 풀링 + 명시적 GC + 약참조 수명관리로 할당·GC 압력·댕글링 동시 해결"
-  - "데미지 표시를 BP→C++ 이벤트 릴레이로 재설계하고 컨테이너 풀링 적용"
+  - "Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
+  - "풀스크린 UI로 전환 시 인게임 Rendering을 중지해 GPU 비용 절감"
+  - "위젯/액터 오브젝트 풀링(용량 상한 FIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
+  - "약참조(TWeakObjectPtr·CreateWeakLambda) 수명 관리와 소프트 참조 지연 로드로 댕글링·GC 압력 동시 해결"
 ---
 
-> **목적** — 모바일 타겟의 프레임·메모리·안정성 상시 개선
-> **성과** — UI 재계산 비용↓, 액터 풀링 freed-tick 크래시 근본 차단, 라이브 안정화 상시 기여
-> **기여** — Global Invalidation 동적 토글, 액터 풀링 틱 제어, 데미지 표시 BP→C++ 재설계, 비동기 디버깅
+> **목적** — 모바일 타겟의 프레임·메모리 비용 상시 절감
+> **성과** — UI 재계산·GPU 비용↓, 풀링으로 CPU 비용↓, GC 스파이크·댕글링 구조적 차단
+> **기여** — Global Invalidation 동적 토글, 풀스크린 렌더링 중지, 액터 풀링·명시적 GC, 약참조 수명관리
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
@@ -39,6 +39,16 @@ bool bUseGlobalInvalidation = false;
 .ForceVolatile(true)  // 동적 콘텐츠 캐싱 이슈 방지를 위해 항상 volatile
 ```
 게임 진입/종료 시에는 전역 토글로 로딩 중 UI 재계산을 줄였습니다 (`GeoGameMode.cpp:177`/`:218`).
+
+### 풀스크린 UI 전환 시 인게임 렌더링 중지
+전체 화면 UI(인벤토리·상점 등)로 전환하면 인게임 3D 화면은 어차피 가려집니다. 그래서 화면 뒤 월드를 계속 그리지 않도록, 렌더링 중지 사유를 한곳에서 관리하는 서브시스템으로 뷰포트 렌더링을 껐습니다 — 모바일 GPU 비용을 크게 줄인 지점입니다.
+```cpp
+// UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
+bIsDisableRenderingOnFullScreen = SolActivatableWidget->IsDisableViewportRenderingOnFullScreen();
+USolDisableGameRenderingSubsystem::Get()
+    ->SetReason(ESolDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
+```
+어떤 화면이 렌더링을 멈출지는 위젯 데이터로 선택하고, 중지 사유는 서브시스템이 취합해 하나라도 남아 있으면 켜지 않도록 관리합니다.
 
 ## 2. Tick / 렌더 패스 비용 절감
 
@@ -141,27 +151,16 @@ NewHandle = UAssetManager::GetStreamableManager().RequestSyncLoad(Path, false);
 
 ---
 
-## 5. 비동기 / 레이스 컨디션 디버깅 — 재현 어려운 버그 추적
-
-라이브 MMORPG에서 가장 까다로운 건 **재현이 어려운 비동기·플랫폼 한정 크래시**입니다. 증상에서 멈추지 않고 원인을 찾아 **구조적으로 차단**한 사례들입니다.
-
-**① 별자리 룰렛 서버-클라 결과 불일치 (CL 30065)** — WebSocket Notify 도착 시점과 연출 상태 전이 사이의 **타이밍 레이스**. 로그 타임라인 대조로 순서 의존성을 특정하고 서버 Notify 단일 기준으로 일원화 — 추적 과정은 [인게임 연출 페이지](/projects/rendering-cinema/) 참고.
-
-**② 액터 풀링 freed-tick 크래시** (위 4-3 항목 참고)
-- 증상: 풀에서 꺼낸 액터가 드물게 죽은 메모리 접근으로 크래시.
-- 원인: 액터만 숨기고 컴포넌트 틱을 끄지 않아, Niagara `bAutoDestroy`로 자기 파괴된 컴포넌트가 freed 후에도 틱.
-- 해결: 풀 입출고 시 **모든 컴포넌트 틱까지 토글**(`ObjectPoolSubsystem.cpp:313-332`).
-
-이 밖에 미니맵 깜빡임(NaN 방어), 채팅 RichText, 순례 보상 정산, 장비 중복 착용/미장착 슬롯, 모바일 한정 인원 표시 제한 크래시(SB-8358) 등 **다수의 현상·크래시**를 **Jira 티켓 연계(SL-/SB-/SM7-)** 로 회귀까지 추적해 핫픽스했습니다.
+> 풀링·비동기 로드가 맞물려 발생하는 freed-tick 크래시 등 **재현 어려운 라이브 크래시의 추적·차단**은 [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/)에서 다룹니다.
 
 ## 최적화 흐름 한눈에
 
 <div class="mermaid">
 flowchart TD
-  COST["프레임 / 메모리 비용 증가"] --> UI["UI: Global Invalidation 동적 토글 · ForceVolatile"]
+  COST["프레임 / 메모리 비용 증가"] --> UI["UI: Global Invalidation · ForceVolatile · 풀스크린 렌더링 중지"]
   COST --> TICK["Tick: Significance 거리별 · 상태별 비활성화"]
   COST --> MEM["메모리: 풀링 · 명시적 GC · 약참조 · 지연로드"]
-  UI --> RES["프레임/메모리 비용 절감 · 크래시 감소"]
+  UI --> RES["프레임/메모리 비용 절감"]
   TICK --> RES
   MEM --> RES
 </div>

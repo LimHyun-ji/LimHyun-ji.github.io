@@ -1,21 +1,27 @@
 ---
 layout: project
-order: 3
-title: "인게임 연출 & GPU 렌더링 파이프라인"
+order: 4
+title: "인게임 연출 & 비동기 에셋 로딩"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
-summary: "RenderTarget·SceneCapture·LevelSequence를 직접 제어해 3D 오브젝트를 UI에 합성하고, 룰렛·주사위·연출 시퀀스를 런타임에 생성·파괴하는 인게임 연출 렌더링 파이프라인을 설계."
-tags: ["RenderTarget", "SceneCapture", "LevelSequence", "Sequencer", "Niagara", "Mobile"]
+summary: "PocketLevel Instance로 인게임과 분리된 연출 공간을 구성하고, LevelSequence·SceneCapture·RenderTarget을 연출 구간에만 살려 모바일 비용을 낮춘 인게임 연출 파이프라인을 설계."
+tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "Niagara", "Mobile"]
 highlights:
-  - "별자리 룰렛: ALevelSequenceActor를 진입 시 동적 생성·종료 시 파괴하고 SoftObjectPtr로 시퀀스를 비동기 로드 (UCinemaConstellationManager)"
-  - "순례 주사위: SceneCapture2D로 3D 주사위를 RenderTarget에 캡처해 UI에 합성, 연출 중에만 캡처를 Visible 토글해 모바일 비용 절감 (ACinePilgrimageManager)"
-  - "미니맵 퀘스트 인디케이터: 퀘스트 데이터를 RenderTarget 텍스처로 변환해 Material Parameter로 전달하는 GPU 기반 표시"
+  - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 비동기 연출 공간 제공"
+  - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 비동기 로드"
+  - "3D 오브젝트를 SceneCapture2D로 RenderTarget에 캡처해 UI에 합성, 연출 구간에만 캡처를 Visible 토글해 모바일 GPU 비용 절감"
   - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
 ---
 
-> **목적** — 3D를 UI에 합성하고 연출 시퀀스를 런타임 생성·파괴하는 렌더링 파이프라인
-> **성과** — 연출 구간 한정으로 모바일 GPU/메모리 비용↓, 서버-클라 레이스(CL 30065) 구조적 해결
-> **기여** — 별자리 룰렛 LevelSequence 동적 제어, 순례 주사위 SceneCapture, 미니맵·갓아머 직접 설계
+> **목적** — 인게임과 분리된 연출 공간을 비동기로 띄우고 연출 구간에만 자원을 쓰는 파이프라인
+> **성과** — PocketLevel·시퀀스·캡처 수명을 연출 구간에 한정해 모바일 GPU/메모리 비용↓
+> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture, 갓아머 연출 직접 설계
+
+## 0. PocketLevel — 인게임과 분리된 연출 공간
+
+별자리·순례 같은 큰 연출은 인게임 월드 안에서 바로 돌리지 않고, **PocketLevel Instance로 인게임과 분리된 별도 공간에 레벨을 구성**해 그 안에서 `LevelSequence`로 재생합니다. 인게임 상태와 섞이지 않는 독립 연출 공간을 비동기로 띄우는 방식입니다.
+
+핵심은 **수명 동적 제어**입니다. `LevelSequence`가 내려갈 때 그 안의 Actor들도 모두 메모리에서 함께 내려가도록 만들어, 연출이 끝나면 연출용 자원이 남지 않습니다. 아래 별자리·순례가 이 원칙 위에서 동작합니다.
 
 ## 1. 별자리 룰렛 — LevelSequence 동적 생성/파괴
 
@@ -43,15 +49,7 @@ ALevelSequenceActor* PlaySequence(TSoftObjectPtr<ULevelSequence> LevelSequence, 
 void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 ```
 
-### 트러블슈팅 — 룰렛 서버-클라 결과 불일치 (CL 30065)
-
-**증상.** 룰렛 결과가 서버와 클라이언트에서 **간헐적으로 다르게 표시**되는 문제가 보고됐습니다. 항상 발생하는 게 아니라 어쩌다 한 번씩 어긋나는 유형이라, 같은 조작을 반복해도 재현이 되지 않아 추적이 어려웠습니다.
-
-**추적.** 룰렛 결과에 관여하는 두 축 — **WebSocket Notify 도착 시점**과 **룰렛 연출 상태 전이 시점** — 에 각각 로그를 심고 타임라인을 대조했습니다. 그 결과 Notify가 연출 상태 전이의 **전/중/후 어느 시점에 도착하느냐에 따라 최종 표시 결과가 갈리는 순서 의존성**을 확인했습니다. "간헐적"으로 보였던 이유가 사실은 두 비동기 이벤트의 도착 순서 차이였던 것입니다.
-
-**원인.** 클라이언트가 결과를 **연출 상태를 기준으로 확정**하고 있었습니다. 서버 Notify는 네트워크 사정에 따라 연출 진행 중 어느 시점에든 도착할 수 있는데, 그 도착 타이밍이 연출 상태와 엮이면서 레이스가 생긴 구조였습니다.
-
-**해결.** 결과 확정을 **서버 Notify 단일 기준으로 일원화**하고, 연출 상태 전이 순서를 고정했습니다. Notify가 언제 도착하든 결과는 항상 같은 기준으로 확정되므로, **순서 의존성 자체가 제거되어 동일 유형의 불일치를 구조적으로 차단**했습니다.
+> 룰렛 결과가 서버-클라에서 **간헐적으로 다르게 표시**되던 레이스 컨디션(WebSocket Notify 도착 시점 × 연출 상태 전이 순서 의존성)의 추적·해결 과정은 [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/)에서 자세히 다룹니다.
 
 ## 2. 순례 주사위 — SceneCapture로 3D를 UI에 합성
 
@@ -78,15 +76,11 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 
 같은 SceneCapture-전용 + 모바일 PostProcess off 패턴은 대화 연출 렌더러(`DialogueRenderer`)에도 적용했습니다(`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기).
 
-## 3. 미니맵 퀘스트 인디케이터 — 데이터 → RenderTarget 텍스처
+> 미니맵·월드맵의 실시간 위치 기반 표시(MPC·RenderTarget·InputProcessor)는 별도 [실시간 위치 기반 맵 페이지](/projects/map-system/)에서 다룹니다.
 
-퀘스트·심볼 데이터를 **RenderTarget 텍스처로 변환**해 미니맵 머티리얼 파라미터로 넘기고, NPC 아이콘은 ObjectPool로 재사용했습니다. 파티원·스쿼드 표시는 Entity 기반으로 전환했습니다(SB-6754).
+## 3. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
 
-운영 중 **아이콘 텍스처가 간헐적으로 깜빡이는 증상**이 있었는데, 원인은 비동기 Mip 스트리밍으로 아이콘 텍스처의 **저해상 Mip이 먼저 표시**되다가 고해상 Mip으로 교체되는 과정이 깜빡임으로 보이는 것이었습니다. 미니맵 아이콘처럼 작고 항상 보이는 텍스처는 스트리밍 이득이 없다고 판단해 **원본 Mip0을 직접 사용**하도록 바꾸고, 함께 발견된 좌표 NaN 유입에 방어 코드를 더해 해소했습니다.
-
-## 4. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
-
-갓아머/PC 연출은 런타임에 본 트랜스폼을 계산해 AnimBP와 연동하는 `TransformBonesComponent`를 신규 설계했습니다(에디터 프리뷰용 `EditorTransformBonesComponent`까지 분리). 연출 시퀀스의 Niagara 잔상은 풀 반납(`ReleaseToPool`)으로는 남는 문제가 있어 **`Deactivate`로 교체**해 정리했습니다(SL-15180, SL-17092).
+갓아머/PC 연출은 런타임에 본 트랜스폼을 계산해 AnimBP와 연동하는 `TransformBonesComponent`를 신규 설계했습니다(에디터 프리뷰용 `EditorTransformBonesComponent`까지 분리). 연출 시퀀스의 Niagara 잔상은 풀 반납(`ReleaseToPool`)으로는 남는 문제가 있어 **`Deactivate`로 교체**해 정리했습니다.
 
 ```
 Source/Sol/Entity/Character/TransformBonesComponent.{h,cpp}      // 런타임

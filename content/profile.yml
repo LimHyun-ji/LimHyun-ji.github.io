@@ -25,15 +25,15 @@ skills:
   - category: "Languages"
     items: ["C++", "C#", "Python"]
   - category: "Engine / Framework"
-    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / SkeletalMesh"]
+    items: ["Unreal Engine 5", "Unity", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / SkeletalMesh"]
   - category: "VisualData / 캐릭터"
     items: ["캐릭터 비주얼 데이터 시스템", "파츠·Override Material·어태치먼트", "액션/전투 데이터 연동", "비동기 로드 · LOD 제어"]
   - category: "Rendering / FX"
     items: ["RenderTarget / SceneCapture", "Material / Shader Parameter", "Significance / Tick 관리", "Object Pooling"]
   - category: "Networking"
-    items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync"]
+    items: ["TCP Socket", "WebSocket", "HTTP API", "Protobuf", "Client-Server Sync"]
   - category: "Tools"
-    items: ["Perforce", "Git", "Visual Studio", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
+    items: ["Perforce", "Git", "SCM Manager", "Visual Studio", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
   - category: "Domains"
     items: ["VisualData / 캐릭터 데이터", "콘텐츠 시스템", "인게임 연출 / 렌더링", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "비동기 디버깅 / 라이브 안정화"]
 
@@ -44,20 +44,19 @@ skills:
 
 # 경력 / 타임라인 (선택)
 experience:
-  # org(회사명)는 확인 후 채워주세요. (Netmarble 계열 MMORPG 프로젝트)
-  - org: "Netmarble (Sol 프로젝트)"
+  - org: "알트나인 · Sol (넷마블 계열 MMORPG)"
     title: "Game Client Developer"
-    period: "2023.02 — 현재"
+    period: "2023.01 — 현재 (약 3년 6개월)"
     desc: >
-      UE5 기반 MMORPG 'Sol' 클라이언트 개발. 신입 합류 → 콘텐츠 오너 → 렌더링/연출 아키텍트 →
-      최적화·라이브까지 매년 영역을 넓히며, 1,500건 이상의 변경(Perforce CL 기준)을 누적하고 길드 등 핵심 시스템을
+      UE5(C++) 기반 모바일·PC MMORPG 'Sol' 클라이언트 개발. 신입 합류 → 콘텐츠 오너 → 연출/렌더링 →
+      최적화·라이브 안정화까지 매년 영역을 넓히며, VisualData 캐릭터 시스템과 길드 등 핵심 시스템을
       여러 해에 걸쳐 단독 오너십으로 담당했습니다.
   - org: "2023 — 신입 / 툴·데이터 + 콘텐츠 오너"
     title: ""
     period: "2023"
     desc: >
-      합류 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 Python 파이프라인을 단독 구축.
-      이후 길드 시스템(130+ CL, Perforce 기준) 단독 소유, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
+      합류 첫 3개월에 Excel↔JSON↔C++ enum/struct 자동 생성 Python 파이프라인을 단독 구축.
+      이후 길드 시스템 단독 소유, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
   - org: "2024 — 렌더링 / 시퀀서 연출 아키텍처"
     title: ""
     period: "2024"
