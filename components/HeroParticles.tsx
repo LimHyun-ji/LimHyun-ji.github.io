@@ -60,7 +60,7 @@ export default function HeroParticles() {
       // 테마별 색/투명도
       const applyTheme = () => {
         const light = document.documentElement.getAttribute('data-theme') === 'light';
-        material.color.set(light ? 0x4a80c8 : 0x7db4ff);
+        material.color.set(light ? 0x1f9d6b : 0x3FD69A);
         material.opacity = light ? 0.5 : 0.7;
       };
       applyTheme();

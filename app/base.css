@@ -1,25 +1,30 @@
 /* ───────────── Theme tokens ───────────── */
+/* Emerald Forge — 주: 에메랄드(인터랙션/구조) · 보조: 골드(라벨/뱃지) */
 :root {
-  --bg: #0d1117;
-  --bg-soft: #161b22;
-  --card: #161b22;
-  --border: #30363d;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #58a6ff;
-  --accent-soft: rgba(88, 166, 255, 0.12);
+  --bg: #0C1210;
+  --bg-soft: #15201C;
+  --card: #15201C;
+  --border: #263a32;
+  --text: #E6ECE8;
+  --muted: #869089;
+  --accent: #3FD69A;
+  --accent-2: #F2B23E;
+  --accent-soft: rgba(63, 214, 154, 0.13);
+  --accent-2-soft: rgba(242, 178, 62, 0.15);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 [data-theme="light"] {
   --bg: #ffffff;
-  --bg-soft: #f6f8fa;
+  --bg-soft: #f2f8f4;
   --card: #ffffff;
-  --border: #d0d7de;
-  --text: #1f2328;
-  --muted: #636c76;
-  --accent: #0969da;
-  --accent-soft: rgba(9, 105, 218, 0.1);
-  --shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+  --border: #d3e2da;
+  --text: #14201A;
+  --muted: #5a6b62;
+  --accent: #128a5c;
+  --accent-2: #b7830f;
+  --accent-soft: rgba(18, 138, 92, 0.10);
+  --accent-2-soft: rgba(183, 131, 15, 0.12);
+  --shadow: 0 8px 24px rgba(90, 107, 98, 0.2);
 }
 
 * { box-sizing: border-box; }
@@ -62,7 +67,7 @@ a:hover { text-decoration: underline; }
 .actions { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
 .btn {
   display: inline-block; padding: 11px 22px; border-radius: 8px;
-  background: var(--accent); color: #fff; font-weight: 600;
+  background: var(--accent); color: #0C1210; font-weight: 700;
   border: 1px solid var(--accent); transition: transform 0.15s, opacity 0.15s;
 }
 .btn:hover { transform: translateY(-2px); text-decoration: none; opacity: 0.92; }
@@ -140,7 +145,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .back.bottom { margin-top: 40px; margin-bottom: 0; }
 .detail-head { margin-bottom: 32px; }
 .detail-head .eyebrow {
-  font-family: 'JetBrains Mono', monospace; color: var(--accent);
+  font-family: 'JetBrains Mono', monospace; color: var(--accent-2);
   font-size: 0.9rem; margin: 0 0 8px;
 }
 .detail-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 800; margin: 0 0 12px; letter-spacing: -0.02em; }
