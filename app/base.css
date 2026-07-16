@@ -148,27 +148,27 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   font-family: 'JetBrains Mono', monospace; color: var(--accent-2);
   font-size: 0.9rem; margin: 0 0 8px;
 }
-.detail-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 800; margin: 0 0 12px; letter-spacing: -0.02em; }
-.detail-head .headline { font-size: 1.15rem; color: var(--muted); margin: 0 0 16px; }
-.highlights.big { font-size: 1rem; color: var(--text); }
+.detail-head h1 { font-size: clamp(2.3rem, 6vw, 3.5rem); font-weight: 800; margin: 0 0 14px; letter-spacing: -0.03em; line-height: 1.1; }
+.detail-head .headline { font-size: 1.2rem; color: var(--muted); margin: 0 0 16px; }
+.highlights.big { font-size: 1.02rem; color: var(--text); }
 .highlights.big li { margin-bottom: 10px; }
-.detail-body { margin-top: 28px; }
+.detail-body { margin-top: 32px; }
 .detail-body h2 {
-  font-size: 1.4rem; margin: 36px 0 14px; font-weight: 800;
-  position: relative; padding-left: 16px;
+  font-size: clamp(1.7rem, 3vw, 2.1rem); margin: 52px 0 18px; font-weight: 800; letter-spacing: -0.02em;
+  position: relative; padding-left: 18px;
 }
 .detail-body h2::before {
-  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px;
-  width: 4px; border-radius: 2px; background: var(--accent);
+  content: ""; position: absolute; left: 0; top: 5px; bottom: 5px;
+  width: 5px; border-radius: 3px; background: var(--accent);
 }
-/* 일감(작업 항목) 제목 — 둥근 네모 배경 배지 (눈에 띄는 컬러) */
+/* 작업 항목 제목 — 골드 배지 */
 .detail-body h3 {
   display: inline-block;
-  font-size: 1.05rem; font-weight: 700;
-  margin: 28px 0 14px; padding: 7px 18px;
+  font-size: 1.28rem; font-weight: 800;
+  margin: 34px 0 14px; padding: 8px 18px;
   border-radius: 10px;
-  background: #f4e6a1;
-  color: #4a4326;
+  background: var(--accent-2);
+  color: #1a1408;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
 }
 .detail-body p { color: var(--text); margin: 0 0 14px; }

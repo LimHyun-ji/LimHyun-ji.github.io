@@ -13,7 +13,8 @@ highlights:
   - "VisualData 에디터는 EditorModule 이전·타입별 클래스 분리·구 에셋 자동 변환(AssetMigration)으로 대규모 리팩토링"
 ---
 
-> 입사 직후 **데이터 코드 생성 파이프라인을 단독 구축**한 것을 시작으로 에디터 툴·빌드 파이프라인을 상시 담당했습니다. 데이터가 자동으로 **검증·생성·배포**되는 흐름을 만들어, 수작업 반복과 잘못된 데이터의 런타임 유입을 줄였습니다.
+- 입사 직후 **데이터 코드 생성 파이프라인 단독 구축** → 에디터 툴·빌드 파이프라인 상시 담당
+- 데이터 자동 **검증·생성·배포** 흐름 구축 → 수작업 반복·런타임 데이터 유입 차단
 
 > **목적** — 데이터 무결성·제작 생산성을 위한 사내 에디터 툴과 빌드 파이프라인
 > **성과** — 잘못된 데이터의 런타임 유입 차단, 반복 작업·휴먼에러↓
@@ -21,32 +22,31 @@ highlights:
 
 ## 개요
 
-콘텐츠 제작팀의 생산성과 게임 데이터의 무결성을 높이기 위한 **사내 에디터 툴과 빌드 파이프라인**을
-개발했습니다. 게임플레이 기능 못지않게 비중이 큰 작업 영역으로, 데이터가 자동으로 검증·생성·배포되는
-흐름을 만드는 데 집중했습니다.
+- 콘텐츠 제작팀 생산성·게임 데이터 무결성 향상을 위한 **사내 에디터 툴·빌드 파이프라인** 개발
+- 데이터 자동 검증·생성·배포 흐름 구축 집중
 
 ## 주요 작업
 
 ### 데이터 코드 생성 파이프라인 — 입사 첫 3개월, 단독 구축
-합류 직후 가장 먼저 맡은 일이 **데이터 파이프라인 전체를 세우는 것**이었습니다.
-**Excel 원본 → JSON → C++ enum/struct 자동 생성** 흐름을 Python으로 단독 설계·구축하면서,
-Perforce 체크인/아웃 자동화, JSON Schema 검증, 리스트 형식(`use_effect[0]/[1]`)·한글 인코딩 처리까지
-직접 정의했습니다. 기획이 Excel만 고치면 검증된 C++ 코드가 자동으로 떨어지는 구조라
-반복 작업과 휴먼 에러를 크게 줄였고, 이후 모든 메타데이터 작업의 토대가 됐습니다.
 
-> **미니 트러블슈팅** — (증상) Excel 원본의 한글이 생성 코드 단계에서 깨지고, export 후 수동 P4 체크아웃을 빠뜨려 변경분이 누락되는 실수가 반복됐습니다. (해결) 한글 인코딩 처리를 파이프라인에 내장하고, P4 reconcile을 export 흐름에 연동해 변경분만 자동으로 체크아웃/추가되게 했습니다. 이후 두 부류의 휴먼 에러가 파이프라인 단계에서 차단됐습니다.
+- **Excel 원본 → JSON → C++ enum/struct** 자동 생성 흐름 Python 단독 설계·구축
+- Perforce 체크인/아웃 자동화·JSON Schema 검증·리스트 형식(`use_effect[0]/[1]`)·한글 인코딩 처리 포함
+- 기획 Excel 수정 → 검증된 C++ 자동 생성 구조 (반복 작업·휴먼에러 감소)
+- 이후 모든 메타데이터 작업의 토대
+
+> **증상** 한글 깨짐·수동 P4 체크아웃 누락 · **해결** 한글 인코딩 파이프라인 내장 + P4 reconcile 자동 연동 → 파이프라인 단계 차단
 
 ### 레벨 / 스폰 데이터 파이프라인 (AreaTool)
-레벨 영역·NPC 스폰·순찰(Patrol) 데이터를 다루는 AreaTool을 개선하고,
-**Commandlet 기반 CI**로 레벨데이터 검증과 export를 자동화해 수작업과 누락을 줄였습니다.
-스폰 데이터는 2D Polygon 편집에서 **3D Point Actor** 편집으로 전환해 저작 UX를 개선했습니다.
+
+- 레벨 영역·NPC 스폰·순찰(Patrol) 데이터 AreaTool 개선
+- **Commandlet 기반 CI** 연동 → 레벨데이터 검증·export 자동화 (수작업·누락 감소)
+- 스폰 데이터 편집: 2D Polygon → **3D Point Actor** 전환 (저작 UX 개선)
 
 ### 데이터 주도 에디터 툴
-메타데이터 Generator, VisualData Editor(캐릭터 외형/소켓 프리뷰) 등
-데이터 주도 설계를 지원하는 에디터 도구를 개발했습니다. VisualData 에디터는 2025년
-EditorModule 이전·PreviewActor 병합·타입별(PC/NPC/FieldObject/Item/Spirit) 클래스 분리·
-`VisualDataInterface` 제거, 구 에셋을 신 타입으로 자동 변환하는 **AssetMigration 툴**까지
-대규모로 리팩토링해 에디터 아키텍처 부채를 일괄 해소했습니다.
+
+- 메타데이터 Generator·VisualData Editor(캐릭터 외형/소켓 프리뷰) 개발
+- VisualData 에디터 2025년 대규모 리팩토링: EditorModule 이전·PreviewActor 병합·타입별(PC/NPC/FieldObject/Item/Spirit) 클래스 분리·`VisualDataInterface` 제거
+- 구 에셋 → 신 타입 자동 변환 **AssetMigration 툴** 구현 → 에디터 아키텍처 부채 일괄 해소
 
 ## 기술 요약
 
@@ -60,14 +60,17 @@ EditorModule 이전·PreviewActor 병합·타입별(PC/NPC/FieldObject/Item/Spir
 
 ## 파이프라인 구조
 
-원본 데이터가 에디터 툴·Commandlet을 거쳐 **검증·생성·배포**되는 자동화 흐름입니다.
+- 원본 데이터 → 에디터 툴·Commandlet → **검증·생성·배포** 자동화 흐름
 
 <img class="diagram" src="/images/diagrams/pipeline-flow.svg" alt="데이터 파이프라인 관계도: 원본(Excel·에셋·레벨)→AreaTool Generator→검증자 체인→Export+P4 Reconcile→Generated 메타데이터(RidType)→런타임 MetadataSubsystem, Commandlet(CI)이 실행" />
 
 ## 핵심 구현
 
 ### Commandlet 기반 CI
-레벨/비주얼 데이터 export를 **에디터 UI 없이 Commandlet으로** 실행해 Jenkins CI에 물렸습니다 — 사람이 잊어도 빌드가 데이터를 검증·생성합니다.
+
+- **에디터 UI 없이 Commandlet**으로 레벨/비주얼 데이터 export 실행 → Jenkins CI 연동
+- 사람 실수와 무관하게 빌드 단계 데이터 검증·생성 보장
+
 ```cpp
 // SolEditor/AreaTool/Commandlet/AreaToolExportCommandlet.h
 class UAreaToolExportCommandlet : public UCommandlet {
@@ -77,7 +80,10 @@ class UAreaToolExportCommandlet : public UCommandlet {
 ```
 
 ### 검증자 체인 (데이터 무결성)
-export 전에 **검증자 체인**으로 리소스ID/이름 중복/네비메시/폴더구조/리전을 통과시켜, 잘못된 데이터가 런타임으로 새는 걸 차단했습니다.
+
+- export 전 **검증자 체인** 통과: RID·이름 중복·NavMesh·폴더구조·리전
+- 잘못된 데이터 런타임 유입 차단
+
 ```cpp
 // SolEditor/AreaTool/AreaToolValidator.h — 인터페이스 + 구현체 체인
 class IAreaToolValidator { virtual bool Validate(const AAreaToolActor&, const FString& ErrorScope); };
@@ -85,13 +91,16 @@ class IAreaToolValidator { virtual bool Validate(const AAreaToolActor&, const FS
 ```
 
 ### Export + 소스컨트롤 연동
-월드 액터를 JSON으로 직렬화하고, **P4와 reconcile**해 변경분만 체크아웃/추가되도록 했습니다(수동 체크아웃 실수 방지).
+
+- 월드 액터 JSON 직렬화 후 **P4 reconcile** → 변경분만 자동 체크아웃/추가 (수동 실수 방지)
+
 ```cpp
 // SolEditor/AreaTool/AreaToolGenerator.h — FAreaToolJsonGenerator
 void Export() override;
 void SaveAndReconcile(const TMap<FString, TArray<TSharedPtr<FJsonValue>>>& ExportedFileDatas); // P4 연동
 TArray<TSharedPtr<IAreaToolValidator>> Validators;
 ```
-`FVisualDataExport`는 NPC/갓아머/정령/필드오브젝트 매핑과 액션 메타데이터를 JSON으로 내보냅니다(`Execute_ExportAssetType(..., bUseP4v)`).
+
+- `FVisualDataExport`: NPC/갓아머/정령/필드오브젝트 매핑·액션 메타데이터 JSON export (`Execute_ExportAssetType(..., bUseP4v)`)
 
 > 미니맵의 RenderTarget 텍스처 변환·퀘스트 인디케이터는 '인게임 연출 & GPU 렌더링 파이프라인' 페이지에서 다룹니다.

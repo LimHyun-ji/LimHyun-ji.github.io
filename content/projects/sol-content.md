@@ -19,28 +19,39 @@ highlights:
 
 ## 개요
 
-인게임 전투 외에도 **로비·성장·편의·경제**를 아우르는 아웃게임 콘텐츠를 폭넓게 담당했습니다. 단발성 기능 구현을 넘어, 여러 핵심 시스템을 **장기 오너십**으로 맡아 기획 연동 → 구현 → 출시 → 라이브 운영까지 책임졌습니다.
+- **로비·성장·편의·경제** 아웃게임 콘텐츠 폭넓은 담당
+- 핵심 시스템 **장기 오너십** — 기획 연동 → 구현 → 출시 → 라이브 운영 전 주기
 
 ## 담당 콘텐츠
 
 ### 길드 / 아지트 — 대표작
-길드 생성·권한·기부·PvP·신권(디바인파워) 연계 등 길드 도메인 클라이언트 전반을 다년간 단독 오너십으로 담당했습니다. 가장 오래, 가장 많이 작업한 시스템입니다.
 
-**왜 리팩토링했나.** 초기 구현은 길드 상태 변경을 컴포넌트 이벤트로 각 수신처에 직접 전파하는 구조였습니다. 기능이 늘수록 위젯·컴포넌트 결합이 깊어져, 어느 위젯이 어떤 이벤트를 받는지 추적이 어려워졌습니다.
+- 길드 생성·권한·기부·PvP·신권(디바인파워) 연계 등 도메인 클라이언트 전반 다년간 단독 오너십
 
-**어떻게.** 전파 경로를 **메시지 시스템 기반으로 전면 재편**했습니다. `UGuildManager`가 서버 Noti의 **단일 수신점**이 되어 상태를 갱신하고, 멀티캐스트 델리게이트로 UI에 전파합니다. 이후 기부·PvP·신권 등 기능을 추가할 때 새 위젯은 구독만 추가하면 되는 형태로 확장 비용이 줄었습니다.
+**왜 리팩토링했나.**
+- 초기: 컴포넌트 이벤트로 각 수신처 직접 전파 → 기능 증가 시 위젯·컴포넌트 결합 심화·추적 난항
 
-> **트러블슈팅 — 길드 자금 정산 정밀도**
-> (증상) 큰 금액을 분배할 때 정산 값이 어긋남. (원인) 정산이 double로 수행돼 큰 금액에서 부동소수 정밀도 한계·오버플로 가능성. (해결) 세금·분배 정산을 **double→int64로 전환**하고 항목마다 올림을 적용해 코드 레벨에서 정밀도·오버플로 안전성 보장.
+**어떻게.**
+- 전파 경로 **메시지 시스템 기반 전면 재편** — `UGuildManager` 단일 수신점
+- 기부·PvP·신권 추가 시 구독만 추가하면 되는 저비용 확장 구조
+
+> **트러블슈팅 — 길드 자금 정산 정밀도** · **증상** 큰 금액 분배 시 정산 값 어긋남 · **원인** double 연산 부동소수 정밀도 한계·오버플로 가능성 · **해결** 세금·분배 정산 **double→int64 전환**, 항목마다 올림 적용
 
 ### 별자리 · 순례 · 연구/연성
-고유 성장·재화 콘텐츠를 입력 방식·게이지·확률 표기·정산 로직까지 구현했습니다. 특히 순례는 로직(`UTravelManager`)과 연출(`ACinePilgrimageManager`)을 분리해, 연출 수정이 정산 로직에 영향을 주지 않게 했습니다. (연출 상세는 [인게임 연출 페이지](/projects/rendering-cinema/) 참고)
+
+- 입력 방식·게이지·확률 표기·정산 로직 구현
+- 순례: 로직(`UTravelManager`)과 연출(`ACinePilgrimageManager`) 분리 — 연출 수정의 정산 로직 무영향 구조
+- 연출 상세: [인게임 연출 페이지](/projects/rendering-cinema/)
 
 ### 도감 / 수집
-컬렉션 일괄등록·일괄강화, overEnchant 표시·정렬, 거래소 검색 연동 등 수집 동선을 구축했고, 페이징을 제거해 ListView로 전환하고 일부 데이터를 UObject→FClass로 변환해 GC 부담을 줄였습니다.
+
+- 일괄등록·일괄강화, overEnchant 표시·정렬, 거래소 검색 연동 등 수집 동선 구축
+- 페이징 제거 → ListView 전환, 일부 데이터 UObject→FClass 변환으로 GC 부담 감소
 
 ### 채팅 / 소셜 · 리텐션 · 재화 정산
-채팅/소셜·파티, 리텐션 리워드(출석/보상), 세금·신권(DivinePower) 등 재화 정산을 신규 도입하고 운영 이슈에 대응했습니다. 재화 정산은 정밀도(int64/double·올림)를 코드 레벨에서 보장해 라이브 경제의 수치 안정성을 확보했습니다.
+
+- 채팅/소셜·파티, 리텐션 리워드(출석/보상), 세금·신권(DivinePower) 재화 정산 신규 도입 및 운영 이슈 대응
+- 재화 정산 정밀도(int64/double·올림) 코드 레벨 보장 → 라이브 경제 수치 안정성
 
 ## 기술 요약
 
@@ -54,13 +65,15 @@ highlights:
 
 ## Manager 구조 — 서버 Noti 단일 수신점
 
-서버 푸시(Noti)는 Manager가 단일 창구로 수신해 상태를 갱신하고 델리게이트로 UI에 전파합니다. 사용자 입력은 **UI → Manager → 서버 요청** 순으로 흐릅니다.
+- 서버 Noti: Manager 단일 창구 수신 → 상태 갱신 → 델리게이트로 UI 전파
+- 사용자 입력 흐름: **UI → Manager → 서버 요청**
 
 <img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="아웃게임 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
 ## 시스템별 핵심 설계
 
-모든 콘텐츠 매니저는 **`USolGameInstanceSubsystem` + `INetworkNotiClientListener`** 공통 골격을 따릅니다 — 세션 단위 싱글톤으로 서버 Noti를 직접 수신해 상태를 갱신하고, 멀티캐스트 델리게이트로 UI에 전파합니다.
+- 모든 콘텐츠 매니저: **`USolGameInstanceSubsystem` + `INetworkNotiClientListener`** 공통 골격
+- 세션 단위 싱글톤 — 서버 Noti 직접 수신 → 상태 갱신 → 멀티캐스트 델리게이트로 UI 전파
 
 ```cpp
 // System/Guild/GuildManager.h — 서버 Noti 단일 수신점 (INetworkNotiClientListener)
@@ -69,7 +82,7 @@ class UGuildManager : public USolGameInstanceSubsystem, public INetworkNotiClien
     // 서버 Noti를 받아 길드 상태를 갱신 (UI 전파는 델리게이트로)
 };
 ```
-자금 입금·분배는 별도 `UGuildDistributionManager`(`DepositFund` / `Distribute` / `RequestFundBalance`)로 분리해 운영 로직과 분배 정산을 모듈화했습니다.
+- 자금 입금·분배: 별도 `UGuildDistributionManager`(`DepositFund` / `Distribute` / `RequestFundBalance`) 분리 — 운영 로직·분배 정산 모듈화
 
 ```cpp
 // System/Travel/TravelManager.h — 순례 보드 진행·주사위 정산 로직 (연출과 분리)

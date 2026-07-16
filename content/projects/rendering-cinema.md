@@ -19,13 +19,12 @@ highlights:
 
 ## 0. PocketLevel — 인게임과 분리된 연출 공간
 
-별자리·순례 같은 큰 연출은 인게임 월드 안에서 바로 돌리지 않고, **PocketLevel Instance로 인게임과 분리된 별도 공간에 레벨을 구성**해 그 안에서 `LevelSequence`로 재생합니다. 인게임 상태와 섞이지 않는 독립 연출 공간을 비동기로 띄우는 방식입니다.
-
-핵심은 **수명 동적 제어**입니다. `LevelSequence`가 내려갈 때 그 안의 Actor들도 모두 메모리에서 함께 내려가도록 만들어, 연출이 끝나면 연출용 자원이 남지 않습니다. 아래 별자리·순례가 이 원칙 위에서 동작합니다.
+- PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
+- **수명 동적 제어** — `LevelSequence` 종료 시 내부 Actor 전체 메모리 해제 (연출 후 자원 잔존 없음)
 
 ## 1. 별자리 룰렛 — LevelSequence 동적 생성/파괴
 
-룰렛 연출은 매번 같은 시퀀스를 쓰는 게 아니라, 선택된 별·결과에 따라 **시퀀스를 런타임에 생성하고 바인딩한 뒤, 끝나면 파괴**하는 구조로 만들었습니다. 미리 모든 시퀀스 액터를 깔아두지 않아 메모리를 아낍니다.
+- 별·결과별 시퀀스 런타임 생성·바인딩 → 종료 시 파괴 구조 (사전 일괄 로드 배제)
 
 ```cpp
 // Cinema/Constellation/CinemaConstellationManager.cpp
@@ -38,7 +37,7 @@ void UCinemaConstellationManager::DestroyLevelSeqActors(ALevelSequenceActor*& Ou
 TMap<TSoftObjectPtr<ULevelSequence>, ALevelSequenceActor*> LevelSeqActorMap;
 ```
 
-룰렛 본체(`ACineConstellationRoulette`)는 **활성/닫기/슬롯세팅/스핀** 시퀀스를 `TSoftObjectPtr`로 들고 있다가 필요할 때만 비동기 로드합니다 — 진입 전 모든 연출 에셋을 메모리에 올리지 않습니다.
+- `ACineConstellationRoulette` — 활성/닫기/슬롯세팅/스핀 시퀀스를 `TSoftObjectPtr`로 보유, 필요 시점 비동기 로드
 
 ```cpp
 // Cinema/Constellation/CineConstellationRoulette.h
@@ -53,7 +52,8 @@ void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 
 ## 2. 순례 주사위 — SceneCapture로 3D를 UI에 합성
 
-순례(보드게임) 주사위는 실제 3D 메시를 굴리고, 그 결과를 **SceneCapture2D로 RenderTarget에 캡처해 UI 위젯에 합성**합니다. 캡처 카메라를 LevelSequence의 named binding에 연결해 연출이 카메라를 직접 제어하도록 했습니다.
+- 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성
+- 캡처 카메라를 `LevelSequence` named binding에 주입, 연출이 카메라 직접 제어
 
 ```cpp
 // Cinema/Pilgrimage/CinePilgrimageManager.cpp
@@ -74,15 +74,19 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
     RenderTargetCam->GetComponentByClass<USceneCaptureComponent2D>()->SetVisibility(false); // 연출 종료
 ```
 
-같은 SceneCapture-전용 + 모바일 PostProcess off 패턴은 대화 연출 렌더러(`DialogueRenderer`)에도 적용했습니다(`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기).
+- 동일 패턴을 `DialogueRenderer`에도 적용 (`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기)
 
 ## 3. 미니맵 RenderTarget 인디케이터
 
-퀘스트·심볼 데이터를 **RenderTarget 텍스처로 변환**해 미니맵 머티리얼 파라미터로 넘기고, 플레이어 위치는 Material Parameter Collection으로 실시간 반영했습니다. 별도 아이콘 위젯을 매번 배치하지 않고 GPU 표시로 처리해, 표시 대상이 늘어도 비용이 일정하도록 했습니다.
+- 퀘스트·심볼 데이터를 RenderTarget 텍스처로 변환 → 미니맵 머티리얼 파라미터 주입
+- 플레이어 위치는 Material Parameter Collection으로 실시간 반영
+- 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
 
 ## 4. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
 
-갓아머/PC 연출은 런타임에 본 트랜스폼을 계산해 AnimBP와 연동하는 `TransformBonesComponent`를 신규 설계했습니다(에디터 프리뷰용 `EditorTransformBonesComponent`까지 분리). 연출 시퀀스의 Niagara 잔상은 풀 반납(`ReleaseToPool`)으로는 남는 문제가 있어 **`Deactivate`로 교체**해 정리했습니다.
+- `TransformBonesComponent` 신규 설계 — 런타임 본 트랜스폼 계산 ↔ AnimBP 연동
+- 에디터 프리뷰 전용 `EditorTransformBonesComponent` 분리
+- Niagara 잔상: `ReleaseToPool` 미정리 문제 → `Deactivate` 교체로 해결
 
 ```
 Source/Sol/Entity/Character/TransformBonesComponent.{h,cpp}      // 런타임

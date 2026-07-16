@@ -20,11 +20,13 @@ highlights:
 
 ## 개요
 
-캐릭터의 외형(파츠·재질·무기·이펙트)은 전투/액션 상황에 따라 계속 바뀝니다. 그래서 외형을 하드코딩하지 않고, **액션 데이터(VisualGameData)로부터 "모듈"을 만들어 각 엔티티에 적용**하는 데이터 주도 구조로 설계했습니다. 핵심은 **모든 엔티티에 공통으로 붙는 하나의 컴포넌트**가 이 로드·적용·정리를 책임진다는 점입니다.
+- 외형 하드코딩 배제 → 액션 데이터(VisualGameData)로 모듈 생성·적용하는 데이터 주도 구조
+- 모든 엔티티 공통 단일 컴포넌트(`UVisualDataModuleComponent`)가 로드·적용·정리 전담
 
 ## 1. 엔티티 공통 컴포넌트 — 각 캐릭터에 Visual 세팅·로드
 
-`UVisualDataModuleComponent`는 PC·NPC·정령·토템·필드오브젝트·아이템 등 **모든 엔티티에 부착**됩니다. 파츠별 스켈레탈 메시를 맵으로 들고, 데이터가 바뀌면 모듈을 새로 만들어 적용합니다.
+- PC·NPC·정령·토템·필드오브젝트·아이템 등 **모든 엔티티 부착 대상**
+- 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성·재적용
 
 ```cpp
 // System/VisualDataCharacter/VisualDataModuleComponent.h
@@ -47,9 +49,9 @@ class SOL_API UVisualDataModuleComponent : public UActorComponent
 
 ## 2. 타입별 모듈 + 경량 폴리모피즘
 
-**왜 `UObject`가 아닌 `TSharedPtr` 경량 모듈인가?** PC·NPC·정령·아이템 등 필드에 대량으로 존재하는 엔티티마다 모듈이 생성·교체되는데, 이를 전부 `UObject`로 만들면 객체 생성과 GC 등록·추적 비용이 엔티티 수에 비례해 쌓입니다. 그래서 모듈은 GC 바깥의 경량 객체로 설계했습니다.
-
-엔티티 종류마다 외형 규칙이 달라, `FVisualDataModuleBase`를 상속한 **타입별 모듈**(PC/NPC/Spirit/Item/FieldObject/Totem + Editor용)로 분리했습니다. 모듈은 `UObject`가 아닌 **`TSharedPtr` 기반 경량 객체**라, 커스텀 RTTI(`ModuleCast<T>`)로 안전하게 다운캐스트합니다.
+- `UObject` 대신 `TSharedPtr` 경량 모듈 채택 — 대량 엔티티 생성·GC 등록·추적 비용 회피
+- 엔티티 종류별 외형 규칙 차이 → `FVisualDataModuleBase` 상속 타입별 분리(PC/NPC/Spirit/Item/FieldObject/Totem + Editor)
+- `UObject` 비사용으로 GC 추적 불가 → 커스텀 RTTI(`ModuleCast<T>`)로 안전 다운캐스트
 
 ```cpp
 // System/VisualDataCharacter/Module/VisualDataModuleBase.h
@@ -69,9 +71,8 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
 
 ## 3. 전이 규칙으로 부분 갱신 최적화
 
-**Before** — 초기에는 외형 데이터가 바뀌면 모듈을 통째로 다시 적용했습니다. 헬멧 하나를 바꿔도 전신 파츠·어태치먼트가 전부 재로드되는 구조라, 장비 교체가 잦은 전투·꾸미기 상황에서 불필요한 로드·재구성 비용이 반복됐습니다.
-
-**After** — 그래서 **다음 데이터와 현재 상태를 비교해 갱신 범위를 결정**하는 전이 규칙을 도입했습니다.
+- **Before** — 외형 데이터 변경 시 모듈 전체 재적용 → 헬멧 교체에도 전신 파츠·어태치먼트 전부 재로드
+- **After** — 다음 데이터와 현재 상태 비교로 갱신 범위 결정하는 **전이 규칙** 도입
 
 ```cpp
 // EvaluateTransitionRule → 갱신 범위 결정
@@ -82,12 +83,12 @@ enum class EVisualDataModuleTransitionRule { FullRest, PartialUpdate, NoUpdate }
 - **NoUpdate**: 동일 → 아무것도 안 함
 - **PartialUpdate**: 바뀐 파츠만 교체 (예: 헬멧만)
 - **FullReset**: 전면 재구성
-
-이 규칙 도입으로 재로드 범위가 **실제로 바뀐 파츠로 한정**되어, 동일 외형 재적용이나 단일 파츠 교체 시 불필요한 전신 재로드가 사라졌습니다.
+- 전이 규칙 도입 → 실제 변경 파츠로 재로드 범위 한정, 불필요한 전신 재로드 제거
 
 ## 4. 어태치먼트 — 무기 / 방어구 / 헬멧
 
-PC 모듈은 방어구·헬멧·주/보조 무기를 **소켓 기반 어태치먼트**로 붙입니다. 어태치먼트도 경량 RTTI(`AttachmentCast<T>`)로 관리하며, 비동기 로드·FX·소켓 전환을 처리합니다.
+- PC 모듈: 방어구·헬멧·주/보조 무기를 **소켓 기반 어태치먼트** 부착
+- 어태치먼트 관리: 경량 RTTI(`AttachmentCast<T>`) + 비동기 로드·FX·소켓 전환 처리
 
 ```cpp
 // System/VisualDataCharacter/Module/PCModuleAttachment.h
@@ -114,17 +115,9 @@ private:
 
 ## 6. 트러블슈팅 — 풀링 × 비동기 로드가 만든 크래시
 
-**증상** — 엔티티를 오브젝트 풀로 재사용하는 환경에서, 풀에서 다시 꺼낸 엔티티가 드물게 **이전 외형이 잔존**하거나, 이미 해제된 메모리에 접근해 크래시가 나는 문제가 있었습니다. 풀 재사용 타이밍과 비동기 로드 완료 타이밍이 겹칠 때만 나타나 재현이 어려웠습니다.
+> **증상** — 풀 재사용 엔티티에 이전 외형 잔존 또는 해제 메모리 접근 크래시 (풀 재사용 × 비동기 완료 경합, 재현 난이도 높음) · **원인** — 풀 반납 시 VisualData 상태 미정리 + 미취소 `FStreamableHandle` 콜백의 소멸 엔티티 뒤늦은 도달 · **해결** — `OnUnregister` 명시적 정리 · 풀 입출고 시 틱 토글 · 반납 시 `FStreamableHandle` 즉시 취소 → 경합 경로 구조적 차단
 
-**원인** — 풀 반납 시점에 VisualData 쪽 상태가 완전히 정리되지 않은 것이 원인이었습니다. 이전 모듈이 세팅해 둔 LOD·컴포넌트 상태가 남은 채로 다음 사용자에게 넘어갔고, 반납 전에 걸려 있던 `FStreamableHandle` 비동기 로드가 취소되지 않아 **풀에 들어간(또는 재사용된) 엔티티에 뒤늦게 로드 완료 콜백이 도착**하면서 죽은 상태를 건드렸습니다.
-
-**해결** — 수명 경계마다 정리를 명시적으로 강제해 구조적으로 차단했습니다.
-
-- `OnUnregister`에서 모듈·파츠 컴포넌트·어태치먼트를 **명시적으로 정리** — 암묵적 파괴에 기대지 않음
-- 풀 입출고 시 **컴포넌트 틱을 함께 토글**해, 풀에 잠든 동안 컴포넌트가 스스로 상태를 바꾸지 못하게 차단
-- 진행 중이던 `FStreamableHandle`을 반납 시점에 **취소**해, 뒤늦은 로드 완료 콜백이 죽은 컨텍스트를 건드리는 경로를 제거
-
-이후 동일 유형(풀 재사용 × 비동기 로드 경합)의 잔존 외형·죽은 메모리 접근이 구조적으로 차단되었습니다. 풀링 자체가 만드는 freed-tick 크래시의 상세는 [퍼포먼스 최적화 페이지의 액터 풀링 항목 참고](/projects/optimization/).
+- 풀링 freed-tick 크래시 상세 → [퍼포먼스 최적화 페이지 액터 풀링 항목](/projects/optimization/)
 
 ## 기술 요약
 
@@ -139,6 +132,6 @@ private:
 | 최적화 | LOD · LightingChannel · Niagara Scalability · SingleShadow 캐시 |
 | 저작 툴 | VisualData 에디터(타입별 클래스 분리·AssetMigration) — [에디터 툴 페이지 참고](/projects/editor-tools/) |
 
-## 데이터 흐름
+## 구성 구조
 
-<img class="diagram" src="/images/diagrams/visualdata-flow.svg" alt="VisualData 데이터 흐름: VisualGameData → 컴포넌트 → 타입별 모듈 → 비동기 로드 → 전이 규칙 → 적용 → EntityVisibility 표시, 전투 이벤트는 OnEvent로 모듈에 전달" />
+<img class="diagram" src="/images/diagrams/visualdata-flow.svg" alt="VisualData 구성 구조: VisualGameData→UVisualDataModuleComponent(파츠 맵·현재 모듈 보유)→FVisualDataModuleBase 상속(PC·NPC·Spirit·Item·FieldObject·Totem)→FPCModuleAttachment 소켓 부착" />
