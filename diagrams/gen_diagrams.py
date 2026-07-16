@@ -143,20 +143,18 @@ def emit(slug, title, nodes, edges):
 def N(id, label, x, y, w, h, cls): return dict(id=id, label=label, x=x, y=y, w=w, h=h, cls=cls)
 
 d1_nodes = [
-    N("tcp",  "게임 서버 · TCP\nNetworkClient",        50, 64, 210, 52, "server"),
-    N("ws",   "Noti 서버 · WebSocket\nNetworkNotiClient", 300, 64, 220, 52, "server"),
-    N("http", "API 서버 · HTTP\nApiServerAsyncOp",     560, 64, 210, 52, "server"),
-    N("geo",  "USolGeoSubsystem\nTCP 수신 · Noti 리스너", 250, 168, 320, 58, "core"),
-    N("meta", "MetaDataSubsystem\nRidType 키",          50, 168, 170, 58, "data"),
+    N("tcp",  "게임 서버 · TCP\nNetworkClient",        130, 64, 220, 52, "server"),
+    N("ws",   "Noti 서버 · WebSocket\nNetworkNotiClient", 400, 64, 240, 52, "server"),
+    N("geo",  "USolGeoSubsystem\nTCP 수신 · Noti 리스너 · Protobuf", 250, 168, 340, 58, "core"),
+    N("meta", "MetaDataSubsystem\nRidType 키",          40, 168, 180, 58, "data"),
     N("mgr",  "Feature Managers\nUGuildManager · UTravelManager …\nUSolGameInstanceSubsystem + INetworkNotiClientListener",
-              190, 286, 440, 72, "manager"),
-    N("vis",  "UVisualDataModuleComponent\n전 엔티티 외형·전투 데이터",  50, 408, 300, 56, "entity"),
-    N("ui",   "UPrimaryGameLayout\nCommonUI 레이어 스택",              470, 408, 300, 56, "ui"),
+              190, 286, 460, 72, "manager"),
+    N("vis",  "UVisualDataModuleComponent\n전 엔티티 외형·전투 데이터",  60, 408, 300, 56, "entity"),
+    N("ui",   "UPrimaryGameLayout\nCommonUI 레이어 스택",              480, 408, 300, 56, "ui"),
 ]
 d1_edges = [
     dict(src="tcp", dst="geo", label="패킷"),
     dict(src="ws", dst="geo", label="Noti"),
-    dict(src="http", dst="mgr", label="지연 조회"),
     dict(src="geo", dst="mgr", label="수신"),
     dict(src="meta", dst="mgr", label="메타데이터"),
     dict(src="mgr", dst="vis", label="외형·전투"),
@@ -189,24 +187,6 @@ d2_edges = [
 emit("visualdata-flow", "VisualData — 데이터 → 모듈 → 부분 갱신 → 표시", d2_nodes, d2_edges)
 
 # ═══════════════════════════════════════════════════════════════
-# D3. 네트워크 3통신
-# ═══════════════════════════════════════════════════════════════
-d3_nodes = [
-    N("tcp",  "TCP · 게임 서버 패킷\n상태 동기화",     60, 70, 220, 54, "server"),
-    N("ws",   "WebSocket · Noti\n실시간",             60, 170, 220, 54, "server"),
-    N("http", "HTTP API · 지연 조회\n화면 진입 시",    60, 270, 220, 54, "server"),
-    N("sync", "리텐션 리워드 · 데미지 미터 · 세금",    360, 70, 300, 54, "manager"),
-    N("chat", "채팅 채널 시스템",                     360, 170, 300, 54, "ui"),
-    N("lazy", "길드 · 수집 · 연구 · 순례 (횡적 성장)", 360, 270, 300, 54, "entity"),
-]
-d3_edges = [
-    dict(src="tcp", dst="sync"),
-    dict(src="ws", dst="chat"),
-    dict(src="http", dst="lazy", label="로그인 과부하 방지"),
-]
-emit("network-3comm", "네트워크 — 통신 방식을 목적에 맞게 분리", d3_nodes, d3_edges)
-
-# ═══════════════════════════════════════════════════════════════
 # D4. 인게임 연출 파이프라인
 # ═══════════════════════════════════════════════════════════════
 d4_nodes = [
@@ -225,28 +205,5 @@ d4_edges = [
     dict(src="seq", dst="end", dashed=True),
 ]
 emit("cinema-pipeline", "인게임 연출 — PocketLevel · Sequence · SceneCapture", d4_nodes, d4_edges)
-
-# ═══════════════════════════════════════════════════════════════
-# D5. 실시간 위치 기반 맵
-# ═══════════════════════════════════════════════════════════════
-d5_nodes = [
-    N("pos",  "플레이어 위치",                         60, 70, 180, 50, "server"),
-    N("mpc",  "MPC SetScalar(X/Y/Zoom)",               300, 70, 250, 50, "core"),
-    N("mat",  "미니맵 머티리얼\n위치·퀘스트 GPU 표시",  600, 70, 230, 56, "ui"),
-    N("in",   "터치 · 마우스휠",                        60, 200, 180, 50, "server"),
-    N("ip",   "FSolWidgetInputProcessor\nSlate InputPreProcessor", 300, 195, 250, 58, "core"),
-    N("zd",   "Zoom / Drag\n경계 제한",                 600, 195, 230, 56, "manager"),
-    N("img",  "영역 이미지 SoftObjectPtr 로드",         300, 300, 250, 50, "entity"),
-    N("view", "월드맵 표시",                            600, 300, 230, 50, "ui"),
-]
-d5_edges = [
-    dict(src="pos", dst="mpc"),
-    dict(src="mpc", dst="mat", label="실시간 반영"),
-    dict(src="in", dst="ip"),
-    dict(src="ip", dst="zd", label="핀치/휠 통합"),
-    dict(src="zd", dst="img"),
-    dict(src="img", dst="view"),
-]
-emit("map-system", "실시간 위치 기반 맵 — MPC · InputProcessor", d5_nodes, d5_edges)
 
 print("\nDONE. SVG →", os.path.normpath(OUT_SVG), "| drawio →", os.path.normpath(OUT_DRAWIO))

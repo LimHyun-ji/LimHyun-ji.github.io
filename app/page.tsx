@@ -40,11 +40,11 @@ export default function Home() {
         <div className="featured-tag">Featured Project</div>
         <h2 className="featured-title">Sol — UE5 MMORPG</h2>
         <p className="featured-sub">
-          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템·퍼포먼스 최적화·콘텐츠/네트워크·
-          인게임 연출·위치 기반 맵·데이터 파이프라인·라이브 안정화까지 <strong>약 3년 6개월간 오너십</strong>으로 담당.
+          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템·퍼포먼스 최적화·
+          아웃게임(로비·성장·편의)·인게임 연출·데이터 파이프라인·라이브 안정화까지 <strong>다년간 오너십</strong>으로 담당.
         </p>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="Sol 클라이언트 아키텍처: 서버(TCP/WebSocket/HTTP) → USolGeoSubsystem → Feature Managers → VisualData·UI" loading="lazy" />
+          alt="Sol 클라이언트 아키텍처: 게임 서버(TCP)·Noti(WebSocket) → USolGeoSubsystem → Feature Managers → VisualData·UI" loading="lazy" />
         <div className="area-grid">
           {areas.map((a) => (
             <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>

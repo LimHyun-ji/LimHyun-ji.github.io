@@ -76,9 +76,11 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 
 같은 SceneCapture-전용 + 모바일 PostProcess off 패턴은 대화 연출 렌더러(`DialogueRenderer`)에도 적용했습니다(`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기).
 
-> 미니맵·월드맵의 실시간 위치 기반 표시(MPC·RenderTarget·InputProcessor)는 별도 [실시간 위치 기반 맵 페이지](/projects/map-system/)에서 다룹니다.
+## 3. 미니맵 RenderTarget 인디케이터
 
-## 3. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
+퀘스트·심볼 데이터를 **RenderTarget 텍스처로 변환**해 미니맵 머티리얼 파라미터로 넘기고, 플레이어 위치는 Material Parameter Collection으로 실시간 반영했습니다. 별도 아이콘 위젯을 매번 배치하지 않고 GPU 표시로 처리해, 표시 대상이 늘어도 비용이 일정하도록 했습니다.
+
+## 4. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
 
 갓아머/PC 연출은 런타임에 본 트랜스폼을 계산해 AnimBP와 연동하는 `TransformBonesComponent`를 신규 설계했습니다(에디터 프리뷰용 `EditorTransformBonesComponent`까지 분리). 연출 시퀀스의 Niagara 잔상은 풀 반납(`ReleaseToPool`)으로는 남는 문제가 있어 **`Deactivate`로 교체**해 정리했습니다.
 

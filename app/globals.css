@@ -13,7 +13,9 @@
 /* NAV (sticky) */
 .nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
   padding: 14px clamp(16px, 5vw, 48px); backdrop-filter: blur(10px);
-  background: color-mix(in srgb, canvas 70%, transparent); border-bottom: 1px solid var(--line); }
+  background: rgba(8, 10, 16, 0.82); border-bottom: 1px solid var(--line); }
+/* 라이트 모드에서만 밝은 nav */
+:root[data-theme="light"] .nav { background: rgba(255, 255, 255, 0.78); }
 .nav-brand { font-weight: 800; font-size: 18px; letter-spacing: .5px; text-decoration: none; color: inherit; }
 .nav-links { display: flex; gap: clamp(12px, 3vw, 28px); }
 .nav-links a { text-decoration: none; color: inherit; opacity: .75; font-size: 14px; font-weight: 600; }

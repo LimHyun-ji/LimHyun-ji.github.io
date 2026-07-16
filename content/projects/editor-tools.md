@@ -1,16 +1,16 @@
 ---
 layout: project
-order: 6
+order: 5
 title: "데이터 파이프라인 & 에디터 자동화"
 role: "Tools / Pipeline"
 period: "2023.02 — 현재 (입사 직후 ~ 상시)"
-summary: "입사 직후 데이터 코드 생성 파이프라인을 단독 구축한 것을 시작으로, 메타데이터 툴·AreaTool·Commandlet CI 등 콘텐츠 제작 생산성과 데이터 무결성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
-tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata", "Schema"]
+summary: "입사 직후 Excel→JSON→C++ 자동 생성 파이프라인을 단독 설계·구축한 것을 시작으로, AreaTool 검증 체인·Commandlet CI 등 데이터 무결성과 제작 생산성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
+tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
 highlights:
-  - "입사 첫 3개월에 Excel↔JSON↔C++ enum/struct 자동 생성 Python 파이프라인 단독 구축 — 단위계 변환·custom 검증 스크립트·Cron식 반복 입력·한글 인코딩·P4 체크아웃 자동화까지 내장"
-  - "각 콘텐츠의 데이터 Schema를 직접 설계해, 기획이 원본만 고치면 검증된 C++ 코드가 자동으로 생성되는 흐름을 구축"
-  - "기획자용 Polygon 영역 설정 커스텀 엔진 툴(AreaTool)과, RID·이름·NavMesh·폴더·리전 검증자 체인으로 잘못된 데이터의 런타임 유입 차단"
-  - "레벨/비주얼 데이터 export를 Commandlet 기반 CI(Jenkins)로 자동화하고 JSON export를 서버와 동기화, VisualData 에디터는 타입별 클래스 분리·AssetMigration으로 대규모 리팩토링"
+  - "입사 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 파이프라인을 단독 설계·구축 (Perforce 자동화·JSON Schema 검증·한글 인코딩)"
+  - "레벨 배치 툴(AreaTool): RID·이름·NavMesh·폴더·리전 검증자 체인, Export 시 P4 reconcile로 변경분만 체크아웃"
+  - "Commandlet 기반 CI(Jenkins) 연동으로 데이터 검증·생성을 빌드 단계에서 강제 — 잘못된 데이터의 런타임 유입 차단"
+  - "VisualData 에디터는 EditorModule 이전·타입별 클래스 분리·구 에셋 자동 변환(AssetMigration)으로 대규모 리팩토링"
 ---
 
 > 입사 직후 **데이터 코드 생성 파이프라인을 단독 구축**한 것을 시작으로 에디터 툴·빌드 파이프라인을 상시 담당했습니다. 데이터가 자동으로 **검증·생성·배포**되는 흐름을 만들어, 수작업 반복과 잘못된 데이터의 런타임 유입을 줄였습니다.
@@ -27,19 +27,18 @@ highlights:
 
 ## 주요 작업
 
-### 메타데이터 데이터 툴 — 입사 첫 3개월, 단독 구축
+### 데이터 코드 생성 파이프라인 — 입사 첫 3개월, 단독 구축
 합류 직후 가장 먼저 맡은 일이 **데이터 파이프라인 전체를 세우는 것**이었습니다.
-**Excel 원본 ↔ JSON ↔ C++ enum/struct 자동 생성** 흐름을 Python으로 단독 구축하면서,
-JSON→Excel 역변환, **단위계 변환**, 콘텐츠별 **custom 검증 스크립트**, **Cron식 반복 입력** 처리,
-리스트 형식(`use_effect[0]/[1]`)·한글 인코딩·Perforce 체크아웃 자동화까지 직접 정의했습니다.
-무엇보다 **각 콘텐츠의 데이터 Schema를 직접 설계**해, 기획이 원본만 고치면 검증된 C++ 코드가
-자동으로 떨어지는 구조를 만들었습니다. 이후 모든 메타데이터 작업의 토대가 됐습니다.
+**Excel 원본 → JSON → C++ enum/struct 자동 생성** 흐름을 Python으로 단독 설계·구축하면서,
+Perforce 체크인/아웃 자동화, JSON Schema 검증, 리스트 형식(`use_effect[0]/[1]`)·한글 인코딩 처리까지
+직접 정의했습니다. 기획이 Excel만 고치면 검증된 C++ 코드가 자동으로 떨어지는 구조라
+반복 작업과 휴먼 에러를 크게 줄였고, 이후 모든 메타데이터 작업의 토대가 됐습니다.
 
 > **미니 트러블슈팅** — (증상) Excel 원본의 한글이 생성 코드 단계에서 깨지고, export 후 수동 P4 체크아웃을 빠뜨려 변경분이 누락되는 실수가 반복됐습니다. (해결) 한글 인코딩 처리를 파이프라인에 내장하고, P4 reconcile을 export 흐름에 연동해 변경분만 자동으로 체크아웃/추가되게 했습니다. 이후 두 부류의 휴먼 에러가 파이프라인 단계에서 차단됐습니다.
 
 ### 레벨 / 스폰 데이터 파이프라인 (AreaTool)
-레벨 영역·NPC 스폰·순찰(Patrol) 데이터를 다루는 **기획자용 Polygon 영역 설정 커스텀 엔진 툴** AreaTool을 개선하고,
-**Commandlet 기반 CI**로 레벨데이터 검증과 export를 자동화해 수작업과 누락을 줄였습니다. JSON export는 서버와 동기화됩니다.
+레벨 영역·NPC 스폰·순찰(Patrol) 데이터를 다루는 AreaTool을 개선하고,
+**Commandlet 기반 CI**로 레벨데이터 검증과 export를 자동화해 수작업과 누락을 줄였습니다.
 스폰 데이터는 2D Polygon 편집에서 **3D Point Actor** 편집으로 전환해 저작 UX를 개선했습니다.
 
 ### 데이터 주도 에디터 툴
