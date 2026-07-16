@@ -12,15 +12,15 @@
 :root[data-theme="light"] { --accent: #128a5c; --accent-2: #b7830f; }
 
 /* NAV (sticky) */
+/* 에메랄드 메뉴바 — 밝은 에메랄드 배경 + 어두운 글자 */
 .nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
   padding: 14px clamp(16px, 5vw, 48px); backdrop-filter: blur(10px);
-  background: rgba(8, 10, 16, 0.82); border-bottom: 1px solid var(--line); }
-/* 라이트 모드에서만 밝은 nav */
-:root[data-theme="light"] .nav { background: rgba(255, 255, 255, 0.78); }
-.nav-brand { font-weight: 800; font-size: 18px; letter-spacing: .5px; text-decoration: none; color: inherit; }
+  background: color-mix(in srgb, var(--accent) 94%, transparent);
+  border-bottom: 1px solid rgba(0, 0, 0, .16); box-shadow: 0 2px 14px rgba(0, 0, 0, .18); }
+.nav-brand { font-weight: 800; font-size: 18px; letter-spacing: .5px; text-decoration: none; color: #0B1310; }
 .nav-links { display: flex; gap: clamp(12px, 3vw, 28px); }
-.nav-links a { text-decoration: none; color: inherit; opacity: .75; font-size: 14px; font-weight: 600; }
-.nav-links a:hover { opacity: 1; color: var(--accent); }
+.nav-links a { text-decoration: none; color: #0B1310; opacity: .82; font-size: 14px; font-weight: 700; }
+.nav-links a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 
 /* HERO */
 .hero-wrap { position: relative; overflow: hidden; }
