@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getProfile, getProjects } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
+import VisualDataDemo from '@/components/VisualDataDemo';
 
 export default function Home() {
   const p = getProfile();
@@ -53,6 +54,18 @@ export default function Home() {
               {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* INTERACTIVE DEMO — VisualData 재현 */}
+      <section className="demo-band" id="demo">
+        <div className="demo-inner">
+          <div className="featured-tag">◇ Interactive Demo · VisualData 재현</div>
+          <h2 className="section-h">데이터로 캐릭터 외형을 조립한다</h2>
+          <p className="section-note">
+            Sol의 VisualData 시스템을 웹으로 재현 — 파츠·Override Material·소켓 어태치먼트를 데이터로 교체, 바뀐 파츠만 갱신(전이 규칙).
+          </p>
+          <VisualDataDemo />
         </div>
       </section>
 
