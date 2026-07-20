@@ -29,7 +29,11 @@ export default function Home() {
           <p className="lead-eyebrow">{p.role}</p>
           <h1 className="lead-name">{p.name}</h1>
           <p className="lead-headline">{p.headline}</p>
-          <p className="lead-intro">{p.intro}</p>
+          {p.keywords && (
+            <ul className="lead-keywords">
+              {p.keywords.map((k) => <li key={k}>{k}</li>)}
+            </ul>
+          )}
           <div className="lead-actions">
             {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
             {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}

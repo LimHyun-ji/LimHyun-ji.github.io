@@ -9,6 +9,7 @@ export interface SkillGroup { category: string; items: string[]; }
 export interface Experience { org?: string; title?: string; period?: string; desc?: string; }
 export interface Profile {
   name: string; role: string; headline: string; intro: string;
+  keywords?: string[];
   links: { github?: string; email?: string; linkedin?: string; blog?: string };
   skills?: SkillGroup[];
   experience?: Experience[];

@@ -13,6 +13,15 @@ intro: >
   RenderTarget·SceneCapture·LevelSequence 기반 인게임 연출 렌더링과 UI·메모리·틱 최적화까지,
   엔진 표준 패턴을 이해하고 그 위에 모바일용 보강을 설계하는 방식으로 일합니다.
 
+# 히어로 키워드 (설명을 대신하는 핵심 키워드 문구)
+keywords:
+  - "UE5 · C++ MMORPG 클라이언트"
+  - "VisualData 캐릭터 시스템 핵심 담당"
+  - "퍼포먼스 · 메모리 최적화"
+  - "인게임 연출 · GPU 렌더링"
+  - "게임 콘텐츠 · 데이터 파이프라인"
+  - "라이브 안정화 · 디버깅"
+
 # 연락 / 링크 (비워두면 버튼이 표시되지 않습니다)
 links:
   github: "https://github.com/LimHyun-ji"
