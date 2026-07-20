@@ -4,19 +4,19 @@ order: 1
 title: "VisualData — 캐릭터 비주얼 데이터 시스템 (인게임 전투)"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
-summary: "모든 엔티티에 외형·전투 Visual 데이터를 세팅·로드하고, 액션/전투 시스템과 결합하는 캐릭터 비주얼 데이터 시스템의 런타임과 저작 툴을 오너십으로 담당."
+summary: "모든 엔티티에 외형·전투 Visual 데이터를 세팅·로드하고, 액션/전투 시스템과 결합하는 캐릭터 비주얼 데이터 시스템의 런타임과 저작 툴을 직접 담당."
 tags: ["VisualData", "Character", "SkeletalMesh", "Async Loading", "Action/전투", "Editor Tooling"]
 highlights:
   - "PC·NPC·정령·토템·필드오브젝트·아이템 등 모든 엔티티에 부착되는 UVisualDataModuleComponent로, 파츠(Master/Face/Torso/Helmet/Wing/Cape)·Override Material·어태치먼트·본 트랜스폼을 세팅·로드"
   - "전투/액션 시스템과 결합 — StatusEffect FX·Montage·ActionNotify를 VisualData와 연동하고 ActionTable로 타입별 동작에 맞는 몽타주를 재생"
   - "전이 규칙(FullReset/PartialUpdate/NoUpdate)으로 바뀐 파츠만 부분 갱신, Override Material·Color Tint·LOD로 에셋 재사용성 향상"
   - "무기/방어구/헬멧 어태치먼트를 소켓 기반으로 부착 — 무기 애니메이션·Niagara FX·소켓 전환(장착↔납도)까지 처리"
-  - "에디터 저작 툴 대규모 리팩토링(슈퍼클래스 Data → 타입별 클래스 분리·구 에셋 자동 변환 AssetMigration) 전체 오너십, 서버 없이 인게임과 동일 동작을 preview하는 아트 테스트 환경 제공"
+  - "에디터 저작 툴 대규모 리팩토링(슈퍼클래스 Data → 타입별 클래스 분리·구 에셋 자동 변환 AssetMigration) 전체 전담, 서버 없이 인게임과 동일 동작을 preview하는 아트 테스트 환경 제공"
 ---
 
 > **목적** — 전투/액션 데이터를 각 캐릭터에 세팅·로드하는 비주얼 데이터 시스템
 > **성과** — 외형·전투 표현 데이터 주도 일관화, 풀링×비동기 크래시 구조적 차단, 부분 갱신 최적화
-> **기여** — 런타임 컴포넌트·타입별 모듈·어태치먼트·저작 에디터 툴까지 전체 오너십
+> **기여** — 런타임 컴포넌트·타입별 모듈·어태치먼트·저작 에디터 툴까지 전체 전담
 
 ## 개요
 
