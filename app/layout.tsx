@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export const metadata: Metadata = {
   title: '임현지 · Game Client Developer',
@@ -18,7 +17,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body>
-        <ThemeToggle />
         <main>{children}</main>
         <footer>
           <p>© {new Date().getFullYear()} 임현지. Built with Next.js.</p>

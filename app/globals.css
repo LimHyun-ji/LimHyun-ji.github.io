@@ -18,7 +18,7 @@
   background: color-mix(in srgb, var(--accent) 94%, transparent);
   border-bottom: 1px solid rgba(0, 0, 0, .16); box-shadow: 0 2px 14px rgba(0, 0, 0, .18); }
 .nav-brand { font-weight: 800; font-size: 18px; letter-spacing: .5px; text-decoration: none; color: #0B1310; }
-.nav-links { display: flex; gap: clamp(12px, 3vw, 28px); }
+.nav-links { display: flex; align-items: center; gap: clamp(12px, 3vw, 28px); }
 .nav-links a { text-decoration: none; color: #0B1310; opacity: .82; font-size: 14px; font-weight: 700; }
 .nav-links a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 
@@ -31,7 +31,20 @@
 /* 3D 오브젝트 위에서도 히어로 텍스트 가독성 확보 — 텍스트 뒤 은은한 스크림 */
 .hero-wrap .lead::before { content: ""; position: absolute; inset: -8% -6%; z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse 58% 62% at 42% 46%, color-mix(in srgb, var(--bg) 80%, transparent) 0%, transparent 72%); }
-.lead { max-width: 860px; margin: 0 auto; padding: clamp(60px, 12vw, 130px) clamp(20px, 5vw, 40px) 40px; }
+.lead { max-width: 860px; margin: 0 auto; padding: clamp(44px, 8vw, 88px) clamp(20px, 5vw, 40px) 40px; }
+
+/* CAREER — 이력 한눈에 (히어로 직후) */
+.career { max-width: 1600px; margin: 0 auto; padding: 10px clamp(20px, 5vw, 48px) 18px; }
+.career-head { font-size: clamp(17px, 2.2vw, 22px); font-weight: 800; letter-spacing: -.3px; margin: 4px 0 18px; }
+.career-period { color: var(--muted); font-weight: 600; font-size: .78em; }
+.career-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 900px) { .career-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .career-grid { grid-template-columns: 1fr; } }
+.career-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: var(--surf);
+  border-top: 3px solid var(--accent); }
+.career-year { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-2); font-weight: 700; margin-bottom: 7px; }
+.career-card h3 { margin: 0 0 8px; font-size: 15px; line-height: 1.35; }
+.career-card p { margin: 0; font-size: 12.5px; line-height: 1.6; opacity: .78; }
 .lead-eyebrow { color: var(--accent-2); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; margin: 0 0 10px; }
 .lead-name { font-size: clamp(40px, 8vw, 76px); line-height: 1.05; margin: 0 0 18px; font-weight: 800; letter-spacing: -1px; }
 .lead-headline { font-size: clamp(18px, 2.4vw, 24px); font-weight: 600; margin: 0 0 16px; opacity: .95; }

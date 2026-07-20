@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { getProject, getSlugs } from '@/lib/content';
 import Mermaid from '@/components/Mermaid';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -19,7 +20,10 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
 
   return (
     <article className="project-detail">
-      <Link className="back" href="/#projects">← 프로젝트 목록</Link>
+      <div className="detail-topbar">
+        <Link className="back" href="/#sol">← 프로젝트 목록</Link>
+        <ThemeToggle />
+      </div>
 
       <header className="detail-head">
         <p className="eyebrow">{proj.role}{proj.period ? ` · ${proj.period}` : ''}</p>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getProfile, getProjects } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Home() {
   const p = getProfile();
@@ -17,6 +18,7 @@ export default function Home() {
           <a href="#side">Side Projects</a>
           <a href="#skills">Skills</a>
           {p.links?.github && <a href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -34,6 +36,28 @@ export default function Home() {
           </div>
         </header>
       </div>
+
+      {/* CAREER — 이력 한눈에 (진입 시 바로 보이는 요약) */}
+      {p.experience && (
+        <section className="career" id="career">
+          <div className="featured-tag">◈ Career · 이력 한눈에</div>
+          {p.experience[0] && (
+            <h2 className="career-head">
+              {p.experience[0].org}
+              <span className="career-period"> · {p.experience[0].period}</span>
+            </h2>
+          )}
+          <div className="career-grid">
+            {p.experience.slice(1).map((e, i) => (
+              <div className="career-card" key={i}>
+                <div className="career-year">{e.period}</div>
+                <h3>{(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')}</h3>
+                <p>{e.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
@@ -101,23 +125,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* EXPERIENCE */}
-      {p.experience && (
-        <section className="block" id="exp">
-          <h2 className="section-h">Experience</h2>
-          <div className="timeline">
-            {p.experience.map((e, i) => (
-              <div className="tl-item" key={i}>
-                <div className="tl-period">{e.period}</div>
-                <div className="tl-body">
-                  <h3>{e.title} {e.org && <span className="org">@ {e.org}</span>}</h3>
-                  <p>{e.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
     </>
   );
 }
