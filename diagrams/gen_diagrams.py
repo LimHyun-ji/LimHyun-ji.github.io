@@ -230,18 +230,14 @@ d1_nodes = [
     N("meta", "MetaDataSubsystem\nRidType 키",          40, 168, 180, 58, "data"),
     N("mgr",  "Feature Managers\nUGuildManager · UTravelManager …\nUSolGameInstanceSubsystem + INetworkNotiClientListener",
               190, 286, 460, 72, "manager"),
-    N("vis",  "UVisualDataModuleComponent\n전 엔티티 외형·전투 데이터",  60, 408, 300, 56, "entity"),
-    N("ui",   "UPrimaryGameLayout\nCommonUI 레이어 스택",              480, 408, 300, 56, "ui"),
 ]
 d1_edges = [
     dict(src="tcp", dst="geo", label="패킷"),
     dict(src="ws", dst="geo", label="Noti"),
     dict(src="geo", dst="mgr", label="수신"),
     dict(src="meta", dst="mgr", label="메타데이터"),
-    dict(src="mgr", dst="vis", label="외형·전투"),
-    dict(src="mgr", dst="ui", label="델리게이트"),
 ]
-emit("sol-architecture", "Sol 클라이언트 아키텍처 — 서버 · 코어 · 매니저 · 표현", d1_nodes, d1_edges)
+emit("sol-architecture", "Sol 클라이언트 아키텍처 — 서버 · 코어 · 매니저", d1_nodes, d1_edges)
 
 # ═══════════════════════════════════════════════════════════════
 # D2. VisualData 데이터 흐름

@@ -44,7 +44,7 @@ export default function Home() {
           아웃게임(로비·성장·편의)·인게임 연출·데이터 파이프라인·라이브 안정화까지 <strong>다년간 오너십</strong>으로 담당.
         </p>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="Sol 클라이언트 아키텍처: 게임 서버(TCP)·Noti(WebSocket) → USolGeoSubsystem → Feature Managers → VisualData·UI" loading="lazy" />
+          alt="Sol 클라이언트 아키텍처: 게임 서버(TCP)·Noti(WebSocket) → USolGeoSubsystem, MetaDataSubsystem → Feature Managers" loading="lazy" />
         <div className="area-grid">
           {areas.map((a) => (
             <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>
