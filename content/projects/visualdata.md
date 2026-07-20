@@ -62,9 +62,6 @@ enum class EVisualDataModuleKind : uint8 { Base, Character, PC, NPC, Spirit, Ite
 class SOL_API FVisualDataModuleBase : public TSharedFromThis<FVisualDataModuleBase>
 {
     virtual void ApplyModule(EVisualDataModuleTransitionRule TransitionRule) {}
-    virtual void OnEvent(const FInstancedStruct& Event) {}   // 전투/액션 이벤트 수신
-    virtual bool IsKindOf(EVisualDataModuleKind InKind) const { return InKind == StaticKind; }
-    // copy/move 삭제 — TStrongObjectPtr 완전형 요구를 피해 forward decl 만으로 헤더 사용 가능하게 설계
 };
 template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisualDataModuleBase>& P);
 ```
