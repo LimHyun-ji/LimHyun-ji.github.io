@@ -9,14 +9,14 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling"]
 highlights:
   - "Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 FIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
-  - "약참조(TWeakObjectPtr·CreateWeakLambda) 수명 관리와 소프트 참조 지연 로드로 댕글링·GC 압력 동시 해결"
+  - "데미지 표시를 BP 애니메이션 의존에서 순수 C++ 이벤트 릴레이 + 컨테이너 풀링으로 재설계"
 ---
 
 > **목적** — 모바일 타겟의 프레임·메모리 비용 상시 절감
 >
-> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓, GC 스파이크·댕글링 구조적 차단
+> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓, freed-tick 크래시 구조적 차단
 >
-> **기여** — Global Invalidation 동적 토글, 액터 풀링·명시적 GC, 약참조 수명관리, 데미지 표시 BP→C++ 재설계
+> **기여** — Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
@@ -91,7 +91,7 @@ Container->SetOnAnimationFinishedCallback([this, WeakContainer]() {
 
 ## 4. 메모리 관리 — 가장 신경 쓴 영역
 
-- 모바일 메모리 예산·GC 스파이크 절감을 위한 네 축: **(1) 명시적 GC, (2) 액터 풀링, (3) 약참조 수명관리, (4) 지연 로드**
+- 모바일 메모리 예산·GC 스파이크 절감을 위한 두 축: **(1) 명시적 GC, (2) 액터 풀링**
 
 ### 4-1. 명시적 GC — 큰 UI 전환 직후
 
@@ -134,31 +134,6 @@ for (UActorComponent* Comp : Components)               // 컴포넌트 틱까지
 - Pull 시 최근 사용 액터 우선 반환 (캐시 적중↑)
 - 주기적 `ShrinkPool()`: 최근 피크 + 20% 버퍼 유지, 초과분 파괴 (`ObjectPoolSubsystem.cpp:120-170, 334-368`)
 
-### 4-3. 약참조 · 수명 안전 — 댕글링/순환참조 차단
-
-- 람다 캡처: `TWeakObjectPtr` + `Get()` 검사
-- 델리게이트: `NativeDestruct`에서 명시적 해제
-
-```cpp
-// HUDMainMenuWidget.cpp:24-31 — weak 캡처로 순환참조/댕글링 방지
-TWeakObjectPtr<UHUDMainMenuWidget> WeakThis(this);
-OpenMenuBehavior->SetFunction([WeakThis]() {
-    if (UHUDMainMenuWidget* StrongThis = WeakThis.Get()) StrongThis->OpenMenu();
-});
-```
-
-- `GeoServerTimerManager`: `CreateWeakLambda` 콜백 + Tick에서 `BoundObject.IsStale()` 검사 → 발화 전 타이머 제거 (`GeoServerTimerManager.cpp:76-82`)
-
-### 4-4. 지연 로드 — 소프트 참조 + StreamableManager
-
-- UI 리소스: `TSoftObjectPtr` 보유 → 필요 시 로드 → 사용 후 핸들 해제
-
-```cpp
-// BeginnerTipPopupWidget.cpp:101-110
-NewHandle = UAssetManager::GetStreamableManager().RequestSyncLoad(Path, false);
-... // 이전 핸들은 ClearTipBanner()로 ReleaseHandle 후 교체
-```
-
 ---
 
 - 풀링·비동기 로드 맞물린 freed-tick 크래시 등 라이브 크래시 추적·차단 → [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/) 참조
@@ -167,4 +142,4 @@ NewHandle = UAssetManager::GetStreamableManager().RequestSyncLoad(Path, false);
 
 - 프레임·메모리 비용을 UI 렌더링 · Tick 제어 · 메모리 관리 세 축으로 접근
 
-<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC·약참조·지연로드)" />
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />

@@ -289,7 +289,7 @@ opt_nodes = [
     N("tick1", "Significance 거리별 Tick",                          310, 212, 240, 48, "data"),
     N("tick2", "상태별 Tick 비활성화",                              310, 278, 240, 48, "data"),
     N("mem1",  "오브젝트 풀링 — Tick 先비활성화\n(freed-tick 방지)", 580, 212, 260, 56, "data"),
-    N("mem2",  "명시적 GC · 약참조 · 지연 로드",                     580, 286, 260, 48, "data"),
+    N("mem2",  "명시적 GC (UObject Exceed 방지)",                   580, 286, 260, 48, "data"),
 ]
 opt_edges = [
     dict(src="root", dst="ui"), dict(src="root", dst="tick"), dict(src="root", dst="mem"),
