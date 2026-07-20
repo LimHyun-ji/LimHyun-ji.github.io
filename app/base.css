@@ -1,6 +1,7 @@
 /* ───────────── Theme tokens ───────────── */
 /* Emerald Forge — 주: 에메랄드(인터랙션/구조) · 보조: 골드(라벨/뱃지) */
 :root {
+  color-scheme: dark;            /* 모바일 강제 다크 재색조 차단 */
   --bg: #0C1210;
   --bg-soft: #15201C;
   --card: #15201C;
@@ -14,6 +15,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 [data-theme="light"] {
+  color-scheme: light;
   --bg: #ffffff;
   --bg-soft: #f2f8f4;
   --card: #ffffff;
