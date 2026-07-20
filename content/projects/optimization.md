@@ -8,14 +8,13 @@ summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바�
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling"]
 highlights:
   - "Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
-  - "풀스크린 UI로 전환 시 인게임 Rendering을 중지해 GPU 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 FIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
   - "약참조(TWeakObjectPtr·CreateWeakLambda) 수명 관리와 소프트 참조 지연 로드로 댕글링·GC 압력 동시 해결"
 ---
 
 > **목적** — 모바일 타겟의 프레임·메모리 비용 상시 절감
-> **성과** — UI 재계산·GPU 비용↓, 풀링으로 CPU 비용↓, GC 스파이크·댕글링 구조적 차단
-> **기여** — Global Invalidation 동적 토글, 풀스크린 렌더링 중지, 액터 풀링·명시적 GC, 약참조 수명관리
+> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓, GC 스파이크·댕글링 구조적 차단
+> **기여** — Global Invalidation 동적 토글, 액터 풀링·명시적 GC, 약참조 수명관리, 데미지 표시 BP→C++ 재설계
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
@@ -43,18 +42,6 @@ bool bUseGlobalInvalidation = false;
 
 - 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감 (`GeoGameMode.cpp:177`/`:218`)
 
-### 풀스크린 UI 전환 시 인게임 렌더링 중지
-
-- 풀스크린 UI 전환 시 3D 화면이 가려짐 → 뷰포트 렌더링 중지로 모바일 GPU 비용 절감
-- 렌더링 중지 대상은 위젯 데이터로 지정, `USolDisableGameRenderingSubsystem`이 사유 취합·관리
-
-```cpp
-// UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
-bIsDisableRenderingOnFullScreen = SolActivatableWidget->IsDisableViewportRenderingOnFullScreen();
-USolDisableGameRenderingSubsystem::Get()
-    ->SetReason(ESolDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
-```
-
 ## 2. Tick / 렌더 패스 비용 절감
 
 - **Significance** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
@@ -76,16 +63,6 @@ float USIGMonsterBucketComponent::CalculateSignificance(
   - 룰렛 시퀀스 대기 중 (`CineConstellationRoulette.cpp:203`)
 - FX 그림자 제거: `SetCastShadow(false)` (`ActionNotify_PlayParticleEffect.cpp:315`)
 - 단일 그림자 메시 메인/뎁스 패스 비활성화 (`SolSingleShadowComponent.cpp:336-340`)
-- SceneCapture 프리뷰: 모바일 PostProcess 비활성화 + 강제 Mip 스트리밍으로 품질 유지
-
-```cpp
-// DialogueRenderer.cpp:107-113 — SceneCapture 전용 + 모바일 PostProcess off
-Component->SetVisibleInSceneCaptureOnly(true);
-Component->bForceMipStreaming = true;
-#if PLATFORM_ANDROID || PLATFORM_IOS
-    CaptureComponent->PostProcessSettings.WeightedBlendables.Array.Empty();
-#endif
-```
 
 ## 3. 데미지 표시: BP → C++ 이벤트 릴레이
 
@@ -188,4 +165,4 @@ NewHandle = UAssetManager::GetStreamableManager().RequestSyncLoad(Path, false);
 
 - 프레임·메모리 비용을 UI 렌더링 · Tick 제어 · 메모리 관리 세 축으로 접근
 
-<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·풀스크린 렌더링 중지), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC·약참조·지연로드)" />
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC·약참조·지연로드)" />

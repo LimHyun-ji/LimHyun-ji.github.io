@@ -285,8 +285,7 @@ opt_nodes = [
     N("ui",    "UI 렌더링 (Slate)",                                 40, 132, 240, 46, "ui"),
     N("tick",  "Tick 제어",                                         310, 132, 240, 46, "core"),
     N("mem",   "메모리 관리",                                       580, 132, 260, 46, "entity"),
-    N("ui1",   "Global Invalidation 동적 토글 · ForceVolatile",     40, 212, 240, 52, "data"),
-    N("ui2",   "풀스크린 시 인게임 렌더링 중지",                     40, 282, 240, 48, "data"),
+    N("ui1",   "Global Invalidation 동적 토글 · ForceVolatile",     40, 212, 240, 56, "data"),
     N("tick1", "Significance 거리별 Tick",                          310, 212, 240, 48, "data"),
     N("tick2", "상태별 Tick 비활성화",                              310, 278, 240, 48, "data"),
     N("mem1",  "오브젝트 풀링 — Tick 先비활성화\n(freed-tick 방지)", 580, 212, 260, 56, "data"),
@@ -294,7 +293,7 @@ opt_nodes = [
 ]
 opt_edges = [
     dict(src="root", dst="ui"), dict(src="root", dst="tick"), dict(src="root", dst="mem"),
-    dict(src="ui", dst="ui1"), dict(src="ui1", dst="ui2"),
+    dict(src="ui", dst="ui1"),
     dict(src="tick", dst="tick1"), dict(src="tick1", dst="tick2"),
     dict(src="mem", dst="mem1"), dict(src="mem1", dst="mem2"),
 ]

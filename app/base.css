@@ -167,15 +167,12 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   content: ""; position: absolute; left: 0; top: 5px; bottom: 5px;
   width: 5px; border-radius: 3px; background: var(--accent);
 }
-/* 작업 항목 제목 — 골드 배지 */
+/* 작업 항목 제목 — 골드 텍스트 (박스 없음) */
 .detail-body h3 {
-  display: inline-block;
+  display: block;
   font-size: 1.28rem; font-weight: 800;
-  margin: 34px 0 14px; padding: 8px 18px;
-  border-radius: 10px;
-  background: var(--accent-2);
-  color: #1a1408;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+  margin: 34px 0 14px;
+  color: var(--accent-2);
 }
 .detail-body p { color: var(--text); margin: 0 0 14px; }
 .detail-body ul { color: var(--text); padding-left: 20px; }

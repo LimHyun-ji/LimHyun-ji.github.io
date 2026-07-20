@@ -1,7 +1,7 @@
 ---
 layout: project
 order: 4
-title: "인게임 연출 & 비동기 에셋 로딩"
+title: "인게임 연출 & GPU 렌더링 파이프라인"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
 summary: "PocketLevel Instance로 인게임과 분리된 연출 공간을 구성하고, LevelSequence·SceneCapture·RenderTarget을 연출 구간에만 살려 모바일 비용을 낮춘 인게임 연출 파이프라인을 설계."
