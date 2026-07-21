@@ -18,6 +18,8 @@ highlights:
 >
 > **기여** — freed-tick·서버-클라 레이스 근본 차단, Jira 연계 회귀 추적·핫픽스
 
+<img class="diagram" src="/images/diagrams/live-race.svg" alt="별자리 룰렛 결과 불일치 레이스 시퀀스: 로컬 연출 선진행 vs 서버 Notify 비동기 도착 순서 의존성 → 로컬 착지 슬롯 산정 버그 → 서버 SelectedSlotIndex 단일 기준으로 확정 수정" />
+
 ## 비동기 / 레이스 컨디션 — 원인까지 추적한 사례
 
 - 재현 어려운 비동기·플랫폼 한정 크래시 → 증상 대응 아닌 원인까지 **구조적 차단** 원칙
@@ -41,8 +43,3 @@ highlights:
 - Jira 티켓 연계 회귀 추적·핫픽스
 - 전체 변경의 평균 약 1/3을 버그·크래시·현상 수정에 투입
 
-## 별자리 룰렛 레이스 — 시퀀스로 본 원인과 해결
-
-- WebSocket Notify 도착 × 연출 상태 전이 순서 의존성 레이스 → **서버 기준 결과 확정 일원화** 해결 시퀀스
-
-<img class="diagram" src="/images/diagrams/live-race.svg" alt="별자리 룰렛 결과 불일치 레이스 시퀀스: 로컬 연출 선진행 vs 서버 Notify 비동기 도착 순서 의존성 → 로컬 착지 슬롯 산정 버그 → 서버 SelectedSlotIndex 단일 기준으로 확정 수정" />

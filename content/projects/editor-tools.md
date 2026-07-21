@@ -27,6 +27,8 @@ highlights:
 - 콘텐츠 제작팀 생산성·게임 데이터 무결성 향상을 위한 **사내 에디터 툴·빌드 파이프라인** 개발
 - 데이터 자동 검증·생성·배포 흐름 구축 집중
 
+<img class="diagram" src="/images/diagrams/pipeline-flow.svg" alt="데이터 파이프라인 관계도: 원본(Excel·에셋·레벨)→AreaTool Generator→검증자 체인→Export+P4 Reconcile→Generated 메타데이터(RidType)→런타임 MetadataSubsystem, Commandlet(CI)이 실행" />
+
 ## 주요 작업
 
 ### 데이터 코드 생성 파이프라인 — 입사 첫 3개월, 단독 구축
@@ -59,12 +61,6 @@ highlights:
 | 자동화 | Commandlet 기반 CI(Jenkins) · P4 자동화 스크립트 |
 | 데이터 | 메타데이터 Generator · VisualData Editor · `RidType` 키 |
 | 출력 | 검증된 Generated 메타데이터 → 런타임 `MetaDataSubsystem` |
-
-## 파이프라인 구조
-
-- 원본 데이터 → 에디터 툴·Commandlet → **검증·생성·배포** 자동화 흐름
-
-<img class="diagram" src="/images/diagrams/pipeline-flow.svg" alt="데이터 파이프라인 관계도: 원본(Excel·에셋·레벨)→AreaTool Generator→검증자 체인→Export+P4 Reconcile→Generated 메타데이터(RidType)→런타임 MetadataSubsystem, Commandlet(CI)이 실행" />
 
 ## 핵심 구현
 

@@ -19,6 +19,8 @@ highlights:
 >
 > **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture, 갓아머 연출 직접 설계
 
+<img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
+
 ## 0. PocketLevel — 인게임과 분리된 연출 공간
 
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
@@ -105,7 +107,3 @@ Source/SolEditor/VisualDataEditor/EditorTransformBonesComponent  // 에디터 �
 | 스켈레탈 | `TransformBonesComponent` 런타임 본 트랜스폼 ↔ AnimBP |
 | FX | Niagara `Deactivate`(잔상 정리) · 모바일 PostProcess off |
 | 비용 | 모바일에서 SceneCapture/시퀀스 액터 수명을 연출 구간에 한정 |
-
-## 연출 렌더링 흐름
-
-<img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />

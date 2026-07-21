@@ -18,6 +18,8 @@ highlights:
 >
 > **기여** — Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
+
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
 - CommonUI/Slate 최대 비용: **매 프레임 위젯 재계산**
@@ -137,9 +139,3 @@ for (UActorComponent* Comp : Components)               // 컴포넌트 틱까지
 ---
 
 - 풀링·비동기 로드 맞물린 freed-tick 크래시 등 라이브 크래시 추적·차단 → [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/) 참조
-
-## 최적화 기법 한눈에
-
-- 프레임·메모리 비용을 UI 렌더링 · Tick 제어 · 메모리 관리 세 축으로 접근
-
-<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />

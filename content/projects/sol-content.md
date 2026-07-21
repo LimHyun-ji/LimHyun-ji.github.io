@@ -24,6 +24,8 @@ highlights:
 - **길드·수집·순례·경제·소셜** 등 게임 콘텐츠 시스템 폭넓은 담당
 - 핵심 시스템 **장기 담당** — 기획 연동 → 구현 → 출시 → 라이브 운영 전 주기
 
+<img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 콘텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
+
 ## 담당 콘텐츠
 
 ### 길드 / 아지트 — 대표작
@@ -69,8 +71,6 @@ highlights:
 
 - 서버 Noti: Manager 단일 창구 수신 → 상태 갱신 → 델리게이트로 UI 전파
 - 사용자 입력 흐름: **UI → Manager → 서버 요청**
-
-<img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 콘텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
 ## 시스템별 핵심 설계
 
