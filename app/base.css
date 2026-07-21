@@ -15,7 +15,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 [data-theme="light"] {
-  color-scheme: light;
+  color-scheme: only light;   /* 'only' 필수 — 모바일 강제 다크(auto/force dark) 옵트아웃 */
   --bg: #ffffff;
   --bg-soft: #f2f8f4;
   --card: #ffffff;

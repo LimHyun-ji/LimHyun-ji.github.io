@@ -15,8 +15,13 @@ export default function ThemeToggle() {
   function toggle() {
     const el = document.documentElement;
     const next = el.getAttribute('data-theme') !== 'light';
-    if (next) { el.setAttribute('data-theme', 'light'); el.style.colorScheme = 'light'; localStorage.setItem('theme', 'light'); }
-    else { el.removeAttribute('data-theme'); el.style.colorScheme = 'dark'; localStorage.setItem('theme', 'dark'); }
+    if (next) { el.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); }
+    else { el.removeAttribute('data-theme'); localStorage.setItem('theme', 'dark'); }
+    // 'only light' 필수 — 모바일 강제 다크 옵트아웃. 주소창 색(theme-color)도 동기화
+    el.style.colorScheme = next ? 'only light' : 'dark';
+    let m = document.querySelector('meta[name="theme-color"]');
+    if (!m) { m = document.createElement('meta'); m.setAttribute('name', 'theme-color'); document.head.appendChild(m); }
+    m.setAttribute('content', next ? '#ffffff' : '#0C1210');
     setLight(next);
     window.dispatchEvent(new Event('themechange'));
   }
