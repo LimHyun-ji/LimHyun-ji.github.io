@@ -105,8 +105,11 @@ export default function Home() {
         <div className="featured-tag">▚ Side Projects · 사이드 프로젝트</div>
         <h2 className="section-h">Side Projects</h2>
         <p className="section-note">개인·학습·팀 프로젝트 ({sideProjects.length}) — Notion 포트폴리오 기반</p>
+
+        {/* 주요 프로젝트 (중요도 상위 5 · 큰 카드) */}
+        <h3 className="side-sub">주요 프로젝트</h3>
         <div className="side-grid">
-          {sideProjects.map((sp) => (
+          {sideProjects.slice(0, 5).map((sp) => (
             <Link className="sp-card" href={`/side/${sp.slug}/`} key={sp.slug}>
               <div className="sp-hero">
                 <img src={sp.image} alt={sp.title} loading="lazy" />
@@ -122,6 +125,23 @@ export default function Home() {
             </Link>
           ))}
         </div>
+
+        {/* 그 외 프로젝트 (작은 카드) */}
+        {sideProjects.length > 5 && (
+          <>
+            <h3 className="side-sub muted">그 외 프로젝트</h3>
+            <div className="side-grid-sm">
+              {sideProjects.slice(5).map((sp) => (
+                <Link className="sp-card-sm" href={`/side/${sp.slug}/`} key={sp.slug}>
+                  <span className="sp-sm-engine">{sp.engine}</span>
+                  <h4>{sp.title}</h4>
+                  <p className="sp-sm-sub">{sp.subtitle}</p>
+                  <ul className="chips small">{sp.tags.slice(0, 3).map((t) => <li key={t}>{t}</li>)}</ul>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
        </div>
       </section>
 

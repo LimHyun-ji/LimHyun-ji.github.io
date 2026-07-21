@@ -9,28 +9,8 @@ export interface SideProject {
   links: { git?: string; video?: string; doc?: string };
 }
 
-// Notion 포트폴리오에서 이관 (기간순/관련도순 정렬). 이미지: PDF 스크린샷 또는 YouTube 썸네일.
+// Notion 포트폴리오에서 이관. 상위 5개(중요도순) = 주요 프로젝트, 이후 = 그 외 프로젝트.
 export const sideProjects: SideProject[] = [
-  {
-    slug: 'genshin',
-    title: '원신 (Genshin) 모작',
-    subtitle: '오픈월드 RPG · Unity',
-    engine: 'Unity / C#',
-    desc: 'GameManager로 던전 Flow를 관리하고, 원소·자연물 상호작용, 상속 기반 다중 캐릭터, 클래스형 FSM, 캐릭터 교체 오브젝트 풀링을 구현.',
-    tags: ['Unity', 'C#', 'FSM', 'Object Pooling', 'Cinemachine'],
-    image: '/images/yt/genshin.jpg',
-    links: { git: 'https://github.com/LimHyun-ji/GenshinImpact_Copy', video: 'https://youtu.be/K3E_Jpei_Oc', doc: 'https://www.miricanvas.com/v/11mr28x' },
-  },
-  {
-    slug: 'journey',
-    title: 'Journey To Space',
-    subtitle: '우주·행성 탐험 FPS RPG · Unreal',
-    engine: 'Unreal / C++',
-    desc: '블루프린트를 최소화하고 C++ 중심으로 행성 파트의 보스·일반 적 AI 행동 패턴과 플레이어 전투·스킬·기믹을 구현.',
-    tags: ['Unreal', 'C++', 'AI Behavior', 'Destructible', 'FPS RPG'],
-    image: '/images/yt/journey.jpg',
-    links: { git: 'https://github.com/LimHyun-ji/Space-To-Journey', video: 'https://youtu.be/xfQBWUyWXu8' },
-  },
   {
     slug: 'ittakestwo',
     title: 'It Takes Two 모작',
@@ -40,6 +20,16 @@ export const sideProjects: SideProject[] = [
     tags: ['Unity', 'FSM', 'Shader', 'Bezier', 'IK'],
     image: '/images/ittakestwo-1.png',
     links: { git: 'https://github.com/LimHyun-ji/ItTakesTwo_GG', video: 'https://youtu.be/23g39-UNHLQ', doc: 'https://www.miricanvas.com/v/11j6dmn' },
+  },
+  {
+    slug: 'genshin',
+    title: '원신 (Genshin) 모작',
+    subtitle: '오픈월드 RPG · Unity',
+    engine: 'Unity / C#',
+    desc: 'GameManager로 던전 Flow를 관리하고, 원소·자연물 상호작용, 상속 기반 다중 캐릭터, 클래스형 FSM, 캐릭터 교체 오브젝트 풀링을 구현.',
+    tags: ['Unity', 'C#', 'FSM', 'Object Pooling', 'Cinemachine'],
+    image: '/images/yt/genshin.jpg',
+    links: { git: 'https://github.com/LimHyun-ji/GenshinImpact_Copy', video: 'https://youtu.be/K3E_Jpei_Oc', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {
     slug: 'cinepx',
@@ -60,6 +50,16 @@ export const sideProjects: SideProject[] = [
     tags: ['Unreal', 'C++', 'VR', 'LiveLink', 'Behavior Tree'],
     image: '/images/yt/bridge.jpg',
     links: { git: 'https://github.com/LimHyun-ji/VR-Theater', video: 'https://youtu.be/D6_bDRrNd8w' },
+  },
+  {
+    slug: 'journey',
+    title: 'Journey To Space',
+    subtitle: '우주·행성 탐험 FPS RPG · Unreal',
+    engine: 'Unreal / C++',
+    desc: '블루프린트를 최소화하고 C++ 중심으로 행성 파트의 보스·일반 적 AI 행동 패턴과 플레이어 전투·스킬·기믹을 구현.',
+    tags: ['Unreal', 'C++', 'AI Behavior', 'Destructible', 'FPS RPG'],
+    image: '/images/yt/journey.jpg',
+    links: { git: 'https://github.com/LimHyun-ji/Space-To-Journey', video: 'https://youtu.be/xfQBWUyWXu8' },
   },
   {
     slug: 'squid',
@@ -99,7 +99,7 @@ export const sideProjects: SideProject[] = [
     desc: 'Passthrough API로 현실 위에 가상 오브젝트를 투영하는 MR 헬스 콘텐츠. 체스트 프레스 유효 판정(UI/Collider)과 GameManager 플로우를 담당.',
     tags: ['MR', 'Passthrough API', 'Oculus Quest', 'GameManager'],
     image: '/images/yt/healthmr.jpg',
-    links: { video: 'https://youtu.be/uVdVijj9Cqg' },
+    links: { video: 'https://youtu.be/WjROo7WEGCY' },
   },
   {
     slug: 'fruit',

@@ -119,4 +119,24 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .sp-more { display: inline-block; margin-top: auto; padding-top: 12px; font-size: 13px; font-weight: 700; color: var(--accent); }
 .sp-card:hover .sp-more { text-decoration: underline; text-underline-offset: 3px; }
 
+/* 사이드 프로젝트 — 중요도 구분 소제목 */
+.side-sub { font-size: 15px; font-weight: 800; letter-spacing: -.2px; margin: 26px 0 14px;
+  padding-left: 11px; border-left: 3px solid var(--accent); }
+.side-sub.muted { color: var(--muted); border-left-color: var(--line); margin-top: 40px; }
+
+/* 그 외 프로젝트 — 작은 카드 (텍스트 위주, 조밀한 그리드) */
+.side-grid-sm { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .side-grid-sm { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .side-grid-sm { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sp-card-sm { display: flex; flex-direction: column; gap: 6px; padding: 14px 15px;
+  border: 1px solid var(--line); border-radius: 11px; background: var(--surf);
+  text-decoration: none; color: inherit; transition: transform .15s, border-color .15s; }
+.sp-card-sm:hover { transform: translateY(-2px); border-color: var(--accent); }
+.sp-sm-engine { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  color: var(--accent-2); letter-spacing: .02em; }
+.sp-card-sm h4 { margin: 0; font-size: 14px; line-height: 1.35; }
+.sp-sm-sub { margin: 0 0 2px; font-size: 11.5px; opacity: .7; line-height: 1.45; }
+.sp-card-sm .chips.small { margin: auto 0 0; }
+.sp-card-sm .chips.small li { font-size: 10px; padding: 2px 7px; }
+
 @media (max-width: 560px) { .nav-links a:nth-child(3) { display: none; } }
