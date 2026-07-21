@@ -14,8 +14,15 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // 첫 페인트 전에 저장된 테마를 적용(플래시 방지) + color-scheme을 테마에 맞춰 즉시 지정
+  // → 모바일 강제 다크(자동 재색조) 옵트아웃 및 하이드레이션 이전 상태 확정
+  const themeInit = `(function(){try{var t=localStorage.getItem('theme');var l=(t==='light');var d=document.documentElement;if(l)d.setAttribute('data-theme','light');d.style.colorScheme=l?'light':'dark';}catch(e){}})();`;
+
   return (
     <html lang="ko">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body>
         <main>{children}</main>
         <footer>
