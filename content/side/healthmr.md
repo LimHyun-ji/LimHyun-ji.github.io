@@ -27,6 +27,6 @@ links: { git: "", doc: "", video: "https://youtu.be/WjROo7WEGCY" }
 - GameManager를 통한 전반적인 플로우 관리
 ## 📝프로젝트를 진행하며 배운 점📝
 <div class="callout"><span class="ci">💡</span> <strong>MR을 이용한 프로젝트 진행 및 기획<br><br></strong>VR, MR 등의 기술을 구현하는 데에 앞서 먼저 중요한 것은 왜? 굳이 이 기술을 사용해야 하는가에 대한 적절한 이해라고 생각합니다. 해당 프로젝트는 그러한 점을 많이 고민했고, 그 결과 헬스장에 가기 어려운 상황, 홈트레이닝을 해야 하는 상황에서 동기부여가 될 수 있도록 콘텐츠를 기획했습니다. 또한, 주변 현실 사물들을 인지해 위험성을 낮추기 위해 현실세계의 투영이 필요하다고 생각했습니다. <br><br>위와 같은 기획 과정을 통해 PassThrough API를 적절히 적용하였고, VR기기를 이용해 MR기술을 일부 구현하는 데에 성공했습니다. 다만 기술적 한계로 인해 선명한 현실을 볼 수 없다는 아쉬움이 있었지만 차후 발전한 기술로 새로운 MR프로젝트를 진행할 수 있을 것이라고 생각합니다.</div>
-**+) Oculus Quest Pro 에서 Color PassThrough 기능을 선보였습니다. **
+<strong>+) Oculus Quest Pro 에서 Color PassThrough 기능을 선보였습니다. </strong>
 
 [▶ Color PassThrough 영상 (YouTube)](https://www.youtube.com/watch?v=Tng2O7d7KCI)

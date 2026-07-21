@@ -106,6 +106,8 @@ def convert(slug, md):
     # 탭 -> 2space (중첩 렌더)
     md = "\n".join(re.sub(r"^\t+", lambda m: "  "*len(m.group(0)), ln) for ln in md.splitlines())
     md = re.sub(r"\n{3,}", "\n\n", md).strip()
+    # 본문에 남은 **bold** → <strong> (닫는 ** 앞 공백 등 CommonMark 경계 문제로 안 굵어지는 경우 방지)
+    md = "\n".join(strong(ln) for ln in md.splitlines())
     return md
 
 def esc(s): return s.replace('"','\\"')

@@ -13,7 +13,7 @@ links: { git: "", doc: "", video: "https://youtu.be/IDryaiFv-Mw" }
 ## 프로젝트 소개
 2박 3일로 진행한 미드나잇 캠프의 인터렉티브 아트 프로젝트입니다. <br>AI로 핸드 모션을 인식하여 아트와 상호작용 하여 갤러리의 스토리라인을 진행할 수 있습니다.
 ## 💻담당 업무 및 해당 업무에서 사용된 기술
-- **Unity 와 AI 연동**
+- <strong>Unity 와 AI 연동</strong>
   - AI에서 인식한 손 정보를 Unity로 불러와 
     String으로 받은 정보를 배열로 변환하여 해당 위치에 Collider 생성
 - 물 상호작용 기능 구현

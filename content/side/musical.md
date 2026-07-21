@@ -11,13 +11,13 @@ tags: ["Java", "JDBC", "MySQL"]
 links: { git: "", doc: "", video: "https://youtu.be/wdOllSk33T0" }
 ---
 ## 프로젝트 소개
-**사용자에게 뮤지컬 배우, 극 정보, 후기, 로그인 시스템을 제공하는 뮤지컬 관리 시스템**입니다. Java JDBC와 MySQL데이터베이스를 연동하여 만든 시스템으로 흩어진 정보를 취합해 제공하기 위해 작성하였습니다.
+<strong>사용자에게 뮤지컬 배우, 극 정보, 후기, 로그인 시스템을 제공하는 뮤지컬 관리 시스템</strong>입니다. Java JDBC와 MySQL데이터베이스를 연동하여 만든 시스템으로 흩어진 정보를 취합해 제공하기 위해 작성하였습니다.
 ## 💻담당 업무
-**Java JDBC, MySQL**
+<strong>Java JDBC, MySQL</strong>
 MySQL 데이터 자료 및 JDBC 내 검색 기능 담당
-- **MySQL과 JDBC의 연동을 통해 사용자에게 효율적인 검색 관리 기능 제공**
-- **JDBC GUI 활용**
-- **MySQL query문 작성 및 활용**
+- <strong>MySQL과 JDBC의 연동을 통해 사용자에게 효율적인 검색 관리 기능 제공</strong>
+- <strong>JDBC GUI 활용</strong>
+- <strong>MySQL query문 작성 및 활용</strong>
   - Statement : 정적인 쿼리문을 동작 시 사용
   - Prepared Statement: 파라미터 값을 입력 받는 동적인 쿼리문 동작 시 사용
 ## 📝프로젝트를 진행하며 배운 점📝
