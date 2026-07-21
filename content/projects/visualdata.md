@@ -11,19 +11,19 @@ highlights:
   - "전투/액션 시스템과 결합 — StatusEffect FX·Montage·ActionNotify를 VisualData와 연동하고 ActionTable로 타입별 동작에 맞는 몽타주를 재생"
   - "전이 규칙(FullReset/PartialUpdate/NoUpdate)으로 바뀐 파츠만 부분 갱신, Override Material·Color Tint·LOD로 에셋 재사용성 향상"
   - "무기/방어구/헬멧 Attachment를 소켓 기반으로 부착 — 무기 애니메이션·Niagara FX·소켓 전환(장착↔납도)까지 처리"
-  - "에디터 저작 툴 대규모 리팩토링(슈퍼클래스 Data → 타입별 클래스 분리·구 에셋 자동 변환 AssetMigration) 전체 전담, 서버 없이 인게임과 동일 동작을 preview하는 아트 테스트 환경 제공"
+  - "에디터 저작 툴 대규모 리팩토링(슈퍼클래스 Data → 타입별 클래스 분리·구 에셋 자동 변환 AssetMigration) 직접 개발, 서버 없이 인게임과 동일 동작을 preview하는 아트 테스트 환경 제공"
 ---
 
 > **목적** — 전투/액션 데이터를 각 캐릭터에 **동적으로** 세팅·로드하는 비주얼 데이터 시스템
 >
 > **성과** — 외형·전투 표현 데이터 주도 일관화, 풀링×비동기 크래시 구조적 차단, 부분 갱신 최적화
 >
-> **기여** — 런타임 컴포넌트·타입별 모듈·Attachment·아트팀 FX 테스트 에디터 툴까지 전체 전담
+> **기여** — 런타임 컴포넌트·타입별 모듈·Attachment·아트팀 FX 테스트 에디터 툴까지 직접 개발
 
 ## 개요
 
 - 외형 하드코딩 배제 → 액션 데이터(VisualGameData)로 모듈 생성·적용하는 데이터 주도 구조
-- 모든 Entity 공통 단일 컴포넌트(`UVisualDataModuleComponent`)가 로드·적용·정리 전담
+- 모든 Entity 공통 단일 컴포넌트(`UVisualDataModuleComponent`)가 로드·적용·정리를 담당
 
 <img class="diagram" src="/images/diagrams/visualdata-flow.svg" alt="VisualData 구성 구조: VisualGameData→UVisualDataModuleComponent(파츠 맵·현재 모듈 보유)→FVisualDataModuleBase 상속(PC·NPC·Spirit·Item·FieldObject·Totem)→FPCModuleAttachment 소켓 부착" />
 
