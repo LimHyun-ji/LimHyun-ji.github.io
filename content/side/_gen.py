@@ -48,7 +48,7 @@ META = {
  "healthmr":  dict(title="헬스 트레이닝 MR", subtitle="MR 헬스 콘텐츠 · 게임잼", engine="Unity / Oculus Quest",
                    period="2022.07", team="개발자 3 · 모델러 2", status="GameJam",
                    tags=["MR","Passthrough API","Oculus Quest","GameManager"], image="/images/yt/healthmr.jpg",
-                   video="https://youtu.be/uVdVijj9Cqg", git="", doc=""),
+                   video="https://youtu.be/WjROo7WEGCY", git="", doc=""),
  "fruit":     dict(title="Fruit Game", subtitle="모바일 미니게임 · Unity", engine="Unity / C#",
                    period="2021.06", team="개발자 1 (본인)", status="",
                    tags=["Unity","C#","2D","Collision"], image="/images/yt/fruit.jpg",
