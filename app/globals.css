@@ -31,7 +31,16 @@
 /* 3D 오브젝트 위에서도 히어로 텍스트 가독성 확보 — 텍스트 뒤 은은한 스크림 */
 .hero-wrap .lead::before { content: ""; position: absolute; inset: -8% -6%; z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse 58% 62% at 42% 46%, color-mix(in srgb, var(--bg) 80%, transparent) 0%, transparent 72%); }
-.lead { max-width: 860px; margin: 0 auto; padding: clamp(44px, 8vw, 88px) clamp(20px, 5vw, 40px) 40px; }
+.lead { max-width: 1200px; margin: 0 auto; padding: clamp(44px, 8vw, 88px) clamp(20px, 5vw, 40px) 40px;
+  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.95fr); gap: clamp(24px, 4vw, 52px); align-items: center; }
+@media (max-width: 860px) { .lead { grid-template-columns: 1fr; } }
+.lead-main { min-width: 0; }
+/* 히어로 우측 스킬 패널 — Language / Engine / Tools */
+.lead-skills { align-self: center; display: flex; flex-direction: column; gap: 16px;
+  border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px;
+  background: color-mix(in srgb, var(--bg) 62%, transparent); backdrop-filter: blur(7px); }
+.ls-group h4 { margin: 0 0 9px; font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--accent-2); font-weight: 700; }
+.ls-group .chips.small { margin: 0; }
 
 /* CAREER — 이력 한눈에 (히어로 직후) */
 .career { max-width: 1600px; margin: 0 auto; padding: 10px clamp(20px, 5vw, 48px) 18px; }

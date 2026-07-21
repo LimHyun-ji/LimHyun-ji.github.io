@@ -7,6 +7,9 @@ import ThemeToggle from '@/components/ThemeToggle';
 export default function Home() {
   const p = getProfile();
   const areas = getProjects(); // Sol 내 세부 영역(5)
+  // 히어로 우측 스킬 패널 — Language / Engine / Tools 어필
+  const heroSkills = (p.skills ?? []).filter((g) =>
+    ['Languages', 'Engine / Framework', 'Tools'].includes(g.category));
 
   return (
     <>
@@ -26,18 +29,30 @@ export default function Home() {
       <div className="hero-wrap">
         <HeroParticles />
         <header className="lead" id="top">
-          <p className="lead-eyebrow">{p.role}</p>
-          <h1 className="lead-name">{p.name}</h1>
-          <p className="lead-headline">{p.headline}</p>
-          {p.keywords && (
-            <ul className="lead-keywords">
-              {p.keywords.map((k) => <li key={k}>{k}</li>)}
-            </ul>
-          )}
-          <div className="lead-actions">
-            {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
-            {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
+          <div className="lead-main">
+            <p className="lead-eyebrow">{p.role}</p>
+            <h1 className="lead-name">{p.name}</h1>
+            <p className="lead-headline">{p.headline}</p>
+            {p.keywords && (
+              <ul className="lead-keywords">
+                {p.keywords.map((k) => <li key={k}>{k}</li>)}
+              </ul>
+            )}
+            <div className="lead-actions">
+              {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
+              {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
+            </div>
           </div>
+          {heroSkills.length > 0 && (
+            <aside className="lead-skills">
+              {heroSkills.map((g) => (
+                <div className="ls-group" key={g.category}>
+                  <h4>{g.category}</h4>
+                  <ul className="chips small">{g.items.map((it) => <li key={it}>{it}</li>)}</ul>
+                </div>
+              ))}
+            </aside>
+          )}
         </header>
       </div>
 
