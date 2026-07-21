@@ -4,6 +4,16 @@ import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
 import ThemeToggle from '@/components/ThemeToggle';
 
+// 스킬 → 배지 약어. 없으면 앞 3글자(영문) 폴백.
+const SKILL_ABBR: Record<string, string> = {
+  'C++': 'C++', 'C#': 'C#', 'Python': 'Py',
+  'Unreal Engine 5': 'UE5', 'CommonUI': 'UI', 'Slate/UMG': 'UMG', 'Niagara': 'Ng',
+  'Sequencer / LevelSequence': 'Seq', 'AnimBP / SkeletalMesh': 'Anim',
+  'TCP Socket': 'TCP', 'WebSocket': 'WS', 'Protobuf': 'Pb', 'Client-Server Sync': 'Sync', '패킷 최적화': 'Opt',
+  'Perforce': 'P4', 'Git': 'Git', 'Commandlet / Editor Module': 'Cmd', 'Jenkins CI': 'CI', 'Jira': 'Jira',
+};
+const abbr = (s: string) => SKILL_ABBR[s] ?? (s.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase() || '·');
+
 export default function Home() {
   const p = getProfile();
   const areas = getProjects(); // Sol 내 세부 영역(5)
@@ -154,11 +164,17 @@ export default function Home() {
       {p.skills && (
         <section className="block" id="skills">
           <h2 className="section-h">Skills</h2>
-          <div className="skills">
+          <div className="skill-spec">
             {p.skills.map((g) => (
-              <div className="skill-group" key={g.category}>
-                <h3>{g.category}</h3>
-                <ul className="chips">{g.items.map((it) => <li key={it}>{it}</li>)}</ul>
+              <div className="ss-row" key={g.category}>
+                <div className="ss-cat">{g.category}</div>
+                <ul className="ss-items">
+                  {g.items.map((it) => (
+                    <li className="ss-item" key={it}>
+                      <span className="ss-badge">{abbr(it)}</span>{it}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>

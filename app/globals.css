@@ -143,4 +143,27 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .sp-sm-body .chips.small { margin: auto 0 0; }
 .sp-sm-body .chips.small li { font-size: 10px; padding: 2px 7px; }
 
+/* SKILLS — 스펙 시트 × 아이콘 배지 하이브리드 */
+.skill-spec { display: grid; grid-template-columns: 170px 1fr; gap: 0;
+  border-top: 1px solid var(--line); }
+.ss-row { display: contents; }
+.ss-cat { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--accent-2); align-self: start; }
+.ss-items { list-style: none; margin: 0; padding: 15px 0; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 9px; }
+.ss-item { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surf);
+  font-size: 13.5px; font-weight: 600; transition: border-color .15s, transform .15s; }
+.ss-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+.ss-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px;
+  padding: 0 6px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  color: var(--bg); background: var(--accent); }
+.ss-item:nth-child(3n) .ss-badge { background: var(--accent-2); }
+@media (max-width: 620px) {
+  .skill-spec { grid-template-columns: 1fr; }
+  .ss-cat { padding: 16px 0 4px; border-bottom: 0; }
+  .ss-items { padding: 4px 0 16px; }
+}
+
 @media (max-width: 560px) { .nav-links a:nth-child(3) { display: none; } }
