@@ -1,6 +1,6 @@
 ---
 layout: project
-order: 5
+order: 6
 title: "데이터 파이프라인 & 에디터 자동화"
 role: "Tools / Pipeline"
 period: "2023.02 — 현재 (입사 직후 ~ 상시)"
@@ -101,4 +101,4 @@ TArray<TSharedPtr<IAreaToolValidator>> Validators;
 
 - `FVisualDataExport`: NPC/갓아머/정령/필드오브젝트 매핑·액션 메타데이터 JSON export (`Execute_ExportAssetType(..., bUseP4v)`)
 
-> 미니맵의 RenderTarget 텍스처 변환·퀘스트 인디케이터는 '인게임 연출 & GPU 렌더링 파이프라인' 페이지에서 다룹니다.
+> 미니맵의 RenderTarget 텍스처 변환·퀘스트 인디케이터는 '실시간 위치 기반 맵 설계' 페이지에서 다룹니다.

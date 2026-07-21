@@ -48,6 +48,16 @@ export default function Home() {
                 {p.keywords.map((k) => <li key={k}>{k}</li>)}
               </ul>
             )}
+            {p.about && (
+              <ul className="lead-bio">
+                {p.about.born && <li><span className="bi">🎂</span>{p.about.born}</li>}
+                {p.about.school && (
+                  <li><span className="bi">🎓</span>{p.about.school}
+                    {p.about.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
+                )}
+                {p.about.highschool && <li><span className="bi">🏫</span>{p.about.highschool}</li>}
+              </ul>
+            )}
             <div className="lead-actions">
               {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
               {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
@@ -56,9 +66,13 @@ export default function Home() {
           {heroSkills.length > 0 && (
             <aside className="lead-skills">
               {heroSkills.map((g) => (
-                <div className="ls-group" key={g.category}>
-                  <h4>{g.category}</h4>
-                  <ul className="chips small">{g.items.map((it) => <li key={it}>{it}</li>)}</ul>
+                <div className="ls-row" key={g.category}>
+                  <span className="ls-cat">{g.category}</span>
+                  <span className="ls-vals">
+                    {g.items.map((it, i) => (
+                      <span key={it}>{i > 0 && <i className="ls-sep">·</i>}{it}</span>
+                    ))}
+                  </span>
                 </div>
               ))}
             </aside>
@@ -93,8 +107,9 @@ export default function Home() {
         <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
         <h2 className="featured-title">Sol — UE5 MMORPG</h2>
         <p className="featured-sub">
-          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템·퍼포먼스 최적화·
-          게임 콘텐츠(길드·성장·경제)·인게임 연출·데이터 파이프라인·라이브 안정화까지 <strong>직접 설계·담당</strong>.
+          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
+          인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
+          <strong> 7개 영역</strong>을 직접 설계·담당.
         </p>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="Sol 클라이언트 아키텍처: 게임 서버(TCP)·Noti(WebSocket) → USolGeoSubsystem, MetaDataSubsystem → Feature Managers" loading="lazy" />

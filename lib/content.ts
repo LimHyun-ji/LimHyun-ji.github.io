@@ -7,9 +7,11 @@ const CONTENT = path.join(process.cwd(), 'content');
 
 export interface SkillGroup { category: string; items: string[]; }
 export interface Experience { org?: string; title?: string; period?: string; desc?: string; }
+export interface About { born?: string; school?: string; schoolPeriod?: string; highschool?: string; }
 export interface Profile {
   name: string; role: string; headline: string; intro: string;
   keywords?: string[];
+  about?: About;
   links: { github?: string; email?: string; linkedin?: string; blog?: string };
   skills?: SkillGroup[];
   experience?: Experience[];

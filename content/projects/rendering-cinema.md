@@ -1,10 +1,10 @@
 ---
 layout: project
 order: 4
-title: "인게임 연출 & GPU 렌더링 파이프라인"
+title: "인게임 연출 & 비동기 에셋 로딩"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
-summary: "PocketLevel Instance로 인게임과 분리된 연출 공간을 구성하고, LevelSequence·SceneCapture·RenderTarget을 연출 구간에만 살려 모바일 비용을 낮춘 인게임 연출 파이프라인을 설계."
+summary: "PocketLevel Instance로 인게임과 분리된 연출 공간을 구성하고, LevelSequence·연출 액터를 SoftObjectPtr로 비동기 로드해 진입 시점에만 올리고 종료 시 메모리에서 내리는 수명 관리로 모바일 비용을 낮춘 인게임 연출 파이프라인을 설계."
 tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "Niagara", "Mobile"]
 highlights:
   - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 비동기 연출 공간 제공"
@@ -24,9 +24,14 @@ highlights:
 ## 0. PocketLevel — 인게임과 분리된 연출 공간
 
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
-- **수명 동적 제어** — `LevelSequence` 종료 시 내부 Actor 전체 메모리 해제 (연출 후 자원 잔존 없음)
 
-## 1. 별자리 룰렛 — LevelSequence 동적 생성/파괴
+## 1. 비동기 에셋 로딩 & 수명 관리 — 진입 시 로드 · 종료 시 해제
+
+- **비동기 로드** — 연출 시퀀스·액터를 `TSoftObjectPtr`로 보유, 사전 일괄 로드 대신 필요 시점에 비동기 로드
+- **수명 동적 제어** — `LevelSequence` 종료 시 내부 Actor 전체 메모리 해제 (연출 후 자원 잔존 없음)
+- 진입 시 생성·로드 → 종료 시 파괴·해제로, 연출 에셋이 상시 메모리를 점유하지 않도록 관리
+
+## 2. 별자리 룰렛 — LevelSequence 동적 생성/파괴
 
 - 별·결과별 시퀀스 런타임 생성·바인딩 → 종료 시 파괴 구조 (사전 일괄 로드 배제)
 
@@ -54,7 +59,7 @@ void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 
 > 룰렛 결과가 서버-클라에서 **간헐적으로 다르게 표시**되던 레이스 컨디션(WebSocket Notify 도착 시점 × 연출 상태 전이 순서 의존성)의 추적·해결 과정은 [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/)에서 자세히 다룹니다.
 
-## 2. 순례 주사위 — SceneCapture로 3D를 UI에 합성
+## 3. 순례 주사위 — SceneCapture로 3D를 UI에 합성
 
 - 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성
 - 캡처 카메라를 `LevelSequence` named binding에 주입, 연출이 카메라 직접 제어
@@ -80,13 +85,14 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 
 - 동일 패턴을 `DialogueRenderer`에도 적용 (`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기)
 
-## 3. 미니맵 RenderTarget 인디케이터
+## 4. 미니맵 RenderTarget 인디케이터
 
 - 퀘스트·심볼 데이터를 RenderTarget 텍스처로 변환 → 미니맵 머티리얼 파라미터 주입
 - 플레이어 위치는 Material Parameter Collection으로 실시간 반영
 - 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
+- MPC·머티리얼 기반 미니맵 및 월드맵 설계 상세 → [실시간 위치 기반 맵 설계 페이지](/projects/mapdesign/)
 
-## 4. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
+## 5. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
 
 - `TransformBonesComponent` 신규 설계 — 런타임 본 트랜스폼 계산 ↔ AnimBP 연동
 - 에디터 프리뷰 전용 `EditorTransformBonesComponent` 분리

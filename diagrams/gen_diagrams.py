@@ -349,4 +349,23 @@ dp_edges = [
 ]
 emit("pipeline-flow", "데이터 파이프라인 — 검증·생성·배포 자동화", dp_nodes, dp_edges)
 
+# ── 맵 설계: 미니맵(MPC/Material) · 월드맵(InputProcessor) (관계도) ──
+md_nodes = [
+    N("pcpos",   "PC Position\n실시간 위치",                       40, 64, 200, 52, "entity"),
+    N("mpc",     "MPC\nMaterial Parameter Collection",             40, 156, 200, 52, "core"),
+    N("quest",   "Quest Data",                                    300, 64, 180, 52, "data"),
+    N("minimap", "Minimap Material\n영역·아이콘 GPU 표시",         150, 260, 280, 56, "ui"),
+    N("input",   "InputProcessor\nPC·모바일 공통 입력",           560, 64, 200, 56, "manager"),
+    N("hires",   "고해상도 영역 이미지",                          800, 64, 200, 52, "data"),
+    N("worldmap","World Map\n확대·드래그",                        620, 200, 280, 56, "ui"),
+]
+md_edges = [
+    dict(src="pcpos", dst="mpc", label="위치 parameter"),
+    dict(src="mpc", dst="minimap", label="실시간 전송"),
+    dict(src="quest", dst="minimap", label="동적 표시"),
+    dict(src="input", dst="worldmap", label="확대/드래그"),
+    dict(src="hires", dst="worldmap", label="동적 로딩", dashed=True),
+]
+emit("mapdesign", "실시간 위치 기반 맵 설계 — 미니맵(MPC·Material) · 월드맵(InputProcessor)", md_nodes, md_edges)
+
 print("\nDONE. SVG →", os.path.normpath(OUT_SVG), "| drawio →", os.path.normpath(OUT_DRAWIO))
