@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { getSideDetail, getSideSlugs } from '@/lib/sideContent';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -55,7 +56,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
       )}
 
       <div className="detail-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>
           {d.body}
         </ReactMarkdown>
       </div>
