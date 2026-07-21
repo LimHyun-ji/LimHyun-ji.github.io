@@ -18,7 +18,7 @@ highlights:
 >
 > **기여** — Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
-<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
@@ -45,6 +45,14 @@ bool bUseGlobalInvalidation = false;
 ```
 
 - 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감 (`GeoGameMode.cpp:177`/`:218`)
+- **풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않음** → `GameRendering`을 false로(뷰포트 렌더링 중지)해 모바일 GPU 비용 절감
+
+```cpp
+// UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
+bIsDisableRenderingOnFullScreen = SolActivatableWidget->IsDisableViewportRenderingOnFullScreen();
+USolDisableGameRenderingSubsystem::Get()
+    ->SetReason(ESolDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
+```
 
 ## 2. Tick / 렌더 패스 비용 절감
 
