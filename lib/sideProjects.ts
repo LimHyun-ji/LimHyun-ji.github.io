@@ -1,4 +1,5 @@
 export interface SideProject {
+  slug: string;
   title: string;
   subtitle: string;
   engine: string;
@@ -11,6 +12,7 @@ export interface SideProject {
 // Notion 포트폴리오에서 이관 (기간순/관련도순 정렬). 이미지: PDF 스크린샷 또는 YouTube 썸네일.
 export const sideProjects: SideProject[] = [
   {
+    slug: 'genshin',
     title: '원신 (Genshin) 모작',
     subtitle: '오픈월드 RPG · Unity',
     engine: 'Unity / C#',
@@ -20,6 +22,7 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/GenshinImpact_Copy', video: 'https://youtu.be/K3E_Jpei_Oc', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {
+    slug: 'journey',
     title: 'Journey To Space',
     subtitle: '우주·행성 탐험 FPS RPG · Unreal',
     engine: 'Unreal / C++',
@@ -29,6 +32,7 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/Space-To-Journey', video: 'https://youtu.be/xfQBWUyWXu8' },
   },
   {
+    slug: 'ittakestwo',
     title: 'It Takes Two 모작',
     subtitle: '2인 협동 어드벤처 · Unity',
     engine: 'Unity / C#',
@@ -38,6 +42,7 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/ItTakesTwo_GG', video: 'https://youtu.be/23g39-UNHLQ', doc: 'https://www.miricanvas.com/v/11j6dmn' },
   },
   {
+    slug: 'cinepx',
     title: 'Cinepx',
     subtitle: '메타버스 영화 촬영 플랫폼 · Unity',
     engine: 'Unity / C#',
@@ -47,6 +52,7 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/AppleBox', video: 'https://youtu.be/aKcv3BfkqDQ', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {
+    slug: 'bridge',
     title: 'Bridge Theater: Red Riding Hood',
     subtitle: '관객 참여형 VR 연극 · 경진대회 우수상',
     engine: 'Unreal / C++',
@@ -56,6 +62,7 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/VR-Theater', video: 'https://youtu.be/D6_bDRrNd8w' },
   },
   {
+    slug: 'squid',
     title: '오징어게임 VR',
     subtitle: '무궁화 꽃이 피었습니다 · 기업 연계',
     engine: 'Unreal / BP·C++',
@@ -65,6 +72,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/hiWAjNyuSsM' },
   },
   {
+    slug: 'zezz',
     title: 'Zezz',
     subtitle: 'Zepeto+Sims 마이홈 메타버스 · Unity',
     engine: 'Unity / C#',
@@ -74,6 +82,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/dXVODz3MJaY', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {
+    slug: 'midnight',
     title: 'Midnight Gallery',
     subtitle: 'Interactive Art · Unity',
     engine: 'Unity / C#',
@@ -83,6 +92,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/IDryaiFv-Mw' },
   },
   {
+    slug: 'healthmr',
     title: '헬스 트레이닝 MR',
     subtitle: 'MR 헬스 콘텐츠 · 게임잼',
     engine: 'Unity / Oculus Quest',
@@ -92,6 +102,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/uVdVijj9Cqg' },
   },
   {
+    slug: 'fruit',
     title: 'Fruit Game',
     subtitle: '모바일 미니게임 · Unity',
     engine: 'Unity / C#',
@@ -101,6 +112,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/wzn5y_Gpyq8' },
   },
   {
+    slug: 'shooting',
     title: 'Shooting Game',
     subtitle: 'Java 슈팅 게임 · 학습',
     engine: 'Java',
@@ -110,6 +122,7 @@ export const sideProjects: SideProject[] = [
     links: { video: 'https://youtu.be/Zu2oAUBnlsk' },
   },
   {
+    slug: 'musical',
     title: '뮤지컬 관리 프로그램',
     subtitle: '데이터베이스 · Java JDBC',
     engine: 'Java / MySQL',

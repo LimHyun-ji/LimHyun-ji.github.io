@@ -185,6 +185,17 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .detail-body blockquote:first-of-type strong { color: #7a6410; }
 .detail-body blockquote:first-of-type code { background: rgba(122,100,16,.14); color: #6b5410; }
 
+/* ── 사이드 프로젝트 상세 (Notion 형식) ── */
+.detail-meta { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 0.9rem; }
+.detail-links { display: flex; flex-wrap: wrap; gap: 18px; margin: 16px 0 4px; }
+.detail-links a { color: var(--accent); font-weight: 700; font-size: 0.95rem; }
+.detail-video { position: relative; aspect-ratio: 16 / 9; margin: 18px 0 30px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: #000; max-width: 860px; }
+.detail-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.detail-body .callout { display: flex; gap: 11px; align-items: flex-start; margin: 16px 0; padding: 15px 18px;
+  background: var(--accent-soft); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; line-height: 1.75; }
+.detail-body .callout .ci { flex: 0 0 auto; font-size: 1.1rem; line-height: 1.4; }
+.detail-body .callout strong { color: var(--accent); }
+
 .detail-body p { color: var(--text); margin: 0 0 14px; }
 .detail-body ul { color: var(--text); padding-left: 20px; }
 .detail-body li { margin-bottom: 6px; }

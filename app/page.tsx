@@ -107,7 +107,7 @@ export default function Home() {
         <p className="section-note">개인·학습·팀 프로젝트 ({sideProjects.length}) — Notion 포트폴리오 기반</p>
         <div className="side-grid">
           {sideProjects.map((sp) => (
-            <article className="sp-card" key={sp.title}>
+            <Link className="sp-card" href={`/side/${sp.slug}/`} key={sp.slug}>
               <div className="sp-hero">
                 <img src={sp.image} alt={sp.title} loading="lazy" />
                 <span className="sp-engine">{sp.engine}</span>
@@ -117,13 +117,9 @@ export default function Home() {
                 <p className="sp-sub">{sp.subtitle}</p>
                 <p className="sp-desc">{sp.desc}</p>
                 <ul className="chips small">{sp.tags.map((t) => <li key={t}>{t}</li>)}</ul>
-                <div className="sp-links">
-                  {sp.links.video && <a href={sp.links.video} target="_blank" rel="noopener">▶ 영상</a>}
-                  {sp.links.git && <a href={sp.links.git} target="_blank" rel="noopener">GitHub</a>}
-                  {sp.links.doc && <a href={sp.links.doc} target="_blank" rel="noopener">기술소개서</a>}
-                </div>
+                <span className="sp-more">자세히 보기 →</span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
        </div>
