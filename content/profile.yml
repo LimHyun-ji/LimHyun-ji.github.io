@@ -35,16 +35,10 @@ skills:
     items: ["C++", "C#", "Python"]
   - category: "Engine / Framework"
     items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / SkeletalMesh"]
-  - category: "VisualData / 캐릭터"
-    items: ["캐릭터 비주얼 데이터 시스템", "파츠·Override Material·어태치먼트", "액션/전투 데이터 연동", "비동기 로드 · LOD 제어"]
-  - category: "Rendering / FX"
-    items: ["RenderTarget / SceneCapture", "Material / Shader Parameter", "Significance / Tick 관리", "Object Pooling"]
   - category: "Networking"
     items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync", "패킷 최적화"]
   - category: "Tools"
     items: ["Perforce", "Git", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
-  - category: "Domains"
-    items: ["VisualData / 캐릭터 데이터", "콘텐츠 시스템", "인게임 연출 / 렌더링", "에디터 툴 / 파이프라인", "UI / UX", "퍼포먼스 최적화", "비동기 디버깅 / 라이브 안정화"]
 
 # 대표 프로젝트
 # ※ 프로젝트는 이제 _projects/*.md 파일로 관리합니다 (클릭 시 상세 페이지로 이동).
