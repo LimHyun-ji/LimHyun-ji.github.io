@@ -133,10 +133,15 @@ export default function Home() {
             <div className="side-grid-sm">
               {sideProjects.slice(5).map((sp) => (
                 <Link className="sp-card-sm" href={`/side/${sp.slug}/`} key={sp.slug}>
-                  <span className="sp-sm-engine">{sp.engine}</span>
-                  <h4>{sp.title}</h4>
-                  <p className="sp-sm-sub">{sp.subtitle}</p>
-                  <ul className="chips small">{sp.tags.slice(0, 3).map((t) => <li key={t}>{t}</li>)}</ul>
+                  <div className="sp-sm-hero">
+                    <img src={sp.image} alt={sp.title} loading="lazy" />
+                    <span className="sp-sm-engine">{sp.engine}</span>
+                  </div>
+                  <div className="sp-sm-body">
+                    <h4>{sp.title}</h4>
+                    <p className="sp-sm-sub">{sp.subtitle}</p>
+                    <ul className="chips small">{sp.tags.slice(0, 3).map((t) => <li key={t}>{t}</li>)}</ul>
+                  </div>
                 </Link>
               ))}
             </div>
