@@ -10,6 +10,7 @@ export interface Experience { org?: string; title?: string; period?: string; des
 export interface About { born?: string; school?: string; schoolPeriod?: string; highschool?: string; }
 export interface Profile {
   name: string; role: string; headline: string; intro: string;
+  photo?: string;
   keywords?: string[];
   about?: About;
   links: { github?: string; email?: string; linkedin?: string; blog?: string };
@@ -17,9 +18,11 @@ export interface Profile {
   experience?: Experience[];
 }
 
+export interface ProjectImage { src: string; alt?: string; caption?: string; }
+
 export interface Project {
   slug: string; order: number; title: string; role?: string; period?: string;
-  summary?: string; tags?: string[]; highlights?: string[]; body: string;
+  summary?: string; tags?: string[]; highlights?: string[]; images?: ProjectImage[]; body: string;
 }
 
 export function getProfile(): Profile {
@@ -37,7 +40,8 @@ export function getProject(slug: string): Project {
   const raw = fs.readFileSync(path.join(PROJ_DIR, `${slug}.md`), 'utf8');
   const { data, content } = matter(raw);
   return { slug, order: Number(data.order ?? 99), title: data.title, role: data.role,
-    period: data.period, summary: data.summary, tags: data.tags, highlights: data.highlights, body: content };
+    period: data.period, summary: data.summary, tags: data.tags, highlights: data.highlights,
+    images: data.images, body: content };
 }
 
 export function getProjects(): Project[] {

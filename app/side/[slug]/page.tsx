@@ -5,6 +5,7 @@ import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { getSideDetail, getSideSlugs } from '@/lib/sideContent';
 import ThemeToggle from '@/components/ThemeToggle';
+import DocPreview from '@/components/DocPreview';
 
 export function generateStaticParams() {
   return getSideSlugs().map((slug) => ({ slug }));
@@ -24,6 +25,7 @@ function ytEmbed(url?: string): string | null {
 export default function SideProjectPage({ params }: { params: { slug: string } }) {
   const d = getSideDetail(params.slug);
   const embed = ytEmbed(d.video || d.links?.video);
+  const docUrl = d.links?.doc || undefined;
 
   return (
     <article className="project-detail">
@@ -44,7 +46,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
         <div className="detail-links">
           {(d.links?.video || d.video) && <a href={d.links?.video || d.video} target="_blank" rel="noopener">▶ 영상</a>}
           {d.links?.git && <a href={d.links.git} target="_blank" rel="noopener">GitHub</a>}
-          {d.links?.doc && <a href={d.links.doc} target="_blank" rel="noopener">기술소개서</a>}
+          {docUrl && <a href={docUrl} target="_blank" rel="noopener">기술소개서</a>}
         </div>
       </header>
 
@@ -54,6 +56,9 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
         </div>
       )}
+
+      {/* 경력기술서 미리보기 */}
+      {docUrl && <DocPreview url={docUrl} title={`${d.title} 기술소개서`} />}
 
       <div className="detail-body">
         <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>

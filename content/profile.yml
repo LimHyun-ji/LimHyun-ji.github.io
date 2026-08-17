@@ -3,6 +3,8 @@
 # ─────────────────────────────────────────────────────────────
 
 # 상단 히어로 영역
+# 프로필 사진 — public/images/ 에 사진을 넣고 아래 주석을 해제하세요
+# photo: "/images/profile.jpg"
 name: "임현지"
 role: "Game Client Developer"
 headline: "설계–구현–최적화–라이브 운영까지 책임져 온 UE5(C++) 게임 클라이언트 개발자"

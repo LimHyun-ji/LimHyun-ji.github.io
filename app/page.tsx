@@ -40,8 +40,25 @@ export default function Home() {
         <HeroParticles />
         <header className="lead" id="top">
           <div className="lead-main">
-            <p className="lead-eyebrow">{p.role}</p>
-            <h1 className="lead-name">{p.name}</h1>
+            {/* 프로필 사진 + 이름 영역 */}
+            <div className="lead-profile-row">
+              {p.photo ? (
+                <div className="lead-photo">
+                  <img src={p.photo} alt={`${p.name} 프로필 사진`} />
+                </div>
+              ) : (
+                <div className="lead-photo lead-photo-empty" title="content/profile.yml에 photo 필드를 추가하세요">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity=".5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+              )}
+              <div>
+                <p className="lead-eyebrow">{p.role}</p>
+                <h1 className="lead-name">{p.name}</h1>
+              </div>
+            </div>
             <p className="lead-headline">{p.headline}</p>
             {p.keywords && (
               <ul className="lead-keywords">

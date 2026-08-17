@@ -5,6 +5,8 @@ import rehypeRaw from 'rehype-raw';
 import { getProject, getSlugs } from '@/lib/content';
 import Mermaid from '@/components/Mermaid';
 import ThemeToggle from '@/components/ThemeToggle';
+import ImageGallery from '@/components/ImageGallery';
+import ImagePlaceholder from '@/components/ImagePlaceholder';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -17,6 +19,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 
 export default function ProjectPage({ params }: { params: { slug: string } }) {
   const proj = getProject(params.slug);
+  const images = (proj.images ?? []).map((img) =>
+    typeof img === 'string' ? { src: img } : img
+  );
 
   return (
     <article className="project-detail">
@@ -31,6 +36,12 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         {proj.summary && <p className="headline">{proj.summary}</p>}
         {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
       </header>
+
+      {/* 이미지 갤러리 또는 플레이스홀더 */}
+      {images.length > 0
+        ? <ImageGallery images={images} slug={proj.slug} />
+        : <ImagePlaceholder slug={proj.slug} type="project" />
+      }
 
       {proj.highlights && (
         <>

@@ -4,6 +4,8 @@ import matter from 'gray-matter';
 
 const SIDE_DIR = path.join(process.cwd(), 'content', 'side');
 
+export interface SideImage { src: string; alt?: string; caption?: string; }
+
 export interface SideDetail {
   slug: string;
   title: string;
@@ -15,6 +17,7 @@ export interface SideDetail {
   tags?: string[];
   image?: string;
   video?: string;
+  images?: SideImage[];
   links?: { git?: string; doc?: string; video?: string };
   body: string;
 }
