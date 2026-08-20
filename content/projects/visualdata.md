@@ -5,7 +5,7 @@ title: "VisualData — 캐릭터 비주얼 데이터 시스템 (인게임 전투
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "모든 Entity에 외형·전투 Visual 데이터를 세팅·로드하고, 액션/전투 시스템과 결합하는 캐릭터 비주얼 데이터 시스템의 런타임과 저작 툴을 직접 담당."
-tags: ["VisualData", "Character", "SkeletalMesh", "Async Loading", "Action/전투", "Editor Tooling"]
+tags: ["VisualData", "Character", "Mesh", "Action/전투", "Editor Tooling"]
 highlights:
   - "PC·NPC·정령·토템·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master/Face/Torso/Helmet/Wing/Cape)·Override Material·Attachment·본 트랜스폼을 세팅·로드"
   - "전투/액션 시스템과 결합 — StatusEffect FX·Montage·ActionNotify를 VisualData와 연동하고 ActionTable로 타입별 동작에 맞는 몽타주를 재생"

@@ -43,7 +43,7 @@ skills:
   - category: "Languages"
     items: ["C++", "C#", "Python"]
   - category: "Engine / Framework"
-    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / SkeletalMesh"]
+    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / Mesh"]
   - category: "Networking"
     items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync", "패킷 최적화"]
   - category: "Tools"
@@ -62,13 +62,13 @@ experience:
     desc: >
       UE5(C++) 기반 모바일·PC MMORPG 'Sol' 클라이언트 개발. 신입 합류 → 콘텐츠 오너 → 연출/렌더링 →
       최적화·라이브 안정화까지 매년 영역을 넓히며, VisualData 캐릭터 시스템과 길드 등 핵심 시스템을
-      여러 해에 걸쳐 단독으로 담당했습니다.
+      여러 해에 걸쳐 담당했습니다.
   - org: "2023 — 신입 / 툴·데이터 + 콘텐츠 오너"
     title: ""
     period: "2023"
     desc: >
-      합류 첫 3개월에 Excel↔JSON↔C++ enum/struct 자동 생성 Python 파이프라인을 단독 구축.
-      이후 길드 시스템 단독 소유, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
+      합류 첫 3개월에 Excel↔JSON↔C++ enum/struct 자동 생성 Python 파이프라인을 설계·구축.
+      이후 길드 시스템 담당, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
   - org: "2024 — 렌더링 / 시퀀서 연출 아키텍처"
     title: ""
     period: "2024"
@@ -81,9 +81,9 @@ experience:
     desc: >
       VisualData 에디터 대규모 리팩토링(타입별 클래스 분리·AssetMigration 자동화), 세금/리텐션 리워드/액션 카메라 신규 소유,
       Slate Global Invalidation 동적 제어·액터 풀링·틱 제어 등 퍼포먼스/메모리 최적화로 영역 확장.
-  - org: "2026 — 라이브 정산 / 안정화"
+  - org: "2026 — 라이브 안정화 / 콘텐츠 고도화"
     title: ""
     period: "2026 상반기"
     desc: >
-      길드 자금 분배(int64 오버플로 대응), 신권 세율, 갓아머 연출 TransformBones 등
-      출시 전후 라이브 운영의 시스템 정밀도와 안정화 작업에 집중.
+      라이브 운영 안정화와 콘텐츠 고도화에 집중 — 던전맵, 월드맵 고해상도 타일링,
+      신권 세율·갓아머 연출(TransformBones) 등 출시 전후 시스템 정밀도와 안정성 향상.

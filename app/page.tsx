@@ -126,10 +126,10 @@ export default function Home() {
         <p className="featured-sub">
           커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
           인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
-          <strong> 7개 영역</strong>을 직접 설계·담당.
+          <strong>직접 설계·담당</strong>.
         </p>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="Sol 클라이언트 아키텍처: 게임 서버(TCP)·Noti(WebSocket) → USolGeoSubsystem, MetaDataSubsystem → Feature Managers" loading="lazy" />
+          alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수)·채팅 채널서버(WebSocket) → USolGeoSubsystem·UNetworkNotiClient·UNetworkChannelSystem → Feature Managers·UChatManager (URL은 USolConfigSubsystem)" loading="lazy" />
         <div className="area-grid">
           {areas.map((a) => (
             <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>
