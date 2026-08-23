@@ -22,7 +22,8 @@ export interface ProjectImage { src: string; alt?: string; caption?: string; }
 
 export interface Project {
   slug: string; order: number; title: string; role?: string; period?: string;
-  summary?: string; tags?: string[]; highlights?: string[]; images?: ProjectImage[]; body: string;
+  summary?: string; tags?: string[]; highlights?: string[]; images?: ProjectImage[];
+  imageLayout?: 'gallery' | 'slider'; body: string;
 }
 
 export function getProfile(): Profile {
@@ -41,7 +42,7 @@ export function getProject(slug: string): Project {
   const { data, content } = matter(raw);
   return { slug, order: Number(data.order ?? 99), title: data.title, role: data.role,
     period: data.period, summary: data.summary, tags: data.tags, highlights: data.highlights,
-    images: data.images, body: content };
+    images: data.images, imageLayout: data.imageLayout, body: content };
 }
 
 export function getProjects(): Project[] {
