@@ -6,7 +6,6 @@ import { getProject, getSlugs } from '@/lib/content';
 import Mermaid from '@/components/Mermaid';
 import ThemeToggle from '@/components/ThemeToggle';
 import ImageGallery from '@/components/ImageGallery';
-import ImagePlaceholder from '@/components/ImagePlaceholder';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -37,11 +36,8 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
       </header>
 
-      {/* 이미지 갤러리 또는 플레이스홀더 */}
-      {images.length > 0
-        ? <ImageGallery images={images} slug={proj.slug} />
-        : <ImagePlaceholder slug={proj.slug} type="project" />
-      }
+      {/* 이미지 갤러리 (이미지가 있을 때만 표시) */}
+      {images.length > 0 && <ImageGallery images={images} slug={proj.slug} />}
 
       {proj.highlights && (
         <>

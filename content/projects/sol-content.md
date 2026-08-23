@@ -6,6 +6,10 @@ role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "길드·수집·순례·경제·채팅 등 콘텐츠를 기획 연동부터 UI·서버 동기화까지 담당하며, 콘텐츠 특성에 맞춰 세 가지 네트워크 방식을 구분 적용 — TCP(리텐션 리워드·데미지미터·세금), WebSocket(채팅 실시간), HTTP API(횡적 성장 콘텐츠 지연 조회로 로그인 패킷 과부하 방지)."
 tags: ["Gameplay", "Content", "Guild", "Economy", "CommonUI", "Protobuf", "TCP", "WebSocket", "HTTP API"]
+images:
+  - src: "/images/projects/sol-content/Screenshot_26.png"
+  - src: "/images/projects/sol-content/Screenshot_27.png"
+  - src: "/images/projects/sol-content/Screenshot_28.png"
 highlights:
   - "길드/아지트 시스템을 담당 — 초기 아키텍처(매니저 컴포넌트) 설계 → 컴포넌트 이벤트에서 메시지 시스템으로 전면 리팩토링"
   - "수집/도감/연구, 별자리·순례, 채팅/소셜, 리텐션 리워드, 세금·신권 등 성장·편의·경제 콘텐츠를 기획 연동부터 UI·서버 동기화까지 구현"
