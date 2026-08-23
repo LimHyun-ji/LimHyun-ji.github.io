@@ -1,14 +1,11 @@
 ---
 layout: project
 order: 2
-title: "퍼포먼스 / 메모리 최적화 (핵심 담당)"
+title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling"]
-images:
-  - src: "/images/projects/optimization/image-20250709-123214.png"
-  - src: "/images/projects/optimization/image-20250709-123225.png"
 highlights:
   - "Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 FIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
@@ -22,6 +19,9 @@ highlights:
 > **기여** — Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
 <img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
+
+![](/images/projects/optimization/image-20250709-123214.png)
+![](/images/projects/optimization/image-20250709-123225.png)
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
