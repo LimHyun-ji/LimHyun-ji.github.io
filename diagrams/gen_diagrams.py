@@ -224,33 +224,27 @@ def emit_seq(slug, title, participants, messages):
 def N(id, label, x, y, w, h, cls): return dict(id=id, label=label, x=x, y=y, w=w, h=h, cls=cls)
 
 d1_nodes = [
-    # 서버 계층 (실제 코드 확인: Lobby=HTTP, Geo=TCP, Noti=WS, API=HTTP, Channel=WS)
-    N("lobby", "로비 서버 · HTTP\nUSolLobbySubsystem",             20, 60, 165, 56, "server"),
-    N("geo",   "게임 서버 Geo · TCP\nNetworkClient",               200, 60, 165, 56, "server"),
-    N("noti",  "Noti 서버 · WebSocket\nUNetworkNotiClient",        380, 60, 165, 56, "server"),
-    N("api",   "API 서버(다수) · HTTP\nEApiServerType 40+",        560, 60, 165, 56, "server"),
-    N("chan",  "채널 서버(채팅) · WebSocket\nUNetworkChannelSystem", 740, 60, 195, 56, "server"),
+    # 서버 계층 (실제 코드 확인: Lobby=HTTP, Geo=TCP, Noti=WS, API=HTTP)
+    N("lobby", "로비 서버 · HTTP\nUSolLobbySubsystem",             20, 60, 170, 56, "server"),
+    N("geo",   "게임 서버 Geo · TCP\nNetworkClient",               210, 60, 170, 56, "server"),
+    N("noti",  "Noti 서버 · WebSocket\nUNetworkNotiClient",        400, 60, 180, 56, "server"),
+    N("api",   "API 서버(다수) · HTTP\nEApiServerType 40+",        600, 60, 180, 56, "server"),
     # 클라이언트 코어
-    N("geosub", "USolGeoSubsystem\nTCP 수신 · 로그인 플로우",       95, 184, 200, 62, "core"),
-    N("notic",  "UNetworkNotiClient\nWS 푸시 수신 + HTTP API 클라이언트", 395, 184, 290, 62, "core"),
-    N("chansys","UNetworkChannelSystem\n채널별 채팅(EChatType)",    742, 184, 193, 62, "core"),
+    N("geosub", "USolGeoSubsystem\nTCP 수신 · 로그인 플로우",       110, 184, 210, 62, "core"),
+    N("notic",  "UNetworkNotiClient\nWS 푸시 수신 + HTTP API 클라이언트", 420, 184, 300, 62, "core"),
     # 매니저 / 소비 계층
-    N("mgr",  "Feature Managers\nUGuildManager · UTravelManager …\nUSolGameInstanceSubsystem + INetworkNotiClientListener",
-              150, 308, 380, 74, "manager"),
-    N("chatmgr", "UChatManager\n채팅 UI 연동", 610, 314, 200, 62, "manager"),
+    N("mgr",  "Feature Managers\nUGuildManager · UChatManager · UTravelManager …\nUSolGameInstanceSubsystem + INetworkNotiClientListener",
+              190, 308, 420, 74, "manager"),
 ]
 d1_edges = [
     dict(src="lobby", dst="geosub", label="로그인·샤드"),
     dict(src="geo",   dst="geosub", label="패킷·Cipher"),
     dict(src="noti",  dst="notic",  label="푸시"),
     dict(src="api",   dst="notic",  label="HTTP"),
-    dict(src="chan",  dst="chansys", label="채팅 WS"),
     dict(src="geosub", dst="mgr", label="TCP 이벤트"),
     dict(src="notic",  dst="mgr", label="Noti·API"),
-    dict(src="chansys", dst="chatmgr", label="채널 채팅"),
-    dict(src="geosub",  dst="chatmgr", label="geo 채팅"),
 ]
-emit("sol-architecture", "Sol 클라이언트 서버 아키텍처 — Lobby·Geo(TCP)·Noti/API(WS·HTTP)·Channel(채팅 WS)  ※URL: USolConfigSubsystem(CDN)", d1_nodes, d1_edges)
+emit("sol-architecture", "Sol 클라이언트 서버 아키텍처 — Lobby(HTTP)·Geo(TCP)·Noti(WS)·API(HTTP)  ※URL: USolConfigSubsystem(CDN)", d1_nodes, d1_edges)
 
 # ═══════════════════════════════════════════════════════════════
 # D2. VisualData 데이터 흐름

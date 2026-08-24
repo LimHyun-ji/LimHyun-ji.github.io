@@ -25,7 +25,7 @@ export default function Home() {
     <>
       {/* NAV */}
       <nav className="nav">
-        <a className="nav-brand" href="#top">임현지</a>
+        <a className="nav-brand" href="#top">임현지 Portfolio</a>
         <div className="nav-links">
           <a href="#sol">Sol</a>
           <a href="#side">Side Projects</a>
@@ -129,7 +129,7 @@ export default function Home() {
           <strong>직접 설계·담당</strong>.
         </p>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수)·채팅 채널서버(WebSocket) → USolGeoSubsystem·UNetworkNotiClient·UNetworkChannelSystem → Feature Managers·UChatManager (URL은 USolConfigSubsystem)" loading="lazy" />
+          alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
         <div className="area-grid">
           {areas.map((a) => (
             <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>
