@@ -47,10 +47,15 @@ export default function Home() {
                   <img src={p.photo} alt={`${p.name} 프로필 사진`} />
                 </div>
               ) : (
-                <div className="lead-photo lead-photo-empty" aria-label={`${p.name} 프로필`}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 20c0-4.1 3.7-6.6 8-6.6s8 2.5 8 6.6v.4H4z" />
+                <div className="lead-photo lead-photo-empty" aria-label={`${p.name} 개발자 프로필`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="7" r="3.7" fill="currentColor" />
+                    <path d="M4.5 20.3c0-4 3.4-6.6 7.5-6.6s7.5 2.6 7.5 6.6v.2H4.5z" fill="currentColor" />
+                    <g fill="none" stroke="var(--photo-bg)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.3 16.4 9 17.8l1.3 1.4" />
+                      <path d="M13.7 16.4 15 17.8l-1.3 1.4" />
+                      <path d="M12.6 16.1l-1.2 3.9" />
+                    </g>
                   </svg>
                 </div>
               )}
