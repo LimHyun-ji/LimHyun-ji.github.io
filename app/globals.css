@@ -86,7 +86,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .project-detail { max-width: 1080px; margin: 0 auto; padding: 100px clamp(20px, 5vw, 40px) 40px; }
 
 /* 코드 분석 기반 아키텍처 다이어그램 (draw.io → SVG) */
-.detail-body img.diagram, img.diagram { display: block; width: 100%; max-width: 520px;
+.detail-body img.diagram, img.diagram { display: block; width: 100%; max-width: 880px;
   margin: 10px auto 26px; border-radius: 14px; }
 .arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px 0 14px; }
 /* 마크다운 본문 내 이미지 — 절반 크기, 중앙 정렬 */
