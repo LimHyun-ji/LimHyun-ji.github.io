@@ -4,7 +4,7 @@ order: 1
 title: "VisualData — 캐릭터 비주얼 데이터 시스템 (인게임 전투)"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
-summary: "모든 Entity에 외형·전투 Visual 데이터를 세팅·로드하고, 액션/전투 시스템과 결합하는 캐릭터 비주얼 데이터 시스템의 런타임과 저작 툴을 직접 담당."
+summary: "캐릭터 외형·전투 Visual 데이터 세팅·로드 시스템의 런타임과 에디터 저작 툴 담당."
 tags: ["VisualData", "Character", "Mesh", "Action/전투", "Editor Tooling"]
 images:
   - src: "/images/projects/visualdata/Screenshot_25.png"

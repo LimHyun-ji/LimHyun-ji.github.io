@@ -4,7 +4,7 @@ order: 4
 title: "인게임 연출 & 비동기 에셋 로딩"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
-summary: "PocketLevel Instance로 인게임과 분리된 연출 공간을 구성하고, LevelSequence·연출 액터를 SoftObjectPtr로 비동기 로드해 진입 시점에만 올리고 종료 시 메모리에서 내리는 수명 관리로 모바일 비용을 낮춘 인게임 연출 파이프라인을 설계."
+summary: "PocketLevel Instance 기반 연출 공간 분리, LevelSequence 비동기 로드·수명 관리로 모바일 비용을 낮춘 인게임 연출 파이프라인 설계."
 tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "Niagara", "Mobile"]
 highlights:
   - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 비동기 연출 공간 제공"

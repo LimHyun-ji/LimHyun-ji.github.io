@@ -4,7 +4,7 @@ order: 5
 title: "실시간 위치 기반 맵 설계 — 미니맵 · 월드맵"
 role: "Client Developer"
 period: "2024 — 현재"
-summary: "PC 위치를 MPC로 미니맵 머티리얼에 실시간 전송해 동기화하고 Quest Data를 머티리얼에 직접 표시하며, 월드맵은 InputProcessor 기반으로 PC·모바일 공통 확대·드래그를 제공하고 영역 이미지를 동적 로딩해 텍스처 비용을 절감."
+summary: "MPC 기반 미니맵 실시간 동기화, InputProcessor 기반 월드맵 확대·드래그, 영역 이미지 동적 로딩으로 텍스처 비용 절감."
 tags: ["Minimap", "World Map", "MPC", "Material", "InputProcessor", "Mobile"]
 images:
   - src: "/images/projects/mapdesign/mapdesign-preview.gif"

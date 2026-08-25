@@ -4,7 +4,7 @@ order: 6
 title: "데이터 파이프라인 & 에디터 자동화"
 role: "Tools / Pipeline"
 period: "2023.02 — 현재 (입사 직후 ~ 상시)"
-summary: "입사 직후 Excel→JSON→C++ 자동 생성 파이프라인을 설계·구축한 것을 시작으로, AreaTool 검증 체인·Commandlet CI 등 데이터 무결성과 제작 생산성을 위한 사내 에디터 툴과 빌드 파이프라인을 개발."
+summary: "Excel→JSON→C++ 자동 생성 파이프라인, AreaTool 검증 체인·Commandlet CI 등 에디터 툴·빌드 파이프라인 개발."
 tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
 highlights:
   - "입사 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 파이프라인을 설계·구축 (Perforce 자동화·JSON Schema 검증·한글 인코딩)"

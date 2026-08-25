@@ -4,7 +4,7 @@ order: 3
 title: "인게임 콘텐츠 & 네트워크 — 길드·수집·순례·경제·채팅"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
-summary: "길드·수집·순례·경제·채팅 등 콘텐츠를 기획 연동부터 UI·서버 동기화까지 담당하며, 콘텐츠 특성에 맞춰 세 가지 네트워크 방식을 구분 적용 — TCP(리텐션 리워드·데미지미터·세금), WebSocket(채팅 실시간), HTTP API(횡적 성장 콘텐츠 지연 조회로 로그인 패킷 과부하 방지)."
+summary: "길드·수집·순례·경제·채팅 등 콘텐츠를 기획~UI~서버 동기화까지 담당. TCP·WebSocket·HTTP API 3방식 구분 적용."
 tags: ["Gameplay", "Content", "Guild", "Economy", "CommonUI", "Protobuf", "TCP", "WebSocket", "HTTP API"]
 imageLayout: slider
 images:

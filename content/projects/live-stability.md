@@ -4,7 +4,7 @@ order: 7
 title: "라이브 안정화(CrashSight) & 아웃게임 대응"
 role: "Client Developer"
 period: "상시 (출시 전후)"
-summary: "CrashSight 콜스택 추적으로 재현이 어려운 비동기·레이스 크래시와 저사양·특정 그래픽 라이브러리 모바일 기기 한정 크래시를 원인까지 추적해 구조적으로 차단하고, 퍼블리셔/아웃게임 이슈(해외 로그인 차단·운영툴 계정 잠금)에 대응."
+summary: "CrashSight 콜스택 기반 비동기·레이스·저사양 크래시 원인 추적 및 구조적 차단, 퍼블리셔/아웃게임 이슈 대응."
 tags: ["Live Ops", "Debugging", "CrashSight", "Race Condition", "Crash", "Mobile"]
 highlights:
   - "CrashSight 콜스택 추적으로 재현이 어려운 비동기·레이스 컨디션(서버–클라 결과 불일치 등)을 원인까지 추적해 구조적으로 해결"
