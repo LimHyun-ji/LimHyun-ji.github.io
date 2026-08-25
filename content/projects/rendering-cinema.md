@@ -57,8 +57,6 @@ ALevelSequenceActor* PlaySequence(TSoftObjectPtr<ULevelSequence> LevelSequence, 
 void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 ```
 
-> 룰렛 결과가 서버-클라에서 **간헐적으로 다르게 표시**되던 레이스 컨디션(WebSocket Notify 도착 시점 × 연출 상태 전이 순서 의존성)의 추적·해결 과정은 [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/)에서 자세히 다룹니다.
-
 ## 3. 순례 주사위 — SceneCapture로 3D를 UI에 합성
 
 - 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성

@@ -45,7 +45,7 @@ skills:
   - category: "Engine / Framework"
     items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / Mesh"]
   - category: "Networking"
-    items: ["TCP Socket", "WebSocket", "Protobuf", "Client-Server Sync", "패킷 최적화"]
+    items: ["TCP Socket", "WebSocket", "HTTP API", "Protobuf", "Client-Server Sync"]
   - category: "Tools"
     items: ["Perforce", "Git", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
 
