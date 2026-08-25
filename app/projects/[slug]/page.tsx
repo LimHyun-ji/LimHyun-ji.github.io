@@ -7,6 +7,7 @@ import Mermaid from '@/components/Mermaid';
 import ThemeToggle from '@/components/ThemeToggle';
 import ImageGallery from '@/components/ImageGallery';
 import ImageSlider from '@/components/ImageSlider';
+import CodeToggle from '@/components/CodeToggle';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -59,6 +60,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
 
       <Link className="back bottom" href="/#projects">← 프로젝트 목록으로</Link>
       <Mermaid />
+      <CodeToggle />
     </article>
   );
 }
