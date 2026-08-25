@@ -3,24 +3,24 @@ layout: project
 order: 6
 title: "데이터 파이프라인 & 에디터 자동화"
 role: "Tools / Pipeline"
-period: "2023.02 — 현재 (입사 직후 ~ 상시)"
+period: "2023.02 — 현재 (상시)"
 summary: "Excel→JSON→C++ 자동 생성 파이프라인, AreaTool 검증 체인·Commandlet CI 등 에디터 툴·빌드 파이프라인 개발."
 tags: ["Editor Tooling", "Python", "Commandlet", "CI", "Metadata"]
 highlights:
-  - "입사 첫 3개월에 Excel→JSON→C++ enum/struct 자동 생성 파이프라인을 설계·구축 (Perforce 자동화·JSON Schema 검증·한글 인코딩)"
+  - "Excel→JSON→C++ enum/struct 자동 생성 파이프라인 설계·구축 (Perforce 자동화·JSON Schema 검증·한글 인코딩)"
   - "레벨 배치 툴(AreaTool): RID·이름·NavMesh·폴더·리전 검증자 체인, Export 시 P4 reconcile로 변경분만 체크아웃"
   - "Commandlet 기반 CI(Jenkins) 연동으로 데이터 검증·생성을 빌드 단계에서 강제 — 잘못된 데이터의 런타임 유입 차단"
   - "VisualData 에디터는 EditorModule 이전·타입별 클래스 분리·구 에셋 자동 변환(AssetMigration)으로 대규모 리팩토링"
 ---
 
-- 입사 직후 **데이터 코드 생성 파이프라인 구축** → 에디터 툴·빌드 파이프라인 상시 담당
+- **데이터 코드 생성 파이프라인 구축** → 에디터 툴·빌드 파이프라인 상시 담당
 - 데이터 자동 **검증·생성·배포** 흐름 구축 → 수작업 반복·런타임 데이터 유입 차단
 
 > **목적** — 데이터 무결성·제작 생산성을 위한 사내 에디터 툴과 빌드 파이프라인
 >
 > **성과** — 잘못된 데이터의 런타임 유입 차단, 반복 작업·휴먼에러↓
 >
-> **기여** — 입사 첫 3개월 코드 생성 파이프라인 구축, AreaTool 검증 체인·Commandlet CI, VisualData 에디터 리팩토링
+> **기여** — 코드 생성 파이프라인 구축, AreaTool 검증 체인·Commandlet CI, VisualData 에디터 리팩토링
 
 ## 개요
 
@@ -31,14 +31,11 @@ highlights:
 
 ## 주요 작업
 
-### 데이터 코드 생성 파이프라인 — 입사 첫 3개월 구축
+### 데이터 코드 생성 파이프라인
 
 - **Excel 원본 → JSON → C++ enum/struct** 자동 생성 흐름 Python 설계·구축
 - Perforce 체크인/아웃 자동화·JSON Schema 검증·리스트 형식(`use_effect[0]/[1]`)·한글 인코딩 처리 포함
 - 기획 Excel 수정 → 검증된 C++ 자동 생성 구조 (반복 작업·휴먼에러 감소)
-- 이후 모든 메타데이터 작업의 토대
-
-> **증상** 한글 깨짐·수동 P4 체크아웃 누락 · **해결** 한글 인코딩 파이프라인 내장 + P4 reconcile 자동 연동 → 파이프라인 단계 차단
 
 ### 레벨 / 스폰 데이터 파이프라인 (AreaTool)
 
