@@ -52,6 +52,16 @@ export const sideProjects: SideProject[] = [
     links: { git: 'https://github.com/LimHyun-ji/VR-Theater', video: 'https://youtu.be/D6_bDRrNd8w' },
   },
   {
+    slug: 'zezz',
+    title: 'Zezz',
+    subtitle: 'Zepeto+Sims 마이홈 메타버스 · Unity',
+    engine: 'Unity / C#',
+    desc: '아바타 커스터마이징·마이홈 꾸미기 메타버스. Building/Save-Load 시스템, HashTable 기반 룸 커스텀 저장, Firebase 로그인·실시간 DB 연동을 구현.',
+    tags: ['Unity', 'Firebase', 'Realtime DB', 'Building System'],
+    image: '/images/yt/zezz.jpg',
+    links: { video: 'https://youtu.be/dXVODz3MJaY', doc: 'https://www.miricanvas.com/v/11mr28x' },
+  },
+  {
     slug: 'journey',
     title: 'Journey To Space',
     subtitle: '우주·행성 탐험 FPS RPG · Unreal',
@@ -70,16 +80,6 @@ export const sideProjects: SideProject[] = [
     tags: ['Unreal', 'VR', 'Blueprint', 'OnlineSubsystem', '멀티플레이'],
     image: '/images/yt/squid.jpg',
     links: { video: 'https://youtu.be/hiWAjNyuSsM' },
-  },
-  {
-    slug: 'zezz',
-    title: 'Zezz',
-    subtitle: 'Zepeto+Sims 마이홈 메타버스 · Unity',
-    engine: 'Unity / C#',
-    desc: '아바타 커스터마이징·마이홈 꾸미기 메타버스. Building/Save-Load 시스템, HashTable 기반 룸 커스텀 저장, Firebase 로그인·실시간 DB 연동을 구현.',
-    tags: ['Unity', 'Firebase', 'Realtime DB', 'Building System'],
-    image: '/images/yt/zezz.jpg',
-    links: { video: 'https://youtu.be/dXVODz3MJaY', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {
     slug: 'midnight',
