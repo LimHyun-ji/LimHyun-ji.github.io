@@ -24,17 +24,17 @@ highlights:
 > **기여** — VisualData 에디터 Slate UI · Preview 환경 개발 · 리팩토링, AssetMigration 툴, VisualData Export Commandlet
 
 
-## 문제 해결 사례
+## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">하나의 슈퍼클래스에 타입별 규칙이 엉킴</p>
+    <p class="case-title">슈퍼클래스에 엉킨 타입별 규칙</p>
     <dl>
-      <dt>문제</dt><dd>PC · NPC · FieldObject · Item · Spirit의 에디터 데이터가 하나의 슈퍼클래스에 모여 타입이 늘수록 유지보수가 어려워짐</dd>
-      <dt>원인</dt><dd>타입마다 다른 외형 규칙을 한 클래스 안에서 분기</dd>
-      <dt>해결</dt><dd>타입별 클래스로 분리하고, 구 구조로 저장된 에셋은 AssetMigration 툴로 새 타입에 자동 변환</dd>
-      <dt>결과</dt><dd>수작업 재저장 없이 기존 에셋을 일괄 이전하고 에디터 구조 부채 해소</dd>
+      <dt>문제</dt><dd>모든 타입의 에디터 데이터가 하나의 슈퍼클래스에 모여 유지보수가 어려움</dd>
+      <dt>해결</dt><dd>타입별 클래스 분리 + AssetMigration으로 구 에셋 자동 변환</dd>
+      <dt>결과</dt><dd>기존 에셋 일괄 이전, 에디터 구조 부채 해소</dd>
     </dl>
+    <a class="case-more" href="#case-refactor">자세히 ↓</a>
   </div>
 </div>
 
@@ -60,7 +60,11 @@ highlights:
 - 새 Entity 타입이나 기능이 추가될 때마다 **Preview 환경을 확장**하고 상시 유지보수
 - **UPROPERTY 변경 → Preview 화면 즉시 반영** — 디테일 패널에서 데이터 값을 바꾸면 프로퍼티 변경 이벤트를 받아 프리뷰에 바로 다시 적용 → 저장하거나 다시 실행하지 않아도 결과를 확인
 
+<div id="case-refactor" class="case-anchor"></div>
+
 ## 2. 2025 대규모 리팩토링
+
+**리팩토링 전에는 PC · NPC · FieldObject · Item · Spirit의 에디터 데이터가 하나의 슈퍼클래스에 모여, 타입마다 다른 외형 규칙을 한 클래스 안에서 분기하고 있었습니다.** 타입이 늘수록 유지보수가 어려워져 아래처럼 구조를 정리했고, 기존 에셋은 AssetMigration(3번)으로 새 타입에 옮겼습니다.
 
 - **EditorModule 이전** — 에디터 전용 코드를 런타임 모듈에서 분리
 - **PreviewActor 병합** — 흩어져 있던 프리뷰 액터를 하나로 통합

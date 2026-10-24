@@ -19,26 +19,35 @@ highlights:
 > **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
 
-## 문제 해결 사례
+## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">Global Invalidation을 켜자 스크롤 리스트가 갱신되지 않음</p>
+    <p class="case-title">Slate Hitching</p>
     <dl>
-      <dt>문제</dt><dd>화면 단위로 Global Invalidation을 적용하자 스크롤 리스트 같은 동적 콘텐츠가 제대로 갱신되지 않는 문제</dd>
-      <dt>원인</dt><dd>Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 계속 바뀌는 스크롤 콘텐츠까지 캐시 대상이 됨</dd>
-      <dt>해결</dt><dd>스크롤 박스를 <code>ForceVolatile(true)</code>로 캐시에서 제외하고, 나머지 UI는 Invalidation 유지</dd>
-      <dt>결과</dt><dd>동적 콘텐츠는 정상 갱신, 나머지 UI는 재계산 절감 효과 유지</dd>
+      <dt>문제</dt><dd>UI 화면에서 Slate Hitching(프레임 튐) 발생</dd>
+      <dt>해결</dt><dd>Unreal Insights로 원인을 측정하고 화면 · 레이어 단위로 Global Invalidation 적용</dd>
+      <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감</dd>
     </dl>
+    <a class="case-more" href="#case-slate-hitching">자세히 ↓</a>
   </div>
   <div class="case">
-    <p class="case-title">풀링한 액터에서 해제된 메모리 접근 크래시</p>
+    <p class="case-title">Invalidation 적용 후 스크롤 갱신 오류</p>
     <dl>
-      <dt>문제</dt><dd>풀에서 재사용하는 액터 주변에서 해제된 메모리에 접근하는 크래시 (재현이 어려움)</dd>
-      <dt>원인</dt><dd>반납 시 액터만 숨기고 컴포넌트 틱은 계속 돌아, Niagara <code>bAutoDestroy</code>로 스스로 파괴된 컴포넌트에 틱이 호출됨. 반납 시 비동기 로드 핸들도 취소되지 않음</dd>
-      <dt>해결</dt><dd>풀 입출고 시 모든 컴포넌트 틱을 함께 토글하고, 반납 시 <code>FStreamableHandle</code>을 즉시 취소해 수명 경계를 명시</dd>
-      <dt>결과</dt><dd>같은 유형의 크래시를 구조적으로 차단</dd>
+      <dt>문제</dt><dd>Global Invalidation을 켜자 스크롤 리스트가 갱신되지 않음</dd>
+      <dt>해결</dt><dd>스크롤 박스만 <code>ForceVolatile</code>로 캐시에서 분리</dd>
+      <dt>결과</dt><dd>동적 콘텐츠 정상 갱신, 나머지 UI는 절감 효과 유지</dd>
     </dl>
+    <a class="case-more" href="#case-forcevolatile">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">풀링 액터의 해제 메모리 접근 크래시</p>
+    <dl>
+      <dt>문제</dt><dd>풀에서 재사용하는 액터 주변의 해제 메모리 접근 크래시</dd>
+      <dt>해결</dt><dd>입출고 시 모든 컴포넌트 틱 토글 + 반납 시 로드 핸들 즉시 취소</dd>
+      <dt>결과</dt><dd>같은 유형의 크래시 구조적 차단</dd>
+    </dl>
+    <a class="case-more" href="#case-pooling-crash">자세히 ↓</a>
   </div>
 </div>
 
@@ -47,10 +56,11 @@ highlights:
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
-### 측정 — Unreal Insights로 Slate Tick 비용 확인
+<div id="case-slate-hitching" class="case-anchor"></div>
 
-- **Unreal Insights**로 UI 프레임 비용을 측정 → `Slate::Tick (Time and Widgets)`·`Slate::DrawWindows`·`Slate_PaintSlowPath`가 **매 프레임** 발생하는 것을 확인
-- 측정 결과를 근거로 **어느 화면/레이어에 Invalidation을 적용할지** 결정하고 수정
+### 측정 — Slate Hitching 원인을 Unreal Insights로 확인
+
+**UI 화면에서 Slate Hitching(프레임이 순간적으로 튀는 현상)이 발생했습니다.** Unreal Insights로 UI 프레임 비용을 측정하자 `Slate::Tick (Time and Widgets)` · `Slate::DrawWindows` · `Slate_PaintSlowPath`가 **매 프레임** 실행되고 있었습니다. 바뀌지 않은 위젯까지 매 프레임 다시 계산하고 그리고 있었던 것이고, 이 측정 결과를 근거로 어느 화면/레이어에 Invalidation을 적용할지 정했습니다.
 
 ![Slate 사이클 카운터 — Total Slate Tick Time·Draw Window·Game UI Paint·Tick Widgets](/images/projects/optimization/image-20250709-123214.png)
 ![Unreal Insights 타이밍 뷰 — Slate::Tick·Slate::DrawWindows·Slate::Prepass·Slate_PaintSlowPath](/images/projects/optimization/image-20250709-123225.png)
@@ -72,7 +82,9 @@ UPROPERTY(EditDefaultsOnly, Category=Screen)
 bool bUseGlobalInvalidation = false;
 ```
 
-- 무조건 활성화 시 동적 콘텐츠(스크롤 리스트) 캐싱 오류 → 스크롤 박스 `ForceVolatile` 처리
+<div id="case-forcevolatile" class="case-anchor"></div>
+
+**그런데 Invalidation을 켜자 스크롤 리스트가 제대로 갱신되지 않는 문제가 생겼습니다.** Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 스크롤처럼 계속 바뀌는 콘텐츠까지 캐시 대상에 들어갔기 때문입니다. 그래서 스크롤 박스만 `ForceVolatile`로 캐시에서 빼고, 나머지 UI는 Invalidation을 유지했습니다.
 
 ```cpp
 // SolScrollBox.cpp:30
@@ -158,10 +170,11 @@ if (PrevTexture) PrevTexture->ClearFlags(RF_Standalone);
 GEngine->ForceGarbageCollection(false);
 ```
 
+<div id="case-pooling-crash" class="case-anchor"></div>
+
 ### 4-2. 액터 풀링 — 풀링이 만드는 크래시까지 차단
 
-- 액터만 숨기고 컴포넌트 틱 미정지 시 → Niagara `bAutoDestroy`로 컴포넌트 자기파괴 → freed 메모리 틱 접근 → 크래시
-- 풀 입출고 시 **모든 컴포넌트 틱까지 함께 토글**로 해결
+**풀에서 재사용하는 액터 주변에서 해제된 메모리에 접근하는 크래시가 드물게 발생했습니다.** 풀에 반납할 때 액터만 숨기고 컴포넌트 틱은 그대로 돌고 있었는데, Niagara 컴포넌트가 `bAutoDestroy`로 스스로 파괴된 뒤에도 틱이 호출되고 있었습니다. 반납 시 비동기 로드 핸들(`FStreamableHandle`)도 취소되지 않아, 뒤늦은 로드 완료 콜백이 이미 정리된 대상을 참조할 수 있었습니다. 그래서 풀 입출고 시 **모든 컴포넌트 틱을 함께 토글**하고, 반납 시 핸들을 즉시 취소하도록 수명 경계를 명시했습니다.
 
 ```cpp
 // ObjectPoolSubsystem.cpp:313-332 — SetPoolActorHidden

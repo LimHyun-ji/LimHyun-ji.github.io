@@ -21,26 +21,26 @@ highlights:
 > **기여** — 인게임 모듈 컴포넌트 · 타입별 모듈 · Action Table · Custom ActionNotify · Attachment 직접 개발
 
 
-## 문제 해결 사례
+## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">헬멧 하나만 바꿔도 전신을 다시 로드</p>
+    <p class="case-title">헬멧만 바꿔도 전신 재로드</p>
     <dl>
-      <dt>문제</dt><dd>외형 데이터가 바뀌면 헬멧 하나만 교체해도 전신 파츠와 Attachment를 전부 다시 로드</dd>
-      <dt>원인</dt><dd>데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조</dd>
-      <dt>해결</dt><dd>다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 전이 규칙(FullReset / PartialUpdate / NoUpdate) 도입</dd>
+      <dt>문제</dt><dd>외형 데이터가 바뀌면 바뀌지 않은 파츠까지 전부 다시 로드</dd>
+      <dt>해결</dt><dd>다음 데이터와 현재 상태를 비교하는 전이 규칙 도입</dd>
       <dt>결과</dt><dd>실제로 바뀐 파츠만 다시 로드</dd>
     </dl>
+    <a class="case-more" href="#case-transition">자세히 ↓</a>
   </div>
   <div class="case">
-    <p class="case-title">풀 재사용 Entity의 외형 잔존 · 해제 메모리 접근</p>
+    <p class="case-title">풀링 × 비동기 로드 크래시</p>
     <dl>
-      <dt>문제</dt><dd>풀에서 재사용한 Entity에 이전 외형이 남거나 해제된 메모리에 접근하는 크래시 (재현이 어려움)</dd>
-      <dt>원인</dt><dd>풀 반납 시 VisualData 상태가 정리되지 않고, 취소되지 않은 <code>FStreamableHandle</code> 콜백이 이미 사라진 Entity에 뒤늦게 도달</dd>
-      <dt>해결</dt><dd><code>OnUnregister</code>에서 명시적으로 정리하고, 풀 입출고 시 틱 토글, 반납 시 <code>FStreamableHandle</code> 즉시 취소</dd>
-      <dt>결과</dt><dd>경합 경로를 구조적으로 차단</dd>
+      <dt>문제</dt><dd>풀 재사용 Entity의 외형 잔존 · 해제 메모리 접근</dd>
+      <dt>해결</dt><dd>반납 시 상태 정리 + 로드 핸들 즉시 취소 + 틱 토글</dd>
+      <dt>결과</dt><dd>경합 경로 구조적 차단</dd>
     </dl>
+    <a class="case-more" href="#case-pooling">자세히 ↓</a>
   </div>
 </div>
 
@@ -118,10 +118,11 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
   - 인게임 로직이 에디터 전용 코드에 의존하지 않고, 에디터에서는 서버 없이 같은 몽타주·Notify를 미리 볼 수 있음
 - 파티클 Notify의 FX 그림자 끄기 최적화 → [퍼포먼스 최적화 페이지](/projects/optimization/)
 
+<div id="case-transition" class="case-anchor"></div>
+
 ## 3. 전이 규칙으로 부분 갱신 최적화
 
-- **Before** — 외형 데이터 변경 시 모듈 전체 재적용 → 헬멧 교체에도 전신 파츠·Attachment 전부 재로드
-- **After** — 다음 데이터와 현재 상태 비교로 갱신 범위 결정하는 **전이 규칙** 도입
+**헬멧 하나만 바꿔도 전신 파츠와 Attachment를 전부 다시 로드하고 있었습니다.** 외형 데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조였기 때문입니다. 그래서 다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 **전이 규칙**을 도입했습니다.
 
 ```cpp
 // EvaluateTransitionRule → 갱신 범위 결정
@@ -159,7 +160,12 @@ private:
 - **가시성 게이팅**: VisualData **로드가 끝난 Entity만 표시**(`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임·미완성 노출 방지
 - **렌더 비용 제어**: `OptimizeLOD`, `SetLightingChannels`, `bAllowNiagaraScalability`, 단일 그림자 캐시 갱신(`RefreshSingleShadowCaches`)
 - **수명 안전**: 모듈/컴포넌트는 `TWeakObjectPtr` · `TSharedPtr`로 관리, `OnUnregister`에서 정리
-- 풀링 × 비동기 로드 크래시 사례는 위 **문제 해결 사례**, 풀링 구조 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고
+
+<div id="case-pooling" class="case-anchor"></div>
+
+### 풀링 × 비동기 로드 크래시
+
+**풀에서 재사용한 Entity에 이전 외형이 남거나, 해제된 메모리에 접근하는 크래시가 드물게 발생했습니다.** 풀 반납 시 VisualData 상태가 정리되지 않았고, 취소되지 않은 `FStreamableHandle` 콜백이 이미 사라진 Entity에 뒤늦게 도달했기 때문입니다. 그래서 `OnUnregister`에서 상태를 명시적으로 정리하고, 풀 입출고 시 틱을 토글하며, 반납 시 `FStreamableHandle`을 즉시 취소해 경합 경로를 막았습니다. 풀링 구조 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고.
 
 ## 기술 요약
 

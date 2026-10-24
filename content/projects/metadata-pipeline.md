@@ -20,17 +20,17 @@ highlights:
 > **기여** — Python 변환 파이프라인에 Cron식 변환 · Unit 단위계 · Custom Validation Script 기능 추가
 
 
-## 문제 해결 사례
+## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">잘못된 값이 변환을 거쳐 그대로 반영</p>
+    <p class="case-title">잘못된 값의 런타임 유입</p>
     <dl>
-      <dt>문제</dt><dd>기획 데이터의 잘못된 값 · 단위 착오가 JSON으로 변환되어 런타임까지 그대로 들어감</dd>
-      <dt>원인</dt><dd>변환 단계에 데이터별 규칙을 검사하는 장치가 없음</dd>
-      <dt>해결</dt><dd>Unit 단위계 지원으로 단위를 일관되게 처리하고, Custom Validation Script로 데이터별 규칙을 변환 단계에서 검사</dd>
+      <dt>문제</dt><dd>잘못된 값 · 단위 착오가 변환을 거쳐 런타임까지 그대로 반영</dd>
+      <dt>해결</dt><dd>Custom Validation Script + Unit 단위계로 변환 단계에서 검사</dd>
       <dt>결과</dt><dd>규칙에 맞지 않는 데이터를 변환 시점에 차단</dd>
     </dl>
+    <a class="case-more" href="#case-validation">자세히 ↓</a>
   </div>
 </div>
 
@@ -53,10 +53,11 @@ highlights:
 - 단위가 붙은 값을 파이프라인에서 인식해 **일관된 단위로 처리**
 - 기획은 읽기 쉬운 단위로 입력하고, 런타임은 정해진 단위의 값만 받음 → 단위 착오로 인한 데이터 오류 감소
 
+<div id="case-validation" class="case-anchor"></div>
+
 ## 3. Custom Validation Script 지원
 
-- 데이터(테이블)별로 **커스텀 검증 스크립트**를 붙일 수 있는 구조
-- 변환 단계에서 스크립트가 값을 검사 → 규칙에 맞지 않는 데이터는 변환 시점에 걸러져 런타임으로 넘어가지 않음
+**변환 단계에 데이터별 규칙을 검사하는 장치가 없으면, 잘못된 값이 JSON으로 변환되어 런타임까지 그대로 들어갑니다.** 그래서 데이터(테이블)별로 **커스텀 검증 스크립트**를 붙일 수 있게 하고, 변환 단계에서 스크립트가 값을 검사해 규칙에 맞지 않는 데이터를 걸러내도록 했습니다. 단위 착오는 2번의 Unit 단위계 지원으로 함께 줄였습니다.
 
 ## 4. 런타임 연결 — MetaDataSubsystem
 

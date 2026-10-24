@@ -20,26 +20,26 @@ highlights:
 > **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 직접 설계
 
 
-## 문제 해결 사례
+## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">연출이 아닐 때도 GPU 비용이 발생</p>
+    <p class="case-title">연출 외 구간의 GPU 비용</p>
     <dl>
-      <dt>문제</dt><dd>순례 주사위 연출용 캡처가 연출 구간이 아닐 때도 모바일 GPU를 소모</dd>
-      <dt>원인</dt><dd>SceneCapture2D는 켜져 있는 동안 매 프레임 씬을 한 번 더 렌더링</dd>
-      <dt>해결</dt><dd>연출 시작 시 캡처를 켜고 종료 시 끄도록 <code>SetVisibility</code>를 연출 구간에 맞춰 토글</dd>
-      <dt>결과</dt><dd>연출 외 구간의 캡처 렌더링 비용 제거</dd>
+      <dt>문제</dt><dd>연출이 아닐 때도 캡처 렌더링 비용 발생</dd>
+      <dt>해결</dt><dd>SceneCapture를 연출 구간에만 켜고 끄도록 토글</dd>
+      <dt>결과</dt><dd>연출 외 구간의 캡처 비용 제거</dd>
     </dl>
+    <a class="case-more" href="#case-scenecapture">자세히 ↓</a>
   </div>
   <div class="case">
-    <p class="case-title">갓아머 연출 후 Niagara 잔상이 남음</p>
+    <p class="case-title">갓아머 연출 후 Niagara 잔상</p>
     <dl>
-      <dt>문제</dt><dd>갓아머 연출이 끝난 뒤에도 Niagara 이펙트 잔상이 화면에 남는 문제</dd>
-      <dt>원인</dt><dd><code>ReleaseToPool</code>로 반납할 때 이펙트가 제대로 정리되지 않음</dd>
-      <dt>해결</dt><dd>이펙트 정리 방식을 <code>Deactivate</code>로 교체</dd>
+      <dt>문제</dt><dd>연출이 끝난 뒤 Niagara 잔상이 남음</dd>
+      <dt>해결</dt><dd>정리 방식을 <code>ReleaseToPool</code>에서 <code>Deactivate</code>로 교체</dd>
       <dt>결과</dt><dd>연출 종료 후 잔상 제거</dd>
     </dl>
+    <a class="case-more" href="#case-niagara">자세히 ↓</a>
   </div>
 </div>
 
@@ -87,6 +87,10 @@ void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 - 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성
 - 캡처 카메라를 `LevelSequence` named binding에 주입, 연출이 카메라 직접 제어
 
+<div id="case-scenecapture" class="case-anchor"></div>
+
+**연출이 아닐 때도 캡처 비용이 계속 드는 문제가 있었습니다.** SceneCapture2D는 켜져 있는 동안 매 프레임 씬을 한 번 더 렌더링하기 때문입니다. 그래서 연출이 시작될 때만 캡처를 켜고, 끝나면 끄도록 연출 구간에 맞춰 토글했습니다.
+
 ```cpp
 // Cinema/Pilgrimage/CinePilgrimageManager.cpp
 #include "Components/SceneCaptureComponent2D.h"
@@ -115,11 +119,13 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 - 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
 - MPC·머티리얼 기반 미니맵 및 월드맵 설계 상세 → [실시간 위치 기반 맵 설계 페이지](/projects/mapdesign/)
 
+<div id="case-niagara" class="case-anchor"></div>
+
 ## 5. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
 
 - `TransformBonesComponent` 신규 설계 — 런타임 본 트랜스폼 계산 ↔ AnimBP 연동
 - 에디터 프리뷰 전용 `EditorTransformBonesComponent` 분리
-- Niagara 잔상: `ReleaseToPool` 미정리 문제 → `Deactivate` 교체로 해결
+- **연출이 끝난 뒤 Niagara 잔상이 남는 문제가 있었습니다.** `ReleaseToPool`로 반납할 때 이펙트가 제대로 정리되지 않았기 때문이라, 정리 방식을 `Deactivate`로 교체했습니다.
 
 ```
 Source/Sol/Entity/Character/TransformBonesComponent.{h,cpp}      // 런타임
