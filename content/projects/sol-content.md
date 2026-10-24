@@ -23,6 +23,31 @@ highlights:
 >
 > **기여** — 길드/아지트 초기 설계~리팩토링 전 주기, 수집 ListView·FClass GC 개선, TCP/WebSocket/HTTP API 3방식 구분 적용
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">길드 기능이 늘수록 코드 결합이 심해짐</p>
+    <dl>
+      <dt>문제</dt><dd>기부 · PvP · 신권 등 길드 기능이 추가될수록 위젯과 컴포넌트가 얽혀 수정 · 추적이 어려워짐</dd>
+      <dt>원인</dt><dd>서버 이벤트를 컴포넌트 이벤트로 각 수신처에 직접 전파하는 구조</dd>
+      <dt>해결</dt><dd><code>UGuildManager</code>를 단일 수신점으로 두고 메시지 시스템 기반 구독 구조로 전면 재편</dd>
+      <dt>결과</dt><dd>새 기능은 구독만 추가하면 되는 저비용 확장 구조</dd>
+    </dl>
+  </div>
+  <div class="case">
+    <p class="case-title">로그인 시 패킷 과부하</p>
+    <dl>
+      <dt>문제</dt><dd>로그인 시점에 받아야 하는 데이터가 많아 로그인 패킷이 과부하</dd>
+      <dt>원인</dt><dd>횡적 성장 콘텐츠 데이터까지 로그인 시점에 함께 동기화</dd>
+      <dt>해결</dt><dd>해당 콘텐츠에 진입하는 시점에 HTTP API로 지연 조회</dd>
+      <dt>결과</dt><dd>로그인 패킷 부담 완화</dd>
+    </dl>
+  </div>
+</div>
+
+
 ## 개요
 
 - **길드·수집·순례·경제·채팅** 등 게임 콘텐츠 시스템 폭넓은 담당

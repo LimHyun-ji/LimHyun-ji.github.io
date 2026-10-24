@@ -23,6 +23,22 @@ highlights:
 >
 > **기여** — VisualData 에디터 Slate UI · Preview 환경 개발 · 리팩토링, AssetMigration 툴, VisualData Export Commandlet
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">하나의 슈퍼클래스에 타입별 규칙이 엉킴</p>
+    <dl>
+      <dt>문제</dt><dd>PC · NPC · FieldObject · Item · Spirit의 에디터 데이터가 하나의 슈퍼클래스에 모여 타입이 늘수록 유지보수가 어려워짐</dd>
+      <dt>원인</dt><dd>타입마다 다른 외형 규칙을 한 클래스 안에서 분기</dd>
+      <dt>해결</dt><dd>타입별 클래스로 분리하고, 구 구조로 저장된 에셋은 AssetMigration 툴로 새 타입에 자동 변환</dd>
+      <dt>결과</dt><dd>수작업 재저장 없이 기존 에셋을 일괄 이전하고 에디터 구조 부채 해소</dd>
+    </dl>
+  </div>
+</div>
+
+
 ## 개요
 
 - 인게임 시스템([VisualData 페이지](/projects/visualdata/))과 짝을 이루는 **에디터 저작 툴**

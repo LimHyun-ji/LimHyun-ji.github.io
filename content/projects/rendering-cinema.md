@@ -19,6 +19,31 @@ highlights:
 >
 > **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 직접 설계
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">연출이 아닐 때도 GPU 비용이 발생</p>
+    <dl>
+      <dt>문제</dt><dd>순례 주사위 연출용 캡처가 연출 구간이 아닐 때도 모바일 GPU를 소모</dd>
+      <dt>원인</dt><dd>SceneCapture2D는 켜져 있는 동안 매 프레임 씬을 한 번 더 렌더링</dd>
+      <dt>해결</dt><dd>연출 시작 시 캡처를 켜고 종료 시 끄도록 <code>SetVisibility</code>를 연출 구간에 맞춰 토글</dd>
+      <dt>결과</dt><dd>연출 외 구간의 캡처 렌더링 비용 제거</dd>
+    </dl>
+  </div>
+  <div class="case">
+    <p class="case-title">갓아머 연출 후 Niagara 잔상이 남음</p>
+    <dl>
+      <dt>문제</dt><dd>갓아머 연출이 끝난 뒤에도 Niagara 이펙트 잔상이 화면에 남는 문제</dd>
+      <dt>원인</dt><dd><code>ReleaseToPool</code>로 반납할 때 이펙트가 제대로 정리되지 않음</dd>
+      <dt>해결</dt><dd>이펙트 정리 방식을 <code>Deactivate</code>로 교체</dd>
+      <dt>결과</dt><dd>연출 종료 후 잔상 제거</dd>
+    </dl>
+  </div>
+</div>
+
+
 <img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
 
 ## 0. PocketLevel — 인게임과 분리된 연출 공간

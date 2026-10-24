@@ -20,6 +20,31 @@ highlights:
 >
 > **기여** — 인게임 모듈 컴포넌트 · 타입별 모듈 · Action Table · Custom ActionNotify · Attachment 직접 개발
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">헬멧 하나만 바꿔도 전신을 다시 로드</p>
+    <dl>
+      <dt>문제</dt><dd>외형 데이터가 바뀌면 헬멧 하나만 교체해도 전신 파츠와 Attachment를 전부 다시 로드</dd>
+      <dt>원인</dt><dd>데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조</dd>
+      <dt>해결</dt><dd>다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 전이 규칙(FullReset / PartialUpdate / NoUpdate) 도입</dd>
+      <dt>결과</dt><dd>실제로 바뀐 파츠만 다시 로드</dd>
+    </dl>
+  </div>
+  <div class="case">
+    <p class="case-title">풀 재사용 Entity의 외형 잔존 · 해제 메모리 접근</p>
+    <dl>
+      <dt>문제</dt><dd>풀에서 재사용한 Entity에 이전 외형이 남거나 해제된 메모리에 접근하는 크래시 (재현이 어려움)</dd>
+      <dt>원인</dt><dd>풀 반납 시 VisualData 상태가 정리되지 않고, 취소되지 않은 <code>FStreamableHandle</code> 콜백이 이미 사라진 Entity에 뒤늦게 도달</dd>
+      <dt>해결</dt><dd><code>OnUnregister</code>에서 명시적으로 정리하고, 풀 입출고 시 틱 토글, 반납 시 <code>FStreamableHandle</code> 즉시 취소</dd>
+      <dt>결과</dt><dd>경합 경로를 구조적으로 차단</dd>
+    </dl>
+  </div>
+</div>
+
+
 ## 개요
 
 - 외형 하드코딩 배제 → 데이터(VisualGameData)로 모듈을 생성·적용하는 데이터 주도 구조
@@ -134,12 +159,7 @@ private:
 - **가시성 게이팅**: VisualData **로드가 끝난 Entity만 표시**(`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임·미완성 노출 방지
 - **렌더 비용 제어**: `OptimizeLOD`, `SetLightingChannels`, `bAllowNiagaraScalability`, 단일 그림자 캐시 갱신(`RefreshSingleShadowCaches`)
 - **수명 안전**: 모듈/컴포넌트는 `TWeakObjectPtr` · `TSharedPtr`로 관리, `OnUnregister`에서 정리
-
-## 6. 트러블슈팅 — 풀링 × 비동기 로드가 만든 크래시
-
-> **증상** — 풀 재사용 Entity에 이전 외형 잔존 또는 해제 메모리 접근 크래시 (풀 재사용 × 비동기 완료 경합, 재현 난이도 높음) · **원인** — 풀 반납 시 VisualData 상태 미정리 + 미취소 `FStreamableHandle` 콜백의 소멸 Entity 뒤늦은 도달 · **해결** — `OnUnregister` 명시적 정리 · 풀 입출고 시 틱 토글 · 반납 시 `FStreamableHandle` 즉시 취소 → 경합 경로 구조적 차단
-
-- 풀링 freed-tick 크래시 상세 → [퍼포먼스 최적화 페이지 액터 풀링 항목](/projects/optimization/)
+- 풀링 × 비동기 로드 크래시 사례는 위 **문제 해결 사례**, 풀링 구조 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고
 
 ## 기술 요약
 

@@ -19,6 +19,22 @@ highlights:
 >
 > **기여** — Python 변환 파이프라인에 Cron식 변환 · Unit 단위계 · Custom Validation Script 기능 추가
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">잘못된 값이 변환을 거쳐 그대로 반영</p>
+    <dl>
+      <dt>문제</dt><dd>기획 데이터의 잘못된 값 · 단위 착오가 JSON으로 변환되어 런타임까지 그대로 들어감</dd>
+      <dt>원인</dt><dd>변환 단계에 데이터별 규칙을 검사하는 장치가 없음</dd>
+      <dt>해결</dt><dd>Unit 단위계 지원으로 단위를 일관되게 처리하고, Custom Validation Script로 데이터별 규칙을 변환 단계에서 검사</dd>
+      <dt>결과</dt><dd>규칙에 맞지 않는 데이터를 변환 시점에 차단</dd>
+    </dl>
+  </div>
+</div>
+
+
 ## 개요
 
 - 기획 Excel 데이터를 JSON 메타데이터로 변환하는 **Python 데이터 파이프라인**

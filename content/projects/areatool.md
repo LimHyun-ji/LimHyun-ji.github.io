@@ -19,6 +19,31 @@ highlights:
 >
 > **기여** — 3D Point Actor 저작 UX, 검증자 체인, P4 연동 export, Commandlet CI
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">스폰 데이터와 실제 레벨 위치가 어긋남</p>
+    <dl>
+      <dt>문제</dt><dd>기획이 편집한 스폰 데이터가 실제 레벨 위치와 맞지 않는 문제</dd>
+      <dt>원인</dt><dd>스폰 영역을 레벨과 분리된 2D Polygon으로 편집</dd>
+      <dt>해결</dt><dd>레벨 위에 직접 배치하는 3D Point Actor 방식으로 전환</dd>
+      <dt>결과</dt><dd>배치한 위치가 곧 데이터가 되는 저작 흐름</dd>
+    </dl>
+  </div>
+  <div class="case">
+    <p class="case-title">잘못된 레벨 데이터가 런타임까지 유입</p>
+    <dl>
+      <dt>문제</dt><dd>RID 중복 · NavMesh 밖 배치 같은 잘못된 데이터가 export되어 런타임에서야 발견</dd>
+      <dt>원인</dt><dd>export 전에 데이터를 자동으로 검사하는 단계가 없음</dd>
+      <dt>해결</dt><dd>RID · 이름 · NavMesh · 폴더 · 리전 검증자 체인을 통과해야 export, Commandlet CI로 빌드 단계에서 강제</dd>
+      <dt>결과</dt><dd>잘못된 데이터를 export 시점에 차단</dd>
+    </dl>
+  </div>
+</div>
+
+
 ## 개요
 
 - 레벨 영역 · NPC 스폰 · 순찰(Patrol) 데이터를 배치하는 **레벨 데이터 저작 툴**

@@ -18,6 +18,31 @@ highlights:
 >
 > **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
+
+## 문제 해결 사례
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">Global Invalidation을 켜자 스크롤 리스트가 갱신되지 않음</p>
+    <dl>
+      <dt>문제</dt><dd>화면 단위로 Global Invalidation을 적용하자 스크롤 리스트 같은 동적 콘텐츠가 제대로 갱신되지 않는 문제</dd>
+      <dt>원인</dt><dd>Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 계속 바뀌는 스크롤 콘텐츠까지 캐시 대상이 됨</dd>
+      <dt>해결</dt><dd>스크롤 박스를 <code>ForceVolatile(true)</code>로 캐시에서 제외하고, 나머지 UI는 Invalidation 유지</dd>
+      <dt>결과</dt><dd>동적 콘텐츠는 정상 갱신, 나머지 UI는 재계산 절감 효과 유지</dd>
+    </dl>
+  </div>
+  <div class="case">
+    <p class="case-title">풀링한 액터에서 해제된 메모리 접근 크래시</p>
+    <dl>
+      <dt>문제</dt><dd>풀에서 재사용하는 액터 주변에서 해제된 메모리에 접근하는 크래시 (재현이 어려움)</dd>
+      <dt>원인</dt><dd>반납 시 액터만 숨기고 컴포넌트 틱은 계속 돌아, Niagara <code>bAutoDestroy</code>로 스스로 파괴된 컴포넌트에 틱이 호출됨. 반납 시 비동기 로드 핸들도 취소되지 않음</dd>
+      <dt>해결</dt><dd>풀 입출고 시 모든 컴포넌트 틱을 함께 토글하고, 반납 시 <code>FStreamableHandle</code>을 즉시 취소해 수명 경계를 명시</dd>
+      <dt>결과</dt><dd>같은 유형의 크래시를 구조적으로 차단</dd>
+    </dl>
+  </div>
+</div>
+
+
 <img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
