@@ -1,11 +1,11 @@
 ---
 layout: project
 order: 4
-title: "인게임 연출 & 비동기 에셋 로딩"
+title: "렌더링 파이프라인 & 인게임 연출 시스템"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
-summary: "PocketLevel Instance 기반 연출 공간 분리, LevelSequence 비동기 로드·수명 관리로 모바일 비용을 낮춘 인게임 연출 파이프라인 설계."
-tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "Niagara", "Mobile"]
+summary: "SceneCapture·RenderTarget·머티리얼 파라미터 기반 렌더링 파이프라인을 설계하고, PocketLevel Instance로 연출 공간을 분리하며 모바일 GPU 비용을 관리."
+tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "RenderPipeline", "MaterialParameter", "Niagara", "Mobile"]
 highlights:
   - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 비동기 연출 공간 제공"
   - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 비동기 로드"
@@ -13,11 +13,11 @@ highlights:
   - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
 ---
 
-> **목적** — 인게임과 분리된 연출 공간을 비동기로 띄우고 연출 구간에만 자원을 쓰는 파이프라인
+> **목적** — SceneCapture, RenderTarget, Material Parameter Collection 등 UE5 렌더링 시스템의 핵심 요소를 직접 다루며, 모바일 GPU 비용 관리를 설계의 중심에 둔 렌더링 파이프라인
 >
 > **성과** — PocketLevel·시퀀스·캡처 수명을 연출 구간에 한정해 모바일 GPU/메모리 비용↓
 >
-> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture, 갓아머 연출 직접 설계
+> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 렌더링 파이프라인, 갓아머 연출 직접 설계
 
 <img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
 
@@ -57,7 +57,7 @@ ALevelSequenceActor* PlaySequence(TSoftObjectPtr<ULevelSequence> LevelSequence, 
 void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 ```
 
-## 3. 순례 주사위 — SceneCapture로 3D를 UI에 합성
+## 3. SceneCapture 렌더링 파이프라인 — 3D를 RenderTarget에 캡처해 UI에 합성
 
 - 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성
 - 캡처 카메라를 `LevelSequence` named binding에 주입, 연출이 카메라 직접 제어
@@ -83,9 +83,9 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 
 - 동일 패턴을 `DialogueRenderer`에도 적용 (`SetVisibleInSceneCaptureOnly(true)` / 모바일 `WeightedBlendables` 비우기)
 
-## 4. 미니맵 RenderTarget 인디케이터
+## 4. 머티리얼 기반 GPU 렌더링 — 미니맵 인디케이터
 
-- 퀘스트·심볼 데이터를 RenderTarget 텍스처로 변환 → 미니맵 머티리얼 파라미터 주입
+- 퀘스트·심볼 데이터를 RenderTarget 텍스처로 변환 → 미니맵 머티리얼 파라미터 주입 (CPU 위젯이 아닌 GPU 머티리얼에서 렌더링 처리)
 - 플레이어 위치는 Material Parameter Collection으로 실시간 반영
 - 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
 - MPC·머티리얼 기반 미니맵 및 월드맵 설계 상세 → [실시간 위치 기반 맵 설계 페이지](/projects/mapdesign/)
