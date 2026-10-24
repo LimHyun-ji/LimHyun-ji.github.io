@@ -8,13 +8,13 @@ status: "Highlights"
 image: "/images/cinepx-1.png"
 video: "https://youtu.be/aKcv3BfkqDQ"
 tags: ["Unity", "Cinemachine", "RenderTexture", "Optimization"]
-links: { git: "https://github.com/LimHyun-ji/AppleBox", doc: "https://www.miricanvas.com/v/11mr28x", video: "https://youtu.be/aKcv3BfkqDQ" }
+links: { git: "https://github.com/LimHyun-ji/AppleBox", doc: "https://www.miricanvas.com/ko/v/11mrvoy", video: "https://youtu.be/aKcv3BfkqDQ" }
 ---
 ## 프로젝트 소개
 오픈월드형 RPG 원신을 모작한 프로젝트로, 플로우를 사용하기 위해 던전 형식을 차용했습니다. 기본에 충실한 움직임을 모두 구현하고자 노력하였으며, GameManager를 통해 던전의 전반적인 Flow를 관리하였습니다. 원소 및 다중 캐릭터를 사용하는 원작의 특성을 반영하였으며 각 원소는 자연물과도 상호작용이 가능하며, 다중 캐릭터의 경우 상속을 통해 공통 기능과 캐릭터별 특성을 구현했습니다.
 ## 📚프로젝트 자료
 ↘️클릭 시 원본 링크로 이동합니다
-### [코드 분석 및 기술소개서](https://www.miricanvas.com/v/11mr28x)
+### [코드 분석 및 기술소개서](https://www.miricanvas.com/ko/v/11mrvoy)
 ### [Git Repository](https://github.com/LimHyun-ji/AppleBox)
 ## 💻담당 업무 및 해당 업무에서 사용된 기술
 - <strong>영상 녹화 기능</strong>

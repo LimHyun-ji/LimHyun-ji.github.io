@@ -17,8 +17,7 @@ intro: >
 
 # 히어로 키워드 (설명을 대신하는 핵심 키워드 문구)
 keywords:
-  - "UE5 · C++ MMORPG 클라이언트"
-  - "VisualData 캐릭터 시스템 핵심 담당"
+  - "UE5 · C++ MMORPG 클라이언트/엔진 툴"
   - "퍼포먼스 · 메모리 최적화"
   - "인게임 연출 · GPU 렌더링"
   - "게임 콘텐츠 · 데이터 파이프라인"
@@ -81,7 +80,7 @@ experience:
     desc: >
       VisualData 에디터 대규모 리팩토링(타입별 클래스 분리·AssetMigration 자동화), 세금/리텐션 리워드 신규 컨텐츠 추가,
       Slate Global Invalidation 동적 제어·액터 풀링·틱 제어 등 퍼포먼스/메모리 최적화로 영역 확장.
-  - org: "2026 — 라이브 안정화 / 콘텐츠 고도화"
+  - org: "2026 — 라이브 안정화 / 콘텐츠 고도화 / 전투 시스템"
     title: ""
     period: "2026 상반기"
     desc: >
