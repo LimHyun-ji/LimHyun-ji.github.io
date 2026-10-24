@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 987 458" width="987" height="458" font-family="Inter, 'Malgun Gothic', sans-serif">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7787a2"/></marker><marker id="arrowo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#7787a2" stroke-width="1.3"/></marker></defs>
+<rect x="0.5" y="0.5" width="986" height="457" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">데이터 파이프라인 — Excel → Python 변환 · 검증 → JSON → 런타임</text>
+<line x1="83.0" y1="90" x2="83.0" y2="438" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="240.5" y1="90" x2="240.5" y2="438" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="455.0" y1="90" x2="455.0" y2="438" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="664.0" y1="90" x2="664.0" y2="438" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="843.0" y1="90" x2="843.0" y2="438" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<rect x="24" y="52" width="118" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="83.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">기획 Excel</text>
+<rect x="176" y="52" width="129" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="240.5" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Python 파이프라인</text>
+<rect x="339" y="52" width="232" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="455.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Custom Validation Script</text>
+<rect x="605" y="52" width="118" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="664.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">JSON 메타데이터</text>
+<rect x="757" y="52" width="172" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="843.0" y="75.0" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">MetaDataSubsystem</text>
+<line x1="83.0" y1="108.0" x2="240.5" y2="108.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="161.8" y="102.0" text-anchor="middle" font-size="10.5" fill="#475569">Excel 데이터 입력</text>
+<path d="M 240.5 154.0 h 46 v 20 h -46" fill="none" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="294.5" y="157.0" font-size="10.5" fill="#475569">Cron식 변환</text>
+<path d="M 240.5 200.0 h 46 v 20 h -46" fill="none" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="294.5" y="203.0" font-size="10.5" fill="#475569">Unit 단위계 처리</text>
+<line x1="240.5" y1="246.0" x2="455.0" y2="246.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="347.8" y="240.0" text-anchor="middle" font-size="10.5" fill="#475569">데이터별 커스텀 검증 실행</text>
+<line x1="455.0" y1="292.0" x2="240.5" y2="292.0" stroke="#7787a2" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#arrowo)"/>
+<text x="347.8" y="286.0" text-anchor="middle" font-size="10.5" fill="#475569">검증 결과 (실패 시 차단)</text>
+<line x1="240.5" y1="338.0" x2="664.0" y2="338.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="452.2" y="332.0" text-anchor="middle" font-size="10.5" fill="#475569">검증 통과 데이터만 JSON 출력</text>
+<line x1="664.0" y1="384.0" x2="843.0" y2="384.0" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="753.5" y="378.0" text-anchor="middle" font-size="10.5" fill="#475569">런타임 로드 · RidType 키 조회</text>
+</svg>

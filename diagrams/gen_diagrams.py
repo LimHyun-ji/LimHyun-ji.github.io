@@ -309,6 +309,19 @@ emit_seq("cinema-pipeline", "인게임 연출 — 별자리 룰렛/순례 연출
     {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(false) 연출 종료"},
   ])
 
+# ── 데이터 파이프라인 자동화 흐름: 기획 Excel → Python 파이프라인(Cron · Unit · 커스텀 검증) → JSON → 런타임 ──
+emit_seq("data-pipeline-flow", "데이터 파이프라인 — Excel → Python 변환 · 검증 → JSON → 런타임",
+  ["기획 Excel", "Python 파이프라인", "Custom Validation Script", "JSON 메타데이터", "MetaDataSubsystem"],
+  [
+    {"frm":"기획 Excel","to":"Python 파이프라인","label":"Excel 데이터 입력"},
+    {"frm":"Python 파이프라인","to":"Python 파이프라인","label":"Cron식 변환"},
+    {"frm":"Python 파이프라인","to":"Python 파이프라인","label":"Unit 단위계 처리"},
+    {"frm":"Python 파이프라인","to":"Custom Validation Script","label":"데이터별 커스텀 검증 실행"},
+    {"frm":"Custom Validation Script","to":"Python 파이프라인","label":"검증 결과 (실패 시 차단)","ret":True},
+    {"frm":"Python 파이프라인","to":"JSON 메타데이터","label":"검증 통과 데이터만 JSON 출력"},
+    {"frm":"JSON 메타데이터","to":"MetaDataSubsystem","label":"런타임 로드 · RidType 키 조회"},
+  ])
+
 # ── 최적화: 기법 맵 (관계도) ──────────────────────────────────
 opt_nodes = [
     N("root",  "퍼포먼스 / 메모리 최적화",                          310, 48, 250, 46, "manager"),

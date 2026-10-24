@@ -25,6 +25,8 @@ highlights:
 - 기존 변환 흐름 위에 **데이터 표현력**(Cron식 · 단위계)과 **데이터 무결성**(커스텀 검증) 기능을 추가
 - 변환된 메타데이터는 런타임 `MetaDataSubsystem`이 `RidType` 키로 조회
 
+<img class="diagram" src="/images/diagrams/data-pipeline-flow.svg" alt="데이터 파이프라인 자동화 흐름: 기획 Excel 데이터 입력 → Python 파이프라인이 Cron식 변환 · Unit 단위계 처리 → Custom Validation Script로 데이터별 검증(실패 시 차단) → 검증 통과 데이터만 JSON 메타데이터로 출력 → 런타임 MetaDataSubsystem이 RidType 키로 조회" />
+
 ## 1. Cron식 변환 지원
 
 - 반복 일정(예: 특정 요일·시각마다 열리는 콘텐츠)을 기획이 **Cron식**으로 입력
