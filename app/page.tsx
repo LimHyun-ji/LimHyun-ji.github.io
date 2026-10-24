@@ -10,7 +10,7 @@ import { glue } from '@/lib/keepWords';
 // 목록에 없는 slug는 마지막 그룹으로.
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
 const PROJECT_GROUPS = [
-  { title: '인게임 클라이언트 — 시스템 · 연출 · 안정성', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign', 'rendering-cinema', 'live-stability'] },
+  { title: '인게임 클라이언트 — 시스템 · 연출', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign', 'rendering-cinema'] },
   { title: '기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'visualdata-editor', 'metadata-pipeline', 'areatool'] },
 ];
 

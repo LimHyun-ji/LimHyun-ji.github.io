@@ -153,7 +153,3 @@ for (UActorComponent* Comp : Components)               // 컴포넌트 틱까지
 - Push 시 틱을 먼저 끈 뒤 정리 콜백 호출 (병렬 틱 태스크그래프 경쟁 방지)
 - Pull 시 최근 사용 액터 우선 반환 (캐시 적중↑)
 - 주기적 `ShrinkPool()`: 최근 피크 + 20% 버퍼 유지, 초과분 파괴 (`ObjectPoolSubsystem.cpp:120-170, 334-368`)
-
----
-
-- 풀링·비동기 로드 맞물린 freed-tick 크래시 등 라이브 크래시 추적·차단 → [라이브 안정화 & 아웃게임 페이지](/projects/live-stability/) 참조
