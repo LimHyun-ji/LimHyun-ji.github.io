@@ -29,7 +29,14 @@ highlights:
 ## 1. 저작 UX — 2D Polygon → 3D Point Actor
 
 - 스폰 데이터 편집을 2D Polygon에서 **3D Point Actor**로 전환
-- 레벨 위에서 스폰 지점을 직접 보며 배치 → 실제 위치와 데이터의 어긋남 감소
+- 레벨 위에서 스폰 지점 · 순찰 경로 · 영역을 직접 보며 배치 → 실제 위치와 데이터의 어긋남 감소
+- **AreaTool Outliner**에서 `rid = 1`처럼 조건으로 배치 액터를 검색 → 넓은 맵에서도 대상 액터를 바로 찾아 수정
+
+<div class="shot-row">
+  <figure><img src="/images/projects/areatool/areatool-patrol-spawn.jpg" alt="레벨 위에 배치된 순찰 경로와 스폰 지점" /><figcaption>레벨 위 순찰 경로 · 스폰 지점 배치</figcaption></figure>
+  <figure><img src="/images/projects/areatool/areatool-spawn-area.jpg" alt="스폰 영역과 영역 안의 NPC 스폰 지점" /><figcaption>스폰 영역과 영역 안의 NPC 스폰 지점</figcaption></figure>
+  <figure><img src="/images/projects/areatool/areatool-outliner.png" alt="AreaTool Outliner에서 rid = 1 조건으로 배치 액터 검색" /><figcaption>AreaTool Outliner — 조건 검색(rid = 1)</figcaption></figure>
+</div>
 
 ## 2. 검증자 체인 (데이터 무결성)
 
