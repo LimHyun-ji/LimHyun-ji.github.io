@@ -5,7 +5,7 @@ title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
-tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling"]
+tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass"]
 highlights:
   - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
@@ -55,7 +55,7 @@ bool bUseGlobalInvalidation = false;
 ```
 
 - 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감 (`GeoGameMode.cpp:177`/`:218`)
-- **풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않음** → `GameRendering`을 false로(뷰포트 렌더링 중지)해 모바일 GPU 비용 절감
+- **풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않음** → `GameRendering`을 false로(뷰포트 렌더링 중지)해 모바일 GPU 비용 절감. GPU 렌더 파이프라인에 대한 이해를 바탕으로 보이지 않는 픽셀에 자원을 낭비하지 않는 원칙을 적용
 
 ```cpp
 // UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
@@ -84,7 +84,7 @@ float USIGMonsterBucketComponent::CalculateSignificance(
   - 파라미터 없을 때 머티리얼 매니저 (`MaterialManagerComponent.cpp:1047-1050`)
   - 룰렛 시퀀스 대기 중 (`CineConstellationRoulette.cpp:203`)
 - FX 그림자 제거: `SetCastShadow(false)` (`ActionNotify_PlayParticleEffect.cpp:315`)
-- 단일 그림자 메시 메인/뎁스 패스 비활성화 (`SolSingleShadowComponent.cpp:336-340`)
+- 단일 그림자 메시 메인/뎁스 패스 비활성화 (`SolSingleShadowComponent.cpp:336-340`) — 렌더 패스 레벨에서 불필요한 드로콜을 제거하는 접근
 
 ## 3. 데미지 표시: BP → C++ 이벤트 릴레이
 

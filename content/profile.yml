@@ -17,8 +17,7 @@ intro: >
 
 # 히어로 키워드 (설명을 대신하는 핵심 키워드 문구)
 keywords:
-  - "UE5 · C++ MMORPG 클라이언트"
-  - "VisualData 캐릭터 시스템 핵심 담당"
+  - "UE5 · C++ MMORPG 클라이언트/엔진 툴"
   - "퍼포먼스 · 메모리 최적화"
   - "인게임 연출 · GPU 렌더링"
   - "게임 콘텐츠 · 데이터 파이프라인"
@@ -27,14 +26,14 @@ keywords:
 # 인적사항 / 학력 (메인에 작게 표기)
 about:
   born: "1999.11.23"
-  school: "이화여자대학교 · 국어국문학과(주전공) / 컴퓨터공학(부전공) / 소프트웨어(복수전공) 졸업"
+  school: "이화여자대학교 국어국문학과(주전공) / 컴퓨터공학(부전공) / 소프트웨어(복수전공) 졸업"
   schoolPeriod: "2018.03 – 2022.08"
   highschool: "과천외국어고등학교 졸업 (2018.02)"
 
 # 연락 / 링크 (비워두면 버튼이 표시되지 않습니다)
 links:
   github: "https://github.com/LimHyun-ji"
-  email: "whitecherry1123@gmail.com"
+  email: "l_hyunji_im@naver.com"
   # linkedin: "https://www.linkedin.com/in/..."
   # blog: "https://..."
 
@@ -56,20 +55,20 @@ skills:
 
 # 경력 / 타임라인 (선택)
 experience:
-  - org: "알트나인 · Sol (넷마블 계열 MMORPG)"
+  - org: "알트나인 · Sol(MMORPG)"
     title: "Game Client Developer"
-    period: "2023.01 — 현재 (약 3년 6개월)"
+    period: "2023.01 — 현재"
     desc: >
-      UE5(C++) 기반 모바일·PC MMORPG 'Sol' 클라이언트 개발. 신입 합류 → 콘텐츠 오너 → 연출/렌더링 →
+      UE5(C++) 기반 모바일·PC MMORPG 'Sol' 클라이언트 개발 → 신규 시스템 컨텐츠 → 연출/렌더링 →
       최적화·라이브 안정화까지 매년 영역을 넓히며, VisualData 캐릭터 시스템과 길드 등 핵심 시스템을
       여러 해에 걸쳐 담당했습니다.
-  - org: "2023 — 신입 / 툴·데이터 + 콘텐츠 오너"
+  - org: "2023 — 신입 / 툴·데이터 + 신규 시스템 컨텐츠"
     title: ""
     period: "2023"
     desc: >
-      합류 첫 3개월에 Excel↔JSON↔C++ enum/struct 자동 생성 Python 파이프라인을 설계·구축.
-      이후 길드 시스템 담당, 인벤토리 인터페이스 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
-  - org: "2024 — 렌더링 / 시퀀서 연출 아키텍처"
+      Excel↔JSON MetadataSystem 데이터 변환 개선 Python 파이프라인 구현.
+      길드 시스템 담당, 아이템 상세정보 리팩토링, 별자리·수집·도감 등 신규 콘텐츠를 설계·구현.
+  - org: "2024 — 렌더링 / 시퀀서 연출 아키텍처 + AreaTool(레벨디자인툴)"
     title: ""
     period: "2024"
     desc: >
@@ -79,11 +78,11 @@ experience:
     title: ""
     period: "2025"
     desc: >
-      VisualData 에디터 대규모 리팩토링(타입별 클래스 분리·AssetMigration 자동화), 세금/리텐션 리워드/액션 카메라 신규 소유,
+      VisualData 에디터 대규모 리팩토링(타입별 클래스 분리·AssetMigration 자동화), 세금/리텐션 리워드 신규 컨텐츠 추가,
       Slate Global Invalidation 동적 제어·액터 풀링·틱 제어 등 퍼포먼스/메모리 최적화로 영역 확장.
-  - org: "2026 — 라이브 안정화 / 콘텐츠 고도화"
+  - org: "2026 — 라이브 안정화 / 콘텐츠 고도화 / 전투 시스템"
     title: ""
     period: "2026 상반기"
     desc: >
-      라이브 운영 안정화와 콘텐츠 고도화에 집중 — 던전맵, 월드맵 고해상도 타일링,
-      신권 세율·갓아머 연출(TransformBones) 등 출시 전후 시스템 정밀도와 안정성 향상.
+      라이브 운영 안정화와 콘텐츠 고도화, 전투에 집중 — 신규 클래스 전투 스킬, 던전맵, 월드맵 고해상도 타일링,
+      신권 세율·갓아머 연출 등 출시 전후 시스템 정밀도와 안정성 향상.
