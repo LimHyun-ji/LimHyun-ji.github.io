@@ -1,7 +1,7 @@
 ---
 layout: project
 order: 3
-title: "인게임 콘텐츠 & 네트워크 — 길드·수집·순례·경제·채팅"
+title: "인게임 콘텐츠 & 네트워크 — 길드 · 수집 · 순례 · 경제 · 채팅"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "길드·수집·순례·경제·채팅 등 콘텐츠를 기획~UI~서버 동기화까지 담당. TCP·WebSocket·HTTP API 3방식 구분 적용."

@@ -10,7 +10,7 @@ images:
   - src: "/images/projects/visualdata/Screenshot_25.png"
     alt: "VisualData 캐릭터 비주얼 시스템"
 highlights:
-  - "PC·NPC·정령·토템·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master/Face/Torso/Helmet/Wing/Cape)·Override Material·Attachment·본 트랜스폼을 세팅·로드"
+  - "PC·NPC·정령·토템·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet / Wing / Cape) · Override Material · Attachment · 본 트랜스폼을 세팅·로드"
   - "전투/액션 시스템과 결합 — StatusEffect FX·Montage·ActionNotify를 VisualData와 연동하고 ActionTable로 타입별 동작에 맞는 몽타주를 재생"
   - "전이 규칙(FullReset/PartialUpdate/NoUpdate)으로 바뀐 파츠만 부분 갱신, Override Material·Color Tint·LOD로 에셋 재사용성 향상"
   - "무기/방어구/헬멧 Attachment를 소켓 기반으로 부착 — 무기 애니메이션·Niagara FX·소켓 전환(장착↔납도)까지 처리"

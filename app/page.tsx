@@ -4,6 +4,7 @@ import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
+import { glue } from '@/lib/keepWords';
 
 // 메인 프로젝트 그룹 — 성장 순서(게임플레이 시스템 → 기술 기반). 목록에 없는 slug는 마지막 그룹으로.
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
@@ -17,7 +18,7 @@ function ProjectCard({ a, no }: { a: Project; no: number }) {
     <Link className="area-card" href={`/projects/${a.slug}/`}>
       <span className="area-no">{String(no).padStart(2, '0')}</span>
       <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
-      <p>{a.summary}</p>
+      <p>{glue(a.summary ?? '')}</p>
       {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
     </Link>
   );
@@ -78,20 +79,20 @@ export default function Home() {
                 <h1 className="lead-name">{p.name}</h1>
               </div>
             </div>
-            {id.tagline && <p className="lead-tagline">{id.tagline}</p>}
-            <p className="lead-headline">{p.headline}</p>
+            {id.tagline && <p className="lead-tagline">{glue(id.tagline)}</p>}
+            <p className="lead-headline">{glue(p.headline)}</p>
             {p.keywords && (
               <ul className="lead-keywords">
-                {p.keywords.map((k) => <li key={k}>{k}</li>)}
+                {p.keywords.map((k) => <li key={k}>{glue(k)}</li>)}
               </ul>
             )}
             {p.about && (
               <ul className="lead-bio">
                 {p.about.school && p.about.school.split('\n').map((line, i, arr) => (
-                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>{line}
-                    {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
+                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>{glue(line)}
+                    {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {glue(p.about.schoolPeriod)}</em>}</li>
                 ))}
-                {p.about.highschool && <li><span className="bi">🏫</span>{p.about.highschool}</li>}
+                {p.about.highschool && <li><span className="bi">🏫</span>{glue(p.about.highschool)}</li>}
               </ul>
             )}
             <div className="lead-actions">
@@ -122,11 +123,11 @@ export default function Home() {
           <div className="featured-tag">◈ Career · 이력 한눈에</div>
           {p.experience[0] && (
             <h2 className="career-head">
-              {p.experience[0].org}
-              <span className="career-period"> · {p.experience[0].period}</span>
+              {glue(p.experience[0].org ?? '')}
+              <span className="career-period"> · {glue(p.experience[0].period ?? '')}</span>
             </h2>
           )}
-          {id.growthIntro && <p className="career-intro">{id.growthIntro}</p>}
+          {id.growthIntro && <p className="career-intro">{glue(id.growthIntro)}</p>}
           <div className="career-grid">
             {p.experience.slice(1).map((e, i) => {
               const g = id.growth?.find((x) => x.period === e.period);
@@ -135,12 +136,12 @@ export default function Home() {
                   <div className="career-year">{e.period}</div>
                   {g && (
                     <div className="career-growth">
-                      <span className="cg-problem">{g.problem}</span>
-                      <span className="cg-area">→ {g.area}</span>
+                      <span className="cg-problem">{glue(g.problem)}</span>
+                      <span className="cg-area">→ {glue(g.area)}</span>
                     </div>
                   )}
                   <h3><KeepWords text={(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')} /></h3>
-                  <p>{e.desc}</p>
+                  <p>{glue(e.desc ?? '')}</p>
                 </div>
               );
             })}
@@ -155,9 +156,9 @@ export default function Home() {
           <div className="featured-text">
             <h2 className="featured-title">Sol — UE5 MMORPG</h2>
             <p className="featured-sub">
-              커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
-              인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
-              <strong>직접 설계·담당</strong>.
+              {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 · '
+                + '인게임 콘텐츠&네트워크 · 인게임 연출&비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지')}{' '}
+              <strong>{glue('직접 설계·담당.')}</strong>
             </p>
           </div>
           <figure className="featured-banner">
@@ -169,7 +170,7 @@ export default function Home() {
           alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
         {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
           <div className={`area-group tone-${g.tone}`} key={g.title}>
-            <h3 className="area-group-title"><span>{String(gi + 1).padStart(2, '0')}</span>{g.title}</h3>
+            <h3 className="area-group-title"><span>{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
             <div className="area-grid">
               {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
             </div>
@@ -182,7 +183,7 @@ export default function Home() {
        <div className="side-inner">
         <div className="featured-tag">▚ Side Projects · 사이드 프로젝트</div>
         <h2 className="section-h">Side Projects</h2>
-        <p className="section-note">개인·학습·팀 프로젝트 ({sideProjects.length}) — Notion 포트폴리오 기반</p>
+        <p className="section-note">{glue(`개인·학습·팀 프로젝트 (${sideProjects.length}) — Notion 포트폴리오 기반`)}</p>
 
         {/* 주요 프로젝트 (중요도 상위 5 · 큰 카드) */}
         <h3 className="side-sub">주요 프로젝트</h3>
@@ -195,8 +196,8 @@ export default function Home() {
               </div>
               <div className="sp-body">
                 <h3><KeepWords text={sp.title} /></h3>
-                <p className="sp-sub">{sp.subtitle}</p>
-                <p className="sp-desc">{sp.desc}</p>
+                <p className="sp-sub">{glue(sp.subtitle)}</p>
+                <p className="sp-desc">{glue(sp.desc)}</p>
                 <ul className="chips small">{sp.tags.map((t) => <li key={t}>{t}</li>)}</ul>
                 <span className="sp-more">자세히 보기 →</span>
               </div>
@@ -217,7 +218,7 @@ export default function Home() {
                   </div>
                   <div className="sp-sm-body">
                     <h4><KeepWords text={sp.title} /></h4>
-                    <p className="sp-sm-sub">{sp.subtitle}</p>
+                    <p className="sp-sm-sub">{glue(sp.subtitle)}</p>
                     <ul className="chips small">{sp.tags.slice(0, 3).map((t) => <li key={t}>{t}</li>)}</ul>
                   </div>
                 </Link>

@@ -7,6 +7,7 @@ import { getSideDetail, getSideSlugs } from '@/lib/sideContent';
 import ThemeToggle from '@/components/ThemeToggle';
 import DocPreview from '@/components/DocPreview';
 import KeepWords from '@/components/KeepWords';
+import { glue, rehypeKeepWords } from '@/lib/keepWords';
 
 export function generateStaticParams() {
   return getSideSlugs().map((slug) => ({ slug }));
@@ -38,7 +39,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
       <header className="detail-head">
         <p className="eyebrow">Side Project{d.engine ? ` · ${d.engine}` : ''}{d.period ? ` · ${d.period}` : ''}</p>
         <h1><KeepWords text={d.title} /></h1>
-        {d.subtitle && <p className="headline">{d.subtitle}</p>}
+        {d.subtitle && <p className="headline">{glue(d.subtitle)}</p>}
         <ul className="detail-meta">
           {d.team && <li>👥 {d.team}</li>}
           {d.status && d.status !== '숨기기' && <li>⭐ {d.status}</li>}
@@ -62,7 +63,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
       {docUrl && <DocPreview url={docUrl} title={`${d.title} 기술소개서`} />}
 
       <div className="detail-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw, rehypeKeepWords]}>
           {d.body}
         </ReactMarkdown>
       </div>
