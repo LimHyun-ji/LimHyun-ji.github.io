@@ -1,6 +1,6 @@
 ---
 layout: project
-order: 7
+order: 9
 title: "라이브 안정화(CrashSight) & 아웃게임 대응"
 role: "Client Developer"
 period: "상시 (출시 전후)"

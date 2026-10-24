@@ -1,0 +1,69 @@
+---
+layout: project
+order: 6
+title: "VisualData 에디터 & Commandlet"
+role: "Tools / Editor"
+period: "2023 — 현재 (2025 대규모 리팩토링)"
+summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터와, 데이터를 빌드 단계에서 export하는 Commandlet 담당."
+tags: ["Editor Tooling", "VisualData", "EditorModule", "AssetMigration", "Commandlet"]
+images:
+  - src: "/images/projects/visualdata/Screenshot_25.png"
+    alt: "VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰"
+highlights:
+  - "서버 없이 인게임과 동일한 외형·전투 동작을 미리 보는 아트 테스트 환경 제공 — 아트팀 이터레이션 단축"
+  - "2025 대규모 리팩토링: EditorModule 이전 · PreviewActor 병합 · 타입별(PC / NPC / FieldObject / Item / Spirit) 클래스 분리 · VisualDataInterface 제거"
+  - "구 에셋을 새 타입으로 자동 변환하는 AssetMigration 툴로 에디터 구조 부채를 일괄 정리"
+  - "VisualDataExportCommandlet으로 에디터 UI 없이 VisualData 매핑·액션 메타데이터를 JSON export — CI(Jenkins)에서 실행"
+---
+
+> **목적** — 아트·기획이 서버 없이 외형과 전투 연출을 직접 확인하고, 데이터는 빌드 단계에서 자동으로 export되는 저작 환경
+>
+> **성과** — 아트 이터레이션 단축, 에디터 구조 부채 일괄 정리, 데이터 export 자동화
+>
+> **기여** — VisualData 에디터 개발·리팩토링, AssetMigration 툴, VisualData Export Commandlet
+
+## 개요
+
+- 인게임 시스템([VisualData 페이지](/projects/visualdata/))과 짝을 이루는 **에디터 저작 툴**
+- 에디터 전용 코드는 에디터 모듈(`SolEditor`)에 두고, 인게임과 같은 데이터·몽타주·Notify를 프리뷰
+- 전투 Notify는 **Notify_Editor**로 에디터 프리뷰 동작을 분리해, 인게임 로직(Notify_Game)이 에디터 코드에 의존하지 않음
+
+## 1. 아트 테스트 환경 — 서버 없이 인게임과 동일하게
+
+- 파츠별 메시 · Override Material · Attachment · 본 트랜스폼을 에디터에서 바로 설정하고 프리뷰
+- 몽타주와 Custom ActionNotify를 서버 없이 재생해 전투 연출을 확인 (Notify_Editor 경로)
+- 갓아머 연출용 본 트랜스폼도 에디터 프리뷰 전용 `EditorTransformBonesComponent`로 분리 → [인게임 연출 페이지](/projects/rendering-cinema/)
+
+## 2. 2025 대규모 리팩토링
+
+- **EditorModule 이전** — 에디터 전용 코드를 런타임 모듈에서 분리
+- **PreviewActor 병합** — 흩어져 있던 프리뷰 액터를 하나로 통합
+- **타입별 클래스 분리** — 하나의 슈퍼클래스 Data를 PC / NPC / FieldObject / Item / Spirit 타입별 클래스로 분리
+- **`VisualDataInterface` 제거** — 타입별 클래스로 대체되어 불필요해진 인터페이스 정리
+
+## 3. AssetMigration — 구 에셋 자동 변환
+
+- 리팩토링 전 구조로 저장된 에셋을 **새 타입으로 자동 변환**
+- 수작업 재저장 없이 기존 에셋을 일괄 이전 → 에디터 아키텍처 부채 일괄 해소
+
+## 4. VisualData Export Commandlet
+
+- **에디터 UI 없이 Commandlet**으로 VisualData 데이터를 JSON export → Jenkins CI에서 실행
+- NPC · 갓아머 · 정령 · 필드오브젝트 매핑과 액션 메타데이터를 export, 필요 시 P4 연동
+
+```cpp
+// VisualDataExportCommandlet → FVisualDataExport::Execute_ExportAllJson()
+// FVisualDataExport: NPC/갓아머/정령/필드오브젝트 매핑·액션 메타데이터 JSON export
+Execute_ExportAssetType(..., bUseP4v);
+```
+
+- export된 데이터는 런타임 메타데이터로 사용 → [메타데이터 파이프라인 페이지](/projects/metadata-pipeline/)
+
+## 기술 요약
+
+| 영역 | 내용 |
+|------|------|
+| 에디터 | UE5 Editor Module(`SolEditor`) · 타입별 클래스 · PreviewActor |
+| 프리뷰 | 서버 없이 외형 · 몽타주 · Custom ActionNotify(Notify_Editor) 재생 |
+| 마이그레이션 | AssetMigration — 구 에셋 → 신 타입 자동 변환 |
+| 자동화 | `VisualDataExportCommandlet` → `FVisualDataExport` JSON export · Jenkins CI · P4 |

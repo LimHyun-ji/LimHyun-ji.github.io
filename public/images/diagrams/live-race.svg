@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 942 550" width="942" height="550" font-family="Inter, 'Malgun Gothic', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1019 550" width="1019" height="550" font-family="Inter, 'Malgun Gothic', sans-serif">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7787a2"/></marker><marker id="arrowo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#7787a2" stroke-width="1.3"/></marker></defs>
-<rect x="0.5" y="0.5" width="941" height="549" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+<rect x="0.5" y="0.5" width="1018" height="549" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
 <text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">라이브 — 별자리 룰렛 결과 불일치 레이스와 해결</text>
 <line x1="83.0" y1="90" x2="83.0" y2="530" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
 <line x1="262.0" y1="90" x2="262.0" y2="530" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>

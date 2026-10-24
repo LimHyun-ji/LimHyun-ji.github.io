@@ -9,6 +9,7 @@ import ImageGallery from '@/components/ImageGallery';
 import ImageSlider from '@/components/ImageSlider';
 import CodeToggle from '@/components/CodeToggle';
 import KeepWords from '@/components/KeepWords';
+import { glue, rehypeKeepWords } from '@/lib/keepWords';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -33,9 +34,9 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
       </div>
 
       <header className="detail-head">
-        <p className="eyebrow">{proj.role}{proj.period ? ` · ${proj.period}` : ''}</p>
+        <p className="eyebrow">{glue(`${proj.role ?? ''}${proj.period ? ` · ${proj.period}` : ''}`)}</p>
         <h1><KeepWords text={proj.title} /></h1>
-        {proj.summary && <p className="headline">{proj.summary}</p>}
+        {proj.summary && <p className="headline">{glue(proj.summary)}</p>}
         {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
       </header>
 
@@ -49,12 +50,12 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
       {proj.highlights && (
         <>
           <h2>주요 작업</h2>
-          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{h}</li>)}</ul>
+          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{glue(h)}</li>)}</ul>
         </>
       )}
 
       <div className="detail-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeKeepWords]}>
           {proj.body}
         </ReactMarkdown>
       </div>

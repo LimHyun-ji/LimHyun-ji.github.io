@@ -14,7 +14,7 @@ growthIntro: >
 # 경력 카드별 "부딪힌 문제 → 넓어진 영역" (period 값이 profile.yml experience의 period와 같아야 표시됨)
 growth:
   - period: "2023"
-    problem: "기획 데이터를 손으로 옮기며 생기는 오류"
+    problem: "기획 데이터의 잘못된 값 · 형식이 런타임까지 유입"
     area: "툴 · 데이터 파이프라인"
   - period: "2024"
     problem: "연출 자원이 상시 메모리·GPU를 점유"

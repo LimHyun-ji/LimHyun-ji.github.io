@@ -38,6 +38,10 @@ body {
   color: var(--text);
   line-height: 1.65;
   transition: background 0.3s, color 0.3s;
+  /* 줄바꿈 원칙: 사이트 전체 텍스트는 띄어쓰기 기준으로만 줄바꿈 (한글 음절 중간에서 끊지 않음).
+     단어 하나가 칸보다 길 때만 예외적으로 끊김. 코드 블록(pre)은 white-space: pre라 영향 없음 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 main { max-width: none; width: 100%; margin: 0; padding: 0; }
 a { color: var(--accent); text-decoration: none; }
@@ -96,6 +100,7 @@ a:hover { text-decoration: underline; }
 .skill-group h3 { font-size: 0.95rem; color: var(--muted); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.04em; }
 .chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .chips li {
+  white-space: nowrap; /* 태그는 한 덩어리 — 줄바꿈은 태그 단위로만 */
   background: var(--accent-soft); color: var(--accent);
   padding: 5px 12px; border-radius: 999px; font-size: 0.88rem;
   font-family: 'JetBrains Mono', monospace; font-weight: 600;
@@ -229,6 +234,8 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .mermaid svg { max-width: 100%; height: auto; }
 
 /* ───────────── Markdown table (기술 요약) ───────────── */
+/* 긴 클래스명(예: UVisualDataModuleComponent)이 모바일에서 표를 넓히지 않도록, 표 안 코드만 넘칠 때 끊기 (한글 단어는 유지) */
+.detail-body td code, .detail-body th code { overflow-wrap: anywhere; }
 .detail-body table {
   width: 100%; border-collapse: collapse; margin: 8px 0 24px; font-size: 0.95rem;
 }
