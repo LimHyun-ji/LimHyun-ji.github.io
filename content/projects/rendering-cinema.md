@@ -1,11 +1,11 @@
 ---
 layout: project
 order: 4
-title: "렌더링 파이프라인 & 인게임 연출 시스템"
+title: "인게임 연출 시스템"
 role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
-summary: "SceneCapture·RenderTarget·머티리얼 파라미터 기반 렌더링 파이프라인을 설계하고, PocketLevel Instance로 연출 공간을 분리하며 모바일 GPU 비용을 관리."
-tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "RenderPipeline", "MaterialParameter", "Niagara", "Mobile"]
+summary: "별자리 · 순례 · 갓아머 등 인게임 연출을 PocketLevel과 LevelSequence로 구성하고, 연출 에셋 수명과 모바일 GPU 비용을 관리."
+tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "MaterialParameter", "Niagara", "Mobile"]
 highlights:
   - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 비동기 연출 공간 제공"
   - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 비동기 로드"
@@ -13,11 +13,11 @@ highlights:
   - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
 ---
 
-> **목적** — SceneCapture, RenderTarget, Material Parameter Collection 등 UE5 렌더링 시스템의 핵심 요소를 직접 다루며, 모바일 GPU 비용 관리를 설계의 중심에 둔 렌더링 파이프라인
+> **목적** — 연출을 인게임과 분리된 공간에서 비동기로 띄우고, 연출 구간에만 자원(시퀀스 · 액터 · 캡처)을 쓰는 구조
 >
 > **성과** — PocketLevel·시퀀스·캡처 수명을 연출 구간에 한정해 모바일 GPU/메모리 비용↓
 >
-> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 렌더링 파이프라인, 갓아머 연출 직접 설계
+> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 직접 설계
 
 <img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
 
@@ -57,7 +57,7 @@ ALevelSequenceActor* PlaySequence(TSoftObjectPtr<ULevelSequence> LevelSequence, 
 void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 ```
 
-## 3. SceneCapture 렌더링 파이프라인 — 3D를 RenderTarget에 캡처해 UI에 합성
+## 3. SceneCapture — 3D 연출을 RenderTarget에 캡처해 UI에 합성
 
 - 실제 3D 메시 굴림 → `SceneCapture2D`로 `RenderTarget` 캡처 → UI 위젯 합성
 - 캡처 카메라를 `LevelSequence` named binding에 주입, 연출이 카메라 직접 제어

@@ -6,11 +6,12 @@ import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import { glue } from '@/lib/keepWords';
 
-// 메인 프로젝트 그룹 — 성장 순서(게임플레이 시스템 → 기술 기반). 목록에 없는 slug는 마지막 그룹으로.
+// 메인 프로젝트 그룹 — 인게임 클라이언트 / 기술 기반(성능 · 툴 · 파이프라인). 그룹 안 순서는 slugs 순서를 따름.
+// 목록에 없는 slug는 마지막 그룹으로.
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
 const PROJECT_GROUPS = [
-  { title: '게임플레이 시스템', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign'] },
-  { title: '기술 기반 — 툴 · 성능 · 에셋 로딩 · 안정성', tone: 'b', slugs: ['optimization', 'rendering-cinema', 'visualdata-editor', 'metadata-pipeline', 'areatool', 'live-stability'] },
+  { title: '인게임 클라이언트 — 시스템 · 연출 · 안정성', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign', 'rendering-cinema', 'live-stability'] },
+  { title: '기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'visualdata-editor', 'metadata-pipeline', 'areatool'] },
 ];
 
 function ProjectCard({ a, no }: { a: Project; no: number }) {
@@ -28,7 +29,10 @@ export default function Home() {
   const p = getProfile();
   const id = getIdentity();
   const areas = getProjects(); // Sol 내 세부 영역
-  const grouped = PROJECT_GROUPS.map((g) => ({ ...g, items: areas.filter((a) => g.slugs.includes(a.slug)) }));
+  const grouped = PROJECT_GROUPS.map((g) => ({
+    ...g,
+    items: g.slugs.map((s) => areas.find((a) => a.slug === s)).filter((a): a is Project => Boolean(a)),
+  }));
   const known = new Set(PROJECT_GROUPS.flatMap((g) => g.slugs));
   const rest = areas.filter((a) => !known.has(a.slug));
   if (rest.length) grouped[grouped.length - 1].items.push(...rest);
