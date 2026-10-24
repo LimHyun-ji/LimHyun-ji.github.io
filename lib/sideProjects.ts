@@ -12,6 +12,16 @@ export interface SideProject {
 // Notion 포트폴리오에서 이관. 상위 5개(중요도순) = 주요 프로젝트, 이후 = 그 외 프로젝트.
 export const sideProjects: SideProject[] = [
   {
+    slug: 'toon-rendering',
+    title: 'UE5 Toon Rendering Demo',
+    subtitle: '카툰 렌더링 기법 연구 · Unreal Engine 5',
+    engine: 'Unreal / C++ · HLSL',
+    desc: 'Custom Shading Model 확장과 Post Process Material로 Toon Shading, 아웃라인, NPR 라이팅을 구현하고 모바일 최적화까지 고려한 카툰 렌더링 데모.',
+    tags: ['Unreal', 'C++', 'HLSL', 'Toon Shading', 'NPR', 'Mobile'],
+    image: '/images/yt/toon-rendering.jpg',
+    links: { git: '', video: '' },
+  },
+  {
     slug: 'ittakestwo',
     title: 'It Takes Two 모작',
     subtitle: '2인 협동 어드벤처 · Unity',
