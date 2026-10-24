@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ImageGallery from '@/components/ImageGallery';
 import ImageSlider from '@/components/ImageSlider';
 import CodeToggle from '@/components/CodeToggle';
+import KeepWords from '@/components/KeepWords';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -33,7 +34,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
 
       <header className="detail-head">
         <p className="eyebrow">{proj.role}{proj.period ? ` · ${proj.period}` : ''}</p>
-        <h1>{proj.title}</h1>
+        <h1><KeepWords text={proj.title} /></h1>
         {proj.summary && <p className="headline">{proj.summary}</p>}
         {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
       </header>

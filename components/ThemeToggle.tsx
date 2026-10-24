@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
-  const [light, setLight] = useState(false);
+  const [light, setLight] = useState(true); // 기본 테마 = 라이트
 
   // DOM(data-theme)을 단일 진실 소스로 사용 → 여러 토글 인스턴스 간 상태 동기화
   useEffect(() => {

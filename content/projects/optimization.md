@@ -7,8 +7,8 @@ period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass"]
 highlights:
-  - "Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
-  - "위젯/액터 오브젝트 풀링(용량 상한 FIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
+  - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
+  - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
   - "데미지 표시를 BP 애니메이션 의존에서 순수 C++ 이벤트 릴레이 + 컨테이너 풀링으로 재설계"
 ---
 
@@ -16,14 +16,21 @@ highlights:
 >
 > **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓, freed-tick 크래시 구조적 차단
 >
-> **기여** — Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
+> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
 
 <img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
 
-![](/images/projects/optimization/image-20250709-123214.png)
-![](/images/projects/optimization/image-20250709-123225.png)
-
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
+
+### 측정 — Unreal Insights로 Slate Tick 비용 확인
+
+- **Unreal Insights**로 UI 프레임 비용을 측정 → `Slate::Tick (Time and Widgets)`·`Slate::DrawWindows`·`Slate_PaintSlowPath`가 **매 프레임** 발생하는 것을 확인
+- 측정 결과를 근거로 **어느 화면/레이어에 Invalidation을 적용할지** 결정하고 수정
+
+![Slate 사이클 카운터 — Total Slate Tick Time·Draw Window·Game UI Paint·Tick Widgets](/images/projects/optimization/image-20250709-123214.png)
+![Unreal Insights 타이밍 뷰 — Slate::Tick·Slate::DrawWindows·Slate::Prepass·Slate_PaintSlowPath](/images/projects/optimization/image-20250709-123225.png)
+
+### 적용 — Global Invalidation
 
 - CommonUI/Slate 최대 비용: **매 프레임 위젯 재계산**
 - 무거운 화면·가벼운 HUD 구분 → **Global Invalidation 레이어 단위 동적 토글**

@@ -1,25 +1,39 @@
 import Link from 'next/link';
-import { getProfile, getProjects } from '@/lib/content';
+import { getProfile, getProjects, getIdentity, type Project } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
 import ThemeToggle from '@/components/ThemeToggle';
+import KeepWords from '@/components/KeepWords';
 
-// 스킬 → 배지 약어. 없으면 앞 3글자(영문) 폴백.
-const SKILL_ABBR: Record<string, string> = {
-  'C++': 'C++', 'C#': 'C#', 'Python': 'Py',
-  'Unreal Engine 5': 'UE5', 'CommonUI': 'UI', 'Slate/UMG': 'UMG', 'Niagara': 'Ng',
-  'Sequencer / LevelSequence': 'Seq', 'AnimBP / SkeletalMesh': 'Anim',
-  'TCP Socket': 'TCP', 'WebSocket': 'WS', 'Protobuf': 'Pb', 'Client-Server Sync': 'Sync', '패킷 최적화': 'Opt',
-  'Perforce': 'P4', 'Git': 'Git', 'Commandlet / Editor Module': 'Cmd', 'Jenkins CI': 'CI', 'Jira': 'Jira',
-};
-const abbr = (s: string) => SKILL_ABBR[s] ?? (s.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase() || '·');
+// 메인 프로젝트 그룹 — 성장 순서(게임플레이 시스템 → 기술 기반). 목록에 없는 slug는 마지막 그룹으로.
+// tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
+const PROJECT_GROUPS = [
+  { title: '게임플레이 시스템', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign'] },
+  { title: '기술 기반 — 툴 · 성능 · 에셋 로딩 · 안정성', tone: 'b', slugs: ['editor-tools', 'optimization', 'rendering-cinema', 'live-stability'] },
+];
+
+function ProjectCard({ a, no }: { a: Project; no: number }) {
+  return (
+    <Link className="area-card" href={`/projects/${a.slug}/`}>
+      <span className="area-no">{String(no).padStart(2, '0')}</span>
+      <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
+      <p>{a.summary}</p>
+      {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
+    </Link>
+  );
+}
 
 export default function Home() {
   const p = getProfile();
-  const areas = getProjects(); // Sol 내 세부 영역(5)
-  // 히어로 우측 스킬 패널 — Language / Engine / Tools 어필
-  const heroSkills = (p.skills ?? []).filter((g) =>
-    ['Languages', 'Engine / Framework', 'Tools'].includes(g.category));
+  const id = getIdentity();
+  const areas = getProjects(); // Sol 내 세부 영역
+  const grouped = PROJECT_GROUPS.map((g) => ({ ...g, items: areas.filter((a) => g.slugs.includes(a.slug)) }));
+  const known = new Set(PROJECT_GROUPS.flatMap((g) => g.slugs));
+  const rest = areas.filter((a) => !known.has(a.slug));
+  if (rest.length) grouped[grouped.length - 1].items.push(...rest);
+  let projectNo = 0;
+  // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
+  const heroSkills = p.skills ?? [];
 
   return (
     <>
@@ -64,6 +78,7 @@ export default function Home() {
                 <h1 className="lead-name">{p.name}</h1>
               </div>
             </div>
+            {id.tagline && <p className="lead-tagline">{id.tagline}</p>}
             <p className="lead-headline">{p.headline}</p>
             {p.keywords && (
               <ul className="lead-keywords">
@@ -72,7 +87,6 @@ export default function Home() {
             )}
             {p.about && (
               <ul className="lead-bio">
-                {p.about.born && <li><span className="bi">🎂</span>{p.about.born}</li>}
                 {p.about.school && p.about.school.split('\n').map((line, i, arr) => (
                   <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>{line}
                     {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
@@ -86,7 +100,7 @@ export default function Home() {
             </div>
           </div>
           {heroSkills.length > 0 && (
-            <aside className="lead-skills">
+            <aside className="lead-skills" id="skills" aria-label="Skills">
               {heroSkills.map((g) => (
                 <div className="ls-row" key={g.category}>
                   <span className="ls-cat">{g.category}</span>
@@ -112,14 +126,24 @@ export default function Home() {
               <span className="career-period"> · {p.experience[0].period}</span>
             </h2>
           )}
+          {id.growthIntro && <p className="career-intro">{id.growthIntro}</p>}
           <div className="career-grid">
-            {p.experience.slice(1).map((e, i) => (
-              <div className="career-card" key={i}>
-                <div className="career-year">{e.period}</div>
-                <h3>{(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')}</h3>
-                <p>{e.desc}</p>
-              </div>
-            ))}
+            {p.experience.slice(1).map((e, i) => {
+              const g = id.growth?.find((x) => x.period === e.period);
+              return (
+                <div className="career-card" key={i}>
+                  <div className="career-year">{e.period}</div>
+                  {g && (
+                    <div className="career-growth">
+                      <span className="cg-problem">{g.problem}</span>
+                      <span className="cg-area">→ {g.area}</span>
+                    </div>
+                  )}
+                  <h3><KeepWords text={(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')} /></h3>
+                  <p>{e.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
@@ -127,23 +151,30 @@ export default function Home() {
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
         <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
-        <h2 className="featured-title">Sol — UE5 MMORPG</h2>
-        <p className="featured-sub">
-          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
-          인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
-          <strong>직접 설계·담당</strong>.
-        </p>
+        <div className="featured-intro">
+          <div className="featured-text">
+            <h2 className="featured-title">Sol — UE5 MMORPG</h2>
+            <p className="featured-sub">
+              커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
+              인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
+              <strong>직접 설계·담당</strong>.
+            </p>
+          </div>
+          <figure className="featured-banner">
+            <img src="/images/projects/sol-banner.jpg" alt="SOL enchant 공식 키 아트 — 넷마블 · ALT9 전지적 MMORPG" />
+            <figcaption>© Netmarble Corp. &amp; ALT9 Inc. All Rights Reserved.</figcaption>
+          </figure>
+        </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
-        <div className="area-grid">
-          {areas.map((a) => (
-            <Link className="area-card" href={`/projects/${a.slug}/`} key={a.slug}>
-              <h3>{a.title}<span className="arrow"> →</span></h3>
-              <p>{a.summary}</p>
-              {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
-            </Link>
-          ))}
-        </div>
+        {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
+          <div className={`area-group tone-${g.tone}`} key={g.title}>
+            <h3 className="area-group-title"><span>{String(gi + 1).padStart(2, '0')}</span>{g.title}</h3>
+            <div className="area-grid">
+              {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
+            </div>
+          </div>
+        ))}
       </section>
 
       {/* SIDE PROJECTS (하단, 별도 밴드로 명확히 분리) */}
@@ -163,7 +194,7 @@ export default function Home() {
                 <span className="sp-engine">{sp.engine}</span>
               </div>
               <div className="sp-body">
-                <h3>{sp.title}</h3>
+                <h3><KeepWords text={sp.title} /></h3>
                 <p className="sp-sub">{sp.subtitle}</p>
                 <p className="sp-desc">{sp.desc}</p>
                 <ul className="chips small">{sp.tags.map((t) => <li key={t}>{t}</li>)}</ul>
@@ -185,7 +216,7 @@ export default function Home() {
                     <span className="sp-sm-engine">{sp.engine}</span>
                   </div>
                   <div className="sp-sm-body">
-                    <h4>{sp.title}</h4>
+                    <h4><KeepWords text={sp.title} /></h4>
                     <p className="sp-sm-sub">{sp.subtitle}</p>
                     <ul className="chips small">{sp.tags.slice(0, 3).map((t) => <li key={t}>{t}</li>)}</ul>
                   </div>
@@ -196,27 +227,6 @@ export default function Home() {
         )}
        </div>
       </section>
-
-      {/* SKILLS */}
-      {p.skills && (
-        <section className="block" id="skills">
-          <h2 className="section-h">Skills</h2>
-          <div className="skill-spec">
-            {p.skills.map((g) => (
-              <div className="ss-row" key={g.category}>
-                <div className="ss-cat">{g.category}</div>
-                <ul className="ss-items">
-                  {g.items.map((it) => (
-                    <li className="ss-item" key={it}>
-                      <span className="ss-badge">{abbr(it)}</span>{it}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
     </>
   );

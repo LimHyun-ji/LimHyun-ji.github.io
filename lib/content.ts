@@ -8,6 +8,9 @@ const CONTENT = path.join(process.cwd(), 'content');
 export interface SkillGroup { category: string; items: string[]; }
 export interface Experience { org?: string; title?: string; period?: string; desc?: string; }
 export interface About { born?: string; school?: string; schoolPeriod?: string; highschool?: string; }
+export interface Growth { period: string; problem: string; area: string; }
+export interface Identity { tagline?: string; growthIntro?: string; growth?: Growth[]; }
+
 export interface Profile {
   name: string; role: string; headline: string; intro: string;
   photo?: string;
@@ -29,6 +32,12 @@ export interface Project {
 export function getProfile(): Profile {
   const raw = fs.readFileSync(path.join(CONTENT, 'profile.yml'), 'utf8');
   return yaml.load(raw) as Profile;
+}
+
+export function getIdentity(): Identity {
+  const file = path.join(CONTENT, 'identity.yml');
+  if (!fs.existsSync(file)) return {};
+  return (yaml.load(fs.readFileSync(file, 'utf8')) as Identity) ?? {};
 }
 
 const PROJ_DIR = path.join(CONTENT, 'projects');
