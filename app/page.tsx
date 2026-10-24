@@ -10,7 +10,7 @@ import { glue } from '@/lib/keepWords';
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
 const PROJECT_GROUPS = [
   { title: '게임플레이 시스템', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign'] },
-  { title: '기술 기반 — 툴 · 성능 · 에셋 로딩 · 안정성', tone: 'b', slugs: ['editor-tools', 'optimization', 'rendering-cinema', 'live-stability'] },
+  { title: '기술 기반 — 툴 · 성능 · 에셋 로딩 · 안정성', tone: 'b', slugs: ['optimization', 'rendering-cinema', 'visualdata-editor', 'metadata-pipeline', 'areatool', 'live-stability'] },
 ];
 
 function ProjectCard({ a, no }: { a: Project; no: number }) {
@@ -170,7 +170,7 @@ export default function Home() {
           alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
         {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
           <div className={`area-group tone-${g.tone}`} key={g.title}>
-            <h3 className="area-group-title"><span>{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
+            <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
             <div className="area-grid">
               {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
             </div>

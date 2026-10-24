@@ -142,15 +142,25 @@ def emit(slug, title, nodes, edges):
 # messages: [{"frm","to","label","ret"(bool)}]
 HEAD_Y, HEAD_H, MSG_TOP, MSG_STEP = 52, 38, 108, 46
 
-def _seq_layout(participants):
+def _label_w(text, size=10.5):
+    # 대략적인 렌더 폭: 한글·전각 ≈ 1.0em, 그 외 ≈ 0.58em
+    return sum(size if ord(ch) >= 0x2E80 else size * 0.58 for ch in text)
+
+def _seq_layout(participants, messages=()):
     xs, cx, boxes = 24, [], []
     for p in participants:
         w = max(int(len(p) * 8.6) + 26, 118)
         boxes.append((xs, w)); cx.append(xs + w / 2); xs += w + 34
-    return boxes, cx, xs + 24  # boxes, centers, total width
+    W = xs + 24
+    # 자기 호출(self message) 라벨은 생명선 오른쪽으로 뻗으므로, 카드 폭이 라벨을 덮도록 확장
+    for m in messages:
+        if m["frm"] == m["to"]:
+            a = participants.index(m["frm"])
+            W = max(W, int(cx[a] + 54 + _label_w(m["label"]) + 24))
+    return boxes, cx, W  # boxes, centers, total width
 
 def seq_svg(title, participants, messages):
-    boxes, cx, W = _seq_layout(participants)
+    boxes, cx, W = _seq_layout(participants, messages)
     H = MSG_TOP + max(1, len(messages)) * MSG_STEP + 28
     life_bottom = H - 20
     P = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="Inter, \'Malgun Gothic\', sans-serif">']
@@ -186,7 +196,7 @@ def seq_svg(title, participants, messages):
     return "\n".join(P)
 
 def seq_drawio(name, participants, messages):
-    boxes, cx, W = _seq_layout(participants)
+    boxes, cx, W = _seq_layout(participants, messages)
     H = MSG_TOP + max(1, len(messages)) * MSG_STEP + 28
     life_bottom = H - 20
     fill, stroke = PAL["core"]
@@ -267,6 +277,19 @@ vd_edges = [
     dict(src="pc", dst="attach", label="소켓 부착"),
 ]
 emit("visualdata-flow", "VisualData — 컴포넌트 · 타입별 모듈 · 어태치먼트 구조", vd_nodes, vd_edges)
+
+# ── VisualData 전투 액션: 서버 ActionEvt → ActionTable → 몽타주 → Custom ActionNotify ──
+emit_seq("visualdata-action", "VisualData 전투 액션 — ActionEvt → 몽타주 재생 → ActionNotify",
+  ["서버", "Entity (액션 처리)", "VisualData · ActionTable", "AnimInstance (Montage)", "Custom ActionNotify"],
+  [
+    {"frm":"서버","to":"Entity (액션 처리)","label":"ActionEvt 수신"},
+    {"frm":"Entity (액션 처리)","to":"VisualData · ActionTable","label":"Entity 타입별 액션 조회"},
+    {"frm":"VisualData · ActionTable","to":"Entity (액션 처리)","label":"재생할 몽타주","ret":True},
+    {"frm":"Entity (액션 처리)","to":"AnimInstance (Montage)","label":"몽타주 Play"},
+    {"frm":"AnimInstance (Montage)","to":"Custom ActionNotify","label":"Notify 시점 도달 → 실행"},
+    {"frm":"Custom ActionNotify","to":"Custom ActionNotify","label":"Notify_Game — 인게임 처리 (FX 등)"},
+    {"frm":"Custom ActionNotify","to":"Custom ActionNotify","label":"Notify_Editor — 에디터 프리뷰 전용"},
+  ])
 
 # ═══════════════════════════════════════════════════════════════
 # D4. 인게임 연출 파이프라인

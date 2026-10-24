@@ -124,7 +124,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .area-group.tone-b { --tone: var(--accent-2); }
 .area-group + .area-group { margin-top: 34px; }
 .area-group-title { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 17px; font-weight: 800; }
-.area-group-title span { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--tone); }
+.area-group-title .area-group-no { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--tone); }
 .area-grid { display: flex; flex-direction: column; gap: 12px; }
 .area-card { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 28px;
   text-decoration: none; color: inherit; padding: 20px 26px 20px 22px; border-radius: 14px;
