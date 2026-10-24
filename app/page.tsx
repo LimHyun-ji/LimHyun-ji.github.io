@@ -73,10 +73,10 @@ export default function Home() {
             {p.about && (
               <ul className="lead-bio">
                 {p.about.born && <li><span className="bi">🎂</span>{p.about.born}</li>}
-                {p.about.school && (
-                  <li><span className="bi">🎓</span>{p.about.school.split('\n').map((line, i) => <span key={i}>{i > 0 && <br />}{line}</span>)}
-                    {p.about.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
-                )}
+                {p.about.school && p.about.school.split('\n').map((line, i, arr) => (
+                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>{line}
+                    {i === arr.length - 1 && p.about.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
+                ))}
                 {p.about.highschool && <li><span className="bi">🏫</span>{p.about.highschool}</li>}
               </ul>
             )}
