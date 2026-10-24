@@ -101,6 +101,11 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px auto 14px; }
 /* 마크다운 본문 내 이미지 — 절반 크기, 중앙 정렬 */
 .detail-body img:not(.diagram) { max-width: 50%; display: block; margin: 10px auto; }
+/* 마크다운 본문의 스크린샷 묶음 (<div class="shot-row"><figure>…) — 나란히 배치, 좁은 화면에서는 세로로 */
+.detail-body .shot-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0 8px; }
+.detail-body .shot-row figure { margin: 0; flex: 1 1 260px; max-width: 420px; }
+.detail-body .shot-row figure img { width: 100%; max-width: 100%; margin: 0; border-radius: 10px; border: 1px solid var(--line); }
+.detail-body .shot-row figcaption { margin-top: 6px; font-size: 12.5px; text-align: center; color: var(--muted); }
 
 /* FEATURED — Sol */
 .featured { max-width: 1600px; margin: 0 auto; padding: 40px clamp(20px, 5vw, 48px);
