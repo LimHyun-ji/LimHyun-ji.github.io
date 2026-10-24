@@ -127,12 +127,20 @@ export default function Home() {
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
         <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
-        <h2 className="featured-title">Sol — UE5 MMORPG</h2>
-        <p className="featured-sub">
-          커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
-          인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
-          <strong>직접 설계·담당</strong>.
-        </p>
+        <div className="featured-intro">
+          <div className="featured-text">
+            <h2 className="featured-title">Sol — UE5 MMORPG</h2>
+            <p className="featured-sub">
+              커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 ·
+              인게임 콘텐츠&amp;네트워크 · 인게임 연출&amp;비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지
+              <strong>직접 설계·담당</strong>.
+            </p>
+          </div>
+          <figure className="featured-banner">
+            <img src="/images/projects/sol-banner.jpg" alt="SOL enchant 공식 키 아트 — 넷마블 · ALT9 전지적 MMORPG" />
+            <figcaption>© Netmarble Corp. &amp; ALT9 Inc. All Rights Reserved.</figcaption>
+          </figure>
+        </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
         <div className="area-grid">
