@@ -23,6 +23,31 @@ highlights:
 >
 > **기여** — 길드/아지트 초기 설계~리팩토링 전 주기, 수집 ListView·FClass GC 개선, TCP/WebSocket/HTTP API 3방식 구분 적용
 
+
+## 문제 해결 요약
+
+<div class="cases">
+  <div class="case">
+    <p class="case-title">길드 기능 확장 시 결합 심화</p>
+    <dl>
+      <dt>문제</dt><dd>기능이 늘수록 위젯 · 컴포넌트가 얽혀 수정 · 추적이 어려워짐</dd>
+      <dt>해결</dt><dd><code>UGuildManager</code> 단일 수신점 + 메시지 구독 구조로 재편</dd>
+      <dt>결과</dt><dd>새 기능은 구독만 추가하면 되는 확장 구조</dd>
+    </dl>
+    <a class="case-more" href="#case-guild">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">로그인 패킷 과부하</p>
+    <dl>
+      <dt>문제</dt><dd>로그인 시점에 받을 데이터가 많아 패킷 과부하</dd>
+      <dt>해결</dt><dd>성장 콘텐츠는 진입 시점에 HTTP API로 지연 조회</dd>
+      <dt>결과</dt><dd>로그인 패킷 부담 완화</dd>
+    </dl>
+    <a class="case-more" href="#case-login-packet">자세히 ↓</a>
+  </div>
+</div>
+
+
 ## 개요
 
 - **길드·수집·순례·경제·채팅** 등 게임 콘텐츠 시스템 폭넓은 담당
@@ -32,20 +57,21 @@ highlights:
   - **WebSocket** — 채팅 실시간 송수신
   - **HTTP API** — 횡적 성장 콘텐츠를 진입 시점에 **지연 조회**해 로그인 패킷 과부하 방지
 
+<div id="case-login-packet" class="case-anchor"></div>
+
+**HTTP API를 따로 둔 이유는 로그인 패킷 과부하였습니다.** 횡적 성장 콘텐츠 데이터까지 로그인 시점에 함께 받으면 로그인 패킷이 무거워지기 때문에, 해당 콘텐츠에 진입하는 시점에 HTTP API로 지연 조회하도록 나눴습니다.
+
 <img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 콘텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
 ## 담당 콘텐츠
+
+<div id="case-guild" class="case-anchor"></div>
 
 ### 길드 / 아지트 — 대표작
 
 - 길드 생성·권한·기부·PvP·신권(디바인파워) 연계 등 도메인 클라이언트 전반 담당
 
-**왜 리팩토링했나.**
-- 초기: 컴포넌트 이벤트로 각 수신처 직접 전파 → 기능 증가 시 위젯·컴포넌트 결합 심화·추적 난항
-
-**어떻게.**
-- 전파 경로 **메시지 시스템 기반 전면 재편** — `UGuildManager` 단일 수신점
-- 기부·PvP·신권 추가 시 구독만 추가하면 되는 저비용 확장 구조
+**초기에는 서버 이벤트를 컴포넌트 이벤트로 각 수신처에 직접 전파했는데, 기부 · PvP · 신권 기능이 늘수록 위젯과 컴포넌트가 서로 얽혀 수정과 추적이 어려워졌습니다.** 그래서 전파 경로를 **메시지 시스템 기반으로 전면 재편**해 `UGuildManager`를 단일 수신점으로 두고, 각 기능은 필요한 메시지만 구독하게 했습니다. 이후 기능을 추가할 때는 구독만 추가하면 되는 구조가 됐습니다.
 
 ### 별자리 · 순례 · 연구/연성
 
