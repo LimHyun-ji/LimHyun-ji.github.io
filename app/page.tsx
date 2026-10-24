@@ -74,7 +74,7 @@ export default function Home() {
               <ul className="lead-bio">
                 {p.about.born && <li><span className="bi">🎂</span>{p.about.born}</li>}
                 {p.about.school && (
-                  <li><span className="bi">🎓</span>{p.about.school}
+                  <li><span className="bi">🎓</span>{p.about.school.split('\n').map((line, i) => <span key={i}>{i > 0 && <br />}{line}</span>)}
                     {p.about.schoolPeriod && <em className="bi-sub"> · {p.about.schoolPeriod}</em>}</li>
                 )}
                 {p.about.highschool && <li><span className="bi">🏫</span>{p.about.highschool}</li>}
