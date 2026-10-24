@@ -36,7 +36,7 @@
 @media (max-width: 860px) { .lead { grid-template-columns: 1fr; } }
 .lead-main { min-width: 0; }
 /* 히어로 우측 스킬 — 카드/칩 아님. 왼쪽 액센트 라인 + 구분선 스펙 리스트 */
-.lead-skills { align-self: center; display: flex; flex-direction: column;
+.lead-skills { scroll-margin-top: 90px; align-self: center; display: flex; flex-direction: column;
   padding-left: 18px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
 .ls-row { display: grid; grid-template-columns: 108px 1fr; gap: 6px 16px; align-items: baseline;
   padding: 12px 0; border-top: 1px solid var(--line); }
@@ -47,6 +47,9 @@
   text-shadow: 0 1px 10px var(--bg), 0 0 2px var(--bg); }
 .ls-sep { color: var(--accent); opacity: .55; font-style: normal; margin: 0 7px; }
 @media (max-width: 520px) { .ls-row { grid-template-columns: 1fr; gap: 2px; } }
+/* 항목 단위로만 줄바꿈 — 항목 하나(예: Unreal Engine 5)가 중간에서 끊기지 않도록 */
+.ls-vals { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }
+.ls-vals > span { white-space: nowrap; }
 
 /* CAREER — 이력 한눈에 (히어로 직후) */
 .career { max-width: 1600px; margin: 0 auto; padding: 10px clamp(20px, 5vw, 48px) 18px; }
@@ -60,9 +63,16 @@
 .career-year { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-2); font-weight: 700; margin-bottom: 7px; }
 .career-card h3 { margin: 0 0 8px; font-size: 15px; line-height: 1.35; }
 .career-card p { margin: 0; font-size: 12.5px; line-height: 1.6; opacity: .78; }
+.career-intro { max-width: 860px; margin: -6px 0 18px; font-size: 14.5px; line-height: 1.7; opacity: .82; word-break: keep-all; }
+.career-growth { display: flex; flex-direction: column; gap: 2px; margin: 0 0 10px; padding: 8px 10px; border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent); border-left: 2px solid var(--accent); }
+.cg-problem { font-size: 12.5px; line-height: 1.45; opacity: .85; word-break: keep-all; }
+.cg-area { font-size: 13px; font-weight: 700; color: var(--accent); word-break: keep-all; }
 .lead-eyebrow { color: var(--accent-2); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; margin: 0 0 10px; }
 .lead-name { font-size: clamp(40px, 8vw, 76px); line-height: 1.05; margin: 0 0 18px; font-weight: 800; letter-spacing: -1px; }
-.lead-headline { font-size: clamp(18px, 2.4vw, 24px); font-weight: 600; margin: 0 0 16px; opacity: .95; }
+.lead-tagline { font-size: clamp(24px, 3.4vw, 36px); font-weight: 800; letter-spacing: -.5px; line-height: 1.3; margin: 0 0 10px;
+  color: var(--accent); word-break: keep-all; }
+.lead-headline { font-size: clamp(16px, 1.9vw, 20px); font-weight: 600; margin: 0 0 16px; opacity: .85; word-break: keep-all; }
 .lead-intro { font-size: 16px; line-height: 1.75; opacity: .8; margin: 0 0 26px; }
 /* 히어로 키워드 문구 — 스캔 쉬운 pill */
 .lead-keywords { list-style: none; padding: 0; margin: 4px 0 28px; display: flex; flex-wrap: wrap; gap: 9px; }
@@ -88,7 +98,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 /* 코드 분석 기반 아키텍처 다이어그램 (draw.io → SVG) */
 .detail-body img.diagram, img.diagram { display: block; width: 100%; max-width: 880px;
   margin: 10px auto 26px; border-radius: 14px; }
-.arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px 0 14px; }
+.arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px auto 14px; }
 /* 마크다운 본문 내 이미지 — 절반 크기, 중앙 정렬 */
 .detail-body img:not(.diagram) { max-width: 50%; display: block; margin: 10px auto; }
 
@@ -106,17 +116,31 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .featured-banner img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line);
   box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .7); }
 .featured-banner figcaption { margin-top: 6px; font-size: 11px; opacity: .55; text-align: right; }
-/* 가로로 긴 카드 · 세로 스택 */
+/* 제목 단어 단위 줄바꿈 (components/KeepWords) */
+.kw { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 메인 프로젝트 — 성장 순서 그룹 + 그룹 색 텍스트 카드 (사이드 프로젝트 갤러리와 구분되는 문서형 목록) */
+.area-group { --tone: var(--accent); }
+.area-group.tone-b { --tone: var(--accent-2); }
+.area-group + .area-group { margin-top: 34px; }
+.area-group-title { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 17px; font-weight: 800; }
+.area-group-title span { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--tone); }
 .area-grid { display: flex; flex-direction: column; gap: 12px; }
 .area-card { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 28px;
-  text-decoration: none; color: inherit; padding: 20px 26px; border-radius: 14px;
-  border: 1px solid var(--line); background: var(--surf); transition: transform .15s, border-color .15s; }
-.area-card:hover { transform: translateX(4px); border-color: var(--accent); }
-.area-card h3 { margin: 0; font-size: 18px; flex: 0 0 clamp(190px, 22%, 300px); }
-.area-card p { margin: 0; font-size: 14px; line-height: 1.55; opacity: .8; flex: 1 1 340px; }
+  text-decoration: none; color: inherit; padding: 20px 26px 20px 22px; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--line)); border-left: 4px solid var(--tone);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 13%, transparent), color-mix(in srgb, var(--tone) 3%, transparent) 70%);
+  transition: transform .15s, border-color .15s, background .15s; }
+.area-card:hover { transform: translateX(4px); border-color: var(--tone);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 20%, transparent), color-mix(in srgb, var(--tone) 5%, transparent) 70%); }
+.area-no { flex: 0 0 auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--tone); }
+.area-card h3 { margin: 0; font-size: 18px; flex: 0 0 clamp(190px, 22%, 300px); word-break: keep-all; }
+.area-card p { margin: 0; font-size: 14px; line-height: 1.55; opacity: .8; flex: 1 1 340px; word-break: keep-all; }
 .area-card .chips.small { margin: 0; flex: 0 0 auto; }
-.area-card .arrow { color: var(--accent); }
-@media (max-width: 640px) { .area-card { padding: 16px 18px; } .area-card h3 { flex-basis: 100%; } }
+.area-card .chips.small li { color: var(--tone); border-color: color-mix(in srgb, var(--tone) 40%, transparent);
+  background: color-mix(in srgb, var(--tone) 10%, transparent); }
+.area-card .arrow { color: var(--tone); }
+@media (max-width: 640px) { .area-card { padding: 16px 18px 16px 16px; } .area-card h3 { flex-basis: calc(100% - 40px); } .area-card .chips.small { flex: 1 1 100%; } }
 
 /* SIDE PROJECTS (12개 컴팩트 그리드) */
 /* 사이드 프로젝트 — 메인 프로젝트와 구분되는 풀폭 밴드 */
@@ -165,29 +189,6 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .sp-sm-sub { margin: 0 0 2px; font-size: 11.5px; opacity: .7; line-height: 1.45; }
 .sp-sm-body .chips.small { margin: auto 0 0; }
 .sp-sm-body .chips.small li { font-size: 10px; padding: 2px 7px; }
-
-/* SKILLS — 스펙 시트 × 아이콘 배지 하이브리드 */
-.skill-spec { display: grid; grid-template-columns: 170px 1fr; gap: 0;
-  border-top: 1px solid var(--line); }
-.ss-row { display: contents; }
-.ss-cat { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--accent-2); align-self: start; }
-.ss-items { list-style: none; margin: 0; padding: 15px 0; border-bottom: 1px solid var(--line);
-  display: flex; flex-wrap: wrap; gap: 9px; }
-.ss-item { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px;
-  border: 1px solid var(--line); border-radius: 999px; background: var(--surf);
-  font-size: 13.5px; font-weight: 600; transition: border-color .15s, transform .15s; }
-.ss-item:hover { border-color: var(--accent); transform: translateY(-1px); }
-.ss-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px;
-  padding: 0 6px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
-  color: var(--bg); background: var(--accent); }
-.ss-item:nth-child(3n) .ss-badge { background: var(--accent-2); }
-@media (max-width: 620px) {
-  .skill-spec { grid-template-columns: 1fr; }
-  .ss-cat { padding: 16px 0 4px; border-bottom: 0; }
-  .ss-items { padding: 4px 0 16px; }
-}
 
 @media (max-width: 560px) { .nav-links a:nth-child(3) { display: none; } }
 

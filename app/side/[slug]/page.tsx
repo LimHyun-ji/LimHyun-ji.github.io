@@ -6,6 +6,7 @@ import rehypeRaw from 'rehype-raw';
 import { getSideDetail, getSideSlugs } from '@/lib/sideContent';
 import ThemeToggle from '@/components/ThemeToggle';
 import DocPreview from '@/components/DocPreview';
+import KeepWords from '@/components/KeepWords';
 
 export function generateStaticParams() {
   return getSideSlugs().map((slug) => ({ slug }));
@@ -36,7 +37,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
 
       <header className="detail-head">
         <p className="eyebrow">Side Project{d.engine ? ` · ${d.engine}` : ''}{d.period ? ` · ${d.period}` : ''}</p>
-        <h1>{d.title}</h1>
+        <h1><KeepWords text={d.title} /></h1>
         {d.subtitle && <p className="headline">{d.subtitle}</p>}
         <ul className="detail-meta">
           {d.team && <li>👥 {d.team}</li>}
