@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" width="880" height="580" font-family="Inter, 'Malgun Gothic', sans-serif">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7787a2"/></marker>
+  <marker id="arrowo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#7787a2" stroke-width="1.3"/></marker>
+</defs>
+<!-- 배경 -->
+<rect x="0.5" y="0.5" width="879" height="579" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+<!-- 제목 -->
+<text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">전투 서버 동기화 아키텍처 — 클라이언트 ↔ 서버 시퀀스</text>
+
+<!-- 열 헤더 -->
+<rect x="120" y="50" width="180" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="210" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">클라이언트</text>
+
+<rect x="580" y="50" width="160" height="38" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="660" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">서버</text>
+
+<!-- 수직 라이프라인 -->
+<line x1="210" y1="88" x2="210" y2="558" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+<line x1="660" y1="88" x2="660" y2="558" stroke="#e2e8f0" stroke-width="1.3" stroke-dasharray="4 5"/>
+
+<!-- Step 1: 클라 → 서버: CastCmd -->
+<line x1="215" y1="118" x2="655" y2="118" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="356" y="104" width="148" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="430" y="116" text-anchor="middle" font-size="10.5" fill="#475569">CastCmd (skill_id, target_id)</text>
+
+<!-- Step 2: 서버 → 클라: SkillCastResultEvt -->
+<line x1="655" y1="158" x2="215" y2="158" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="336" y="144" width="148" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="410" y="156" text-anchor="middle" font-size="10.5" fill="#475569">SkillCastResultEvt</text>
+
+<!-- Step 3: 서버 → 클라: ActionEvt -->
+<line x1="655" y1="198" x2="215" y2="198" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="296" y="184" width="218" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="405" y="196" text-anchor="middle" font-size="10.5" fill="#475569">ActionEvt (NotifyInfoList)</text>
+
+<!-- Step 4: 클라 내부: ActionQueue → Montage -->
+<rect x="80" y="218" width="260" height="32" rx="7" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="210" y="238" text-anchor="middle" font-size="11" fill="#1e293b">ActionQueue → Montage 재생</text>
+
+<!-- Step 5: 클라 내부: Hit_0 Immediate -->
+<rect x="80" y="268" width="260" height="32" rx="7" fill="#fef9ec" stroke="#d4a017" stroke-width="1.2"/>
+<text x="210" y="288" text-anchor="middle" font-size="11" fill="#1e293b">Hit_0 (Immediate) → 즉시 데미지</text>
+
+<!-- Step 6: 서버 → 클라: LazyHitNotifyEvt -->
+<line x1="655" y1="338" x2="215" y2="338" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="310" y="324" width="180" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="400" y="336" text-anchor="middle" font-size="10.5" fill="#475569">LazyHitNotifyEvt</text>
+
+<!-- Step 6b: 클라 내부: Hit_1 Lazy -->
+<rect x="80" y="356" width="260" height="32" rx="7" fill="#fef9ec" stroke="#d4a017" stroke-width="1.2"/>
+<text x="210" y="376" text-anchor="middle" font-size="11" fill="#1e293b">Hit_1 (Lazy) → 데미지 적용</text>
+
+<!-- Step 7: 서버 → 클라: ChangeStatusEffectEvt -->
+<line x1="655" y1="418" x2="215" y2="418" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="270" y="404" width="250" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="395" y="416" text-anchor="middle" font-size="10.5" fill="#475569">ChangeStatusEffectEvt (버프 / 디버프)</text>
+
+<!-- Step 8: 서버 → 클라: AttackEndEvt -->
+<line x1="655" y1="468" x2="215" y2="468" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="346" y="454" width="118" height="18" rx="4" fill="#ffffff" opacity="0.92"/>
+<text x="405" y="466" text-anchor="middle" font-size="10.5" fill="#475569">AttackEndEvt</text>
+
+<!-- 단계 번호 레이블 (왼쪽 여백) -->
+<text x="36" y="122" font-size="10" fill="#94a3b8">①</text>
+<text x="36" y="162" font-size="10" fill="#94a3b8">②</text>
+<text x="36" y="202" font-size="10" fill="#94a3b8">③</text>
+<text x="36" y="240" font-size="10" fill="#94a3b8">④</text>
+<text x="36" y="288" font-size="10" fill="#94a3b8">⑤</text>
+<text x="36" y="342" font-size="10" fill="#94a3b8">⑥</text>
+<text x="36" y="376" font-size="10" fill="#94a3b8">⑥</text>
+<text x="36" y="422" font-size="10" fill="#94a3b8">⑦</text>
+<text x="36" y="472" font-size="10" fill="#94a3b8">⑧</text>
+
+<!-- 범례 -->
+<rect x="20" y="524" width="130" height="20" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+<text x="85" y="538" text-anchor="middle" font-size="10" fill="#475569">클라이언트 내부 처리</text>
+<rect x="170" y="524" width="130" height="20" rx="4" fill="#fef9ec" stroke="#d4a017" stroke-width="1"/>
+<text x="235" y="538" text-anchor="middle" font-size="10" fill="#475569">히트 판정 처리</text>
+</svg>

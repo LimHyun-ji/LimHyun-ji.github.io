@@ -5,7 +5,7 @@ title: "외형 · 전투 시스템"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "모든 Entity에 외형을 세팅·로드하는 인게임 모듈 컴포넌트와, 서버 ActionEvt를 몽타주 · ActionNotify로 연결하는 Action Table 관리."
-tags: ["VisualData", "Character", "Action/전투", "AnimMontage", "ActionNotify"]
+tags: ["VisualData", "Character", "Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/Lazy Hit", "StatusEffect"]
 highlights:
   - "PC·NPC·Spirit·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet) · Override Material · Attachment · 본 트랜스폼을 세팅·로드"
   - "**Action Table 관리** — Entity 타입별 동작에 맞는 몽타주를 데이터로 정의하고, 서버에서 받은 ActionEvt에 따라 해당 몽타주를 재생"
@@ -108,6 +108,76 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
 - Notify 처리를 **Notify_Game**(인게임)과 **Notify_Editor**(에디터 프리뷰)로 나눠 구현
   - 인게임 로직이 에디터 전용 코드에 의존하지 않고, 에디터에서는 서버 없이 같은 몽타주·Notify를 미리 볼 수 있음
 
+
+## 전투 서버 동기화 아키텍처
+
+<img class="diagram" src="/images/diagrams/combat-sync.svg" alt="전투 서버 동기화 시퀀스: CastCmd → SkillCastResultEvt → ActionEvt(NotifyInfoList) → Montage 재생 → Immediate/Lazy Hit 분기 → StatusEffect → AttackEndEvt" />
+
+서버-클라이언트 동기화를 맞추기 위해 Montage 내 Notify 데이터를 JSON으로 Export하고, 런타임에 서버로부터 수신한 `ActionNotify` 실행 시점에 맞춰 클라이언트 Montage를 재생하며 Notify를 발화합니다.
+
+```
+[클라이언트] CastCmd 전송
+      ↓
+[서버]  SkillCastResultEvt — ActionEvt(NotifyInfoList) 반환
+      ↓
+[클라이언트] ActionQueue에서 Montage 재생
+      ├─ Hit_0 (Immediate) : NotifyInfoList[0] 소비 → 즉시 데미지 적용
+      ├─ Hit_1 (Lazy)      : LazyHitNotifyEvt 수신 대기 → 서버 확인 후 적용
+      ├─ ChangeStatusEffectEvt : 버프 / 디버프 / CC 적용
+      └─ AttackEndEvt      : 스킬 처리 완료
+```
+
+### Immediate / Lazy Hit 구분
+
+`ConsumeNotifyInfo`에서 `bIsImmediate` 플래그로 분기합니다.
+- **Immediate** : `NotifyInfoList` 큐 앞에서 즉시 소비해 데미지를 바로 적용
+- **Lazy** : `LazyNotifyHitList`에 서버 확인 패킷이 도착한 뒤 적용. 실행 여부는 `ExecutedLazyHitNotifyIds`로 중복 방지
+
+```cpp
+// GameplayAction_Combat.cpp
+bool UGameplayAction_Combat::ConsumeNotifyInfo(
+    int32 NotifyId, bool bIsImmediate, sol::geo::sync::NotifyInfo& Out)
+{
+    if (!bIsImmediate)
+    {
+        ExecutedLazyHitNotifyIds.Add(NotifyId);
+        for (const sol::geo::sync::NotifyInfo& NotifyInfo : LazyNotifyHitList)
+        {
+            if (NotifyInfo.notify_id() == NotifyId)
+            {
+                Out = NotifyInfo;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    if (NotifyInfoList.IsEmpty()) return false;
+    Out = NotifyInfoList[0];
+    NotifyInfoList.RemoveAt(0);
+    return true;
+}
+```
+
+### Montage Notify JSON Export
+
+에디터 전용 `IActionNotifyExportInterface`를 구현한 Notify 클래스가 파라미터를 JSON으로 직렬화합니다. 서버는 이 데이터를 기반으로 `NotifyInfo`를 생성해 클라이언트로 전송하므로 양측 판정 기준이 일치합니다.
+
+```cpp
+// ActionNotify_Hit.h (Export 인터페이스 선언 예)
+virtual bool IsUseExport() override;
+virtual FString GetExportTypeName() override;
+virtual bool IsParameter(const FProperty* InProperty) override;
+
+// 프로퍼티에 ExportParameter 메타 지정으로 JSON 항목 선택
+UPROPERTY(EditAnywhere, Category="Hit",
+    meta=(ExportParameter, ExportParameterName="Damage_Weight"))
+int32 DamageWeight;
+```
+
+### StatusEffect Notify
+
+`UActionNotify_StatusEffect`가 버프·디버프·CC를 담당하며, Hit Notify와 동일하게 `Status_Effect_Index`를 Export해 서버 판정과 클라 연출을 동기화합니다.
 
 ## 3. 전이 규칙으로 부분 갱신 최적화
 
