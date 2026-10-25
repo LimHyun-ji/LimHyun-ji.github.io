@@ -4,6 +4,7 @@ import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
+import SideNav, { type NavItem } from '@/components/SideNav';
 import { glue } from '@/lib/keepWords';
 
 // 메인 프로젝트 그룹 — 인게임 클라이언트 / 기술 기반(성능 · 툴 · 파이프라인). 그룹 안 순서는 slugs 순서를 따름.
@@ -16,7 +17,7 @@ const PROJECT_GROUPS = [
 
 function ProjectCard({ a, no }: { a: Project; no: number }) {
   return (
-    <Link className="area-card" href={`/projects/${a.slug}/`}>
+    <Link id={`proj-${a.slug}`} className="area-card" href={`/projects/${a.slug}/`}>
       <span className="area-no">{String(no).padStart(2, '0')}</span>
       <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
       <p>{glue(a.summary ?? '')}</p>
@@ -40,8 +41,31 @@ export default function Home() {
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
 
+  // 사이드 네비 항목 구성 — 라벨은 짧게
+  const shortLabel: Record<string, string> = {
+    visualdata: '외형/전투',
+    'sol-content': '컨텐츠',
+    mapdesign: '맵',
+    'rendering-cinema': '연출',
+    optimization: '최적화',
+    'visualdata-editor': '에디터',
+    'metadata-pipeline': '데이터',
+    areatool: 'AreaTool',
+  };
+  const navItems: NavItem[] = [
+    { id: 'sol', label: 'Projects' },
+    ...grouped.flatMap((g) =>
+      g.items.map((a) => ({ id: `proj-${a.slug}`, label: shortLabel[a.slug] ?? a.title, indent: true }))
+    ),
+    { id: 'side', label: 'Side' },
+    { id: 'skills', label: 'Skills' },
+  ];
+
   return (
     <>
+      {/* 데스크톱 사이드 네비 */}
+      <SideNav items={navItems} />
+
       {/* NAV */}
       <nav className="nav">
         <a className="nav-brand" href="#top">임현지 Portfolio</a>

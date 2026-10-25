@@ -63,7 +63,7 @@ highlights:
 
 <div id="case-refactor" class="case-anchor"></div>
 
-## 2. 슈클래스 리팩토링
+## 2. 슈퍼클래스 리팩토링
 
 **리팩토링 전에는 PC · NPC · FieldObject · Item · Spirit의 에디터 데이터가 하나의 슈퍼클래스에 모여, 타입마다 다른 외형 규칙을 한 클래스 안에서 분기하고 있었습니다.** 타입이 늘수록 유지보수가 어려워져 아래처럼 구조를 정리했고, 기존 에셋은 AssetMigration(3번)으로 새 타입에 옮겼습니다.
 

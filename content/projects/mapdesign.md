@@ -55,25 +55,25 @@ highlights:
 
 <img class="diagram" src="/images/diagrams/mapdesign.svg" alt="맵 설계 관계도: PC Position→MPC→Minimap Material, Quest Data→Minimap Material, InputProcessor→World Map 확대/드래그, 고해상도 영역 이미지→(동적 로딩)→World Map" />
 
-## 1. 미니맵 — MPC 기반 실시간 위치 동기화
+## 1. 미니맵 위치 동기화 — MPC 기반
 
 - PC 위치를 **MPC(Material Parameter Collection)**를 통해 미니맵 머티리얼에 **실시간 위치 parameter**로 전송해 동기화
 - 매 프레임 위젯 갱신 대신 머티리얼 파라미터로 위치를 반영 → 위치 표시를 GPU 측에서 처리
 
 <div id="case-minimap-cost" class="case-anchor"></div>
 
-## 2. 미니맵 — Quest Data 머티리얼 직접 표시
+## 2. 미니맵 퀘스트 표시 — 머티리얼 직접 렌더
 
 **퀘스트 위치를 아이콘 위젯으로 하나씩 표시하면, 표시 대상이 늘어날수록 위젯 비용도 함께 늘어납니다.** 그래서 Quest Data를 미니맵 머티리얼에서 직접 표시하도록 해, 별도 아이콘 위젯 없이 영역을 보여주게 했습니다. 표시 대상이 늘어도 위젯 비용이 늘지 않는 구조입니다.
 
-## 3. 월드맵 — InputProcessor 기반 확대 · 드래그
+## 3. 월드맵 입력 — InputProcessor 확대/드래그
 
 - 모바일과 PC를 **모두 대응**하기 위해 **InputProcessor 기반**으로 설계
 - 플랫폼별 입력 분기를 입력 처리 계층으로 일원화해 **확대·드래그** 조작 제공
 
 <div id="case-worldmap-memory" class="case-anchor"></div>
 
-## 4. 월드맵 — 영역 이미지 동적 로딩
+## 4. 월드맵 동적 로딩 — 영역 이미지 타일화
 
 **월드맵 전체를 고해상도 한 장으로 상시 메모리에 올리면 모바일 메모리 예산을 넘습니다.** 그래서 그리려는 영역만 **고해상도 이미지로 동적 로딩**하도록 했고, 이를 타일 단위로 세분화해 확대 수준에 맞는 해상도의 타일만 불러오도록 고도화했습니다(5번 참고).
 
