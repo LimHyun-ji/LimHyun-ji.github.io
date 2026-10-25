@@ -19,7 +19,6 @@ export default function TableOfContents({ headings }: Props) {
     if (headings.length === 0) return;
 
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      // 화면 위쪽에 보이는 섹션들 중 가장 위에 있는 것을 active로
       const visible = entries.filter((e) => e.isIntersecting);
       if (visible.length > 0) {
         const top = visible.reduce((a, b) =>
@@ -29,17 +28,23 @@ export default function TableOfContents({ headings }: Props) {
       }
     };
 
-    observerRef.current = new IntersectionObserver(handleIntersect, {
-      rootMargin: '-60px 0px -60% 0px',
-      threshold: 0,
-    });
+    // DOM 렌더링 완료 후 observer 연결
+    const timer = setTimeout(() => {
+      observerRef.current = new IntersectionObserver(handleIntersect, {
+        rootMargin: '-60px 0px -60% 0px',
+        threshold: 0,
+      });
 
-    headings.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observerRef.current!.observe(el);
-    });
+      headings.forEach(({ id }) => {
+        const el = document.getElementById(id);
+        if (el) observerRef.current!.observe(el);
+      });
+    }, 100);
 
-    return () => observerRef.current?.disconnect();
+    return () => {
+      clearTimeout(timer);
+      observerRef.current?.disconnect();
+    };
   }, [headings]);
 
   if (headings.length === 0) return null;
