@@ -45,7 +45,7 @@ highlights:
 
 ## 1. Cron식 변환 지원
 
-- 반복 일정(예: 특정 요일·시각마다 열리는 콘텐츠)을 기획이 **Cron식**으로 입력
+- 반복 일정(예: 특정 요일·시각마다 열리는 컨텐츠)을 기획이 **Cron식**으로 입력
 - 파이프라인이 Cron식을 해석·변환해 데이터로 반영 → 일정 데이터를 사람이 풀어서 적지 않아도 됨
 
 ## 2. Unit 단위계 지원
@@ -61,7 +61,7 @@ highlights:
 
 ## 4. 런타임 연결 — MetaDataSubsystem
 
-- 변환된 메타데이터 테이블을 런타임 `MetaDataSubsystem`이 제공, 콘텐츠 Manager들이 `RidType` 키로 조회
+- 변환된 메타데이터 테이블을 런타임 `MetaDataSubsystem`이 제공, 컨텐츠 Manager들이 `RidType` 키로 조회
 - 에디터 툴의 export 결과도 같은 경로로 유입
   - 레벨 · 스폰 데이터 → [AreaTool 페이지](/projects/areatool/)
   - VisualData 매핑 · 액션 메타데이터 → [VisualData 에디터 & Commandlet 페이지](/projects/visualdata-editor/)

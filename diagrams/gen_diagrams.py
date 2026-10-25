@@ -2,7 +2,7 @@
 """
 Sol 클라이언트 아키텍처 다이어그램 생성기.
 하나의 스펙(nodes/edges)에서 .drawio(편집용)와 .svg(사이트 임베드용)를 동시에 출력.
-- 코드 분석 기반: 실제 클래스명(USolGeoSubsystem, UVisualDataModuleComponent, FSolWidgetInputProcessor 등)
+- 코드 분석 기반: 실제 클래스명(UGeoSubsystem, UVisualDataModuleComponent, FWidgetInputProcessor 등)
 - SVG는 라이트/다크 페이지 어디에 올려도 동일하게 보이는 self-contained 'figure card' 스타일
 """
 import os, html
@@ -235,15 +235,15 @@ def N(id, label, x, y, w, h, cls): return dict(id=id, label=label, x=x, y=y, w=w
 
 d1_nodes = [
     # 서버 계층 (실제 코드 확인: Lobby=HTTP, Geo=TCP, Noti=WS, API=HTTP)
-    N("lobby", "로비 서버 · HTTP\nUSolLobbySubsystem",             20, 60, 170, 56, "server"),
+    N("lobby", "로비 서버 · HTTP\nULobbySubsystem",             20, 60, 170, 56, "server"),
     N("geo",   "게임 서버 Geo · TCP\nNetworkClient",               210, 60, 170, 56, "server"),
     N("noti",  "Noti 서버 · WebSocket\nUNetworkNotiClient",        400, 60, 180, 56, "server"),
     N("api",   "API 서버(다수) · HTTP\nEApiServerType 40+",        600, 60, 180, 56, "server"),
     # 클라이언트 코어
-    N("geosub", "USolGeoSubsystem\nTCP 수신 · 로그인 플로우",       110, 184, 210, 62, "core"),
+    N("geosub", "UGeoSubsystem\nTCP 수신 · 로그인 플로우",       110, 184, 210, 62, "core"),
     N("notic",  "UNetworkNotiClient\nWS 푸시 수신 + HTTP API 클라이언트", 420, 184, 300, 62, "core"),
     # 매니저 / 소비 계층
-    N("mgr",  "Feature Managers\nUGuildManager · UChatManager · UTravelManager …\nUSolGameInstanceSubsystem + INetworkNotiClientListener",
+    N("mgr",  "Feature Managers\nUGuildManager · UChatManager · UTravelManager …\nUGameInstanceSubsystem + INetworkNotiClientListener",
               190, 308, 420, 74, "manager"),
 ]
 d1_edges = [
@@ -254,7 +254,7 @@ d1_edges = [
     dict(src="geosub", dst="mgr", label="TCP 이벤트"),
     dict(src="notic",  dst="mgr", label="Noti·API"),
 ]
-emit("sol-architecture", "Sol 클라이언트 서버 아키텍처 — Lobby(HTTP)·Geo(TCP)·Noti(WS)·API(HTTP)  ※URL: USolConfigSubsystem(CDN)", d1_nodes, d1_edges)
+emit("sol-architecture", "Sol 클라이언트 서버 아키텍처 — Lobby(HTTP)·Geo(TCP)·Noti(WS)·API(HTTP)  ※URL: UConfigSubsystem(CDN)", d1_nodes, d1_edges)
 
 # ═══════════════════════════════════════════════════════════════
 # D2. VisualData 데이터 흐름
@@ -328,7 +328,7 @@ opt_nodes = [
     N("ui",    "UI 렌더링 (Slate)",                                 40, 132, 240, 46, "ui"),
     N("tick",  "Tick 제어",                                         310, 132, 240, 46, "core"),
     N("mem",   "메모리 관리",                                       580, 132, 260, 46, "entity"),
-    N("ui1",   "Global Invalidation 동적 토글\n+ 동적 콘텐츠 ForceVolatile", 40, 212, 240, 52, "data"),
+    N("ui1",   "Global Invalidation 동적 토글\n+ 동적 컨텐츠 ForceVolatile", 40, 212, 240, 52, "data"),
     N("ui2",   "풀스크린 시 GameRendering false",                   40, 282, 240, 48, "data"),
     N("tick1", "Significance 거리별 Tick",                          310, 212, 240, 48, "data"),
     N("tick2", "상태별 Tick 비활성화",                              310, 278, 240, 48, "data"),
