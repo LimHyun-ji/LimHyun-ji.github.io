@@ -41,9 +41,9 @@ highlights:
     <dl>
       <dt>문제</dt><dd>채팅 로그가 많아짐에 따라 클라 메모리 부족, 다중입력 시 순서 갱신 오류</dd>
       <dt>해결</dt><dd>채팅 채널 별 max 로그 설정 및 채널별 키매핑으로 관리, 패킷에 Sequence Num 추가</dd>
-      <dt>결과</dt><dd>각 채널별 로그 적재 관리 용이</dd>
+      <dt>결과</dt><dd>채널별 로그 적재량 관리, Sequence Num 기준으로 메시지 순서 보장</dd>
     </dl>
-    <a class="case-more" href="#case-login-packet">자세히 ↓</a>
+    <a class="case-more" href="#case-chat">자세히 ↓</a>
   </div>
 </div>
 
@@ -85,9 +85,12 @@ highlights:
 - 일괄등록·일괄강화, overEnchant 표시·정렬, 거래소 검색 연동 등 수집 동선 구축
 - **페이징 제거 → ListView 전환, 일부 데이터 UObject→FClass 변환으로 GC 부담 감소**
 
+<div id="case-chat" class="case-anchor"></div>
+
 ### 채팅 / 소셜 · 리텐션 · 재화 정산
 
 - 채팅, 리텐션 리워드(출석/보상), 세금 재화 정산 신규 도입 및 운영 이슈 대응
+- **채팅 로그 과부하 · 순서 오류** — 채널별 최대 로그 수 설정 · 채널별 키 매핑으로 로그를 관리하고, 패킷에 Sequence Num을 추가해 다중 입력 시에도 순서 보장
 - 세금의 경우 반올림 계산에 따른 부동소수점 오차 확인
 
 ## 기술 요약

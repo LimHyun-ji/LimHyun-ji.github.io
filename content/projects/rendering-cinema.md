@@ -67,7 +67,6 @@ TMap<TSoftObjectPtr<ULevelSequence>, ALevelSequenceActor*> LevelSeqActorMap;
 - `ACineConstellationRoulette` — 활성/닫기/슬롯세팅/스핀 시퀀스를 `TSoftObjectPtr`로 보유, 필요 시점 비동기 로드
 
 ```cpp
-// Cinema/Constellation/CineConstellationRoulette.h
 TSoftObjectPtr<ULevelSequence> ActiveRouletteSeq;
 TSoftObjectPtr<ULevelSequence> SpinRouletteSeq;
 TMap<int32, TSoftObjectPtr<ULevelSequence>> ConstellationFocusSeqMap; // 별별 포커스 연출

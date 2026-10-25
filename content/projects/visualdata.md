@@ -27,9 +27,9 @@ highlights:
   <div class="case">
     <p class="case-title">구조 정립을 통한 전역 데이터 참조 문제 해결</p>
     <dl>
-      <dt>문제</dt><dd>모든 Entity가 산발적으로 VD데이터들 들고 있던 구조적 문제</dd>
+      <dt>문제</dt><dd>모든 Entity가 VD 데이터를 각자 산발적으로 들고 있던 구조</dd>
       <dt>해결</dt><dd>Module 시스템에서 각 Entity 타입별 Apply Module을 정의 후 필요한 컴포넌트에 데이터만 할당</dd>
-      <dt>결과</dt><dd>불필요한 전체 VD데이터 참조 제거</dd>
+      <dt>결과</dt><dd>불필요한 전체 VD 데이터 참조 제거</dd>
     </dl>
     <a class="case-more" href="#case-allocating">자세히 ↓</a>
   </div>
@@ -49,7 +49,7 @@ highlights:
 
 <div id="case-allocating" class="case-anchor"></div>
 
-- PC·NPC·Spirit필드오브젝트·아이템 등 **모든 Entity 부착 대상**
+- PC·NPC·Spirit·필드오브젝트·아이템 등 **모든 Entity 부착 대상**
 - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성·재적용
 
 ```cpp

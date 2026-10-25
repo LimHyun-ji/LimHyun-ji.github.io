@@ -74,7 +74,7 @@ experience:
     period: "2024"
     desc: >
       별자리 룰렛 LevelSequenceActor 동적 생성/파괴\n
-      순례 주사위 RenderTarget·Tweening 연출 구조 설계\n,
+      순례 주사위 RenderTarget·Tweening 연출 구조 설계\n
       미니맵 퀘스트 텍스처 렌더링까지 인게임 연출 렌더링 쉐이더 설계\n
       AreaTool 레벨디자인 저작 도구 개선 및 검증 체인을 Commandlet CI로 전환\n
   - org: "2025 — 에디터 리팩토링 + 신규 시스템 + 최적화"
@@ -89,4 +89,4 @@ experience:
     desc: >
       라이브 운영 안정화와 콘텐츠 고도화\n
       던전맵, 월드맵 고해상도 타일링 R&D\n
-      신규 클래스 -> 전투 시스템 확장 Action Montage기반
+      신규 클래스 → 전투 시스템 확장 (Action Montage 기반)

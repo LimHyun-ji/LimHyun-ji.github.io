@@ -11,6 +11,11 @@ import CodeToggle from '@/components/CodeToggle';
 import KeepWords from '@/components/KeepWords';
 import { glue, rehypeKeepWords } from '@/lib/keepWords';
 
+// 주요 작업 문구의 **강조**를 굵게 렌더링 (나머지는 glue로 줄바꿈 처리)
+function renderBold(text: string) {
+  return text.split(/\*\*(.+?)\*\*/).map((part, i) => (i % 2 ? <strong key={i}>{glue(part)}</strong> : glue(part)));
+}
+
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
 }
@@ -50,7 +55,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
       {proj.highlights && (
         <>
           <h2>주요 작업</h2>
-          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{glue(h)}</li>)}</ul>
+          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{renderBold(h)}</li>)}</ul>
         </>
       )}
 

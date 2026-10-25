@@ -66,7 +66,7 @@ IsGlobalInvalidationEnabled = SolActivatableWidget->UseGlobalInvalidation();
 FSlateApplication::Get().ToggleGlobalInvalidation(IsGlobalInvalidationEnabled);
 ```
 ```cpp
-// ActivatableWidget.h:102 — 화면별로 사용 여부를 데이터로 선택
+// 화면별로 사용 여부를 데이터로 선택
 bool bUseGlobalInvalidation = false;
 ```
 
@@ -75,15 +75,14 @@ bool bUseGlobalInvalidation = false;
 **그런데 Invalidation을 켜자 스크롤 리스트가 제대로 갱신되지 않는 문제가 생겼습니다.** Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 스크롤처럼 계속 바뀌는 콘텐츠까지 캐시 대상에 들어갔기 때문입니다. 그래서 스크롤 박스만 `ForceVolatile`로 캐시에서 빼고, 나머지 UI는 Invalidation을 유지했습니다.
 
 ```cpp
-// SSolScrollBox.cpp:30
 .ForceVolatile(true)  // 동적 콘텐츠 캐싱 이슈 방지를 위해 항상 volatile
 ```
 
-- 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감 (`GeoGameMode.cpp:177`/`:218`)
+- 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감
 - **풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않음** → `GameRendering`을 false로(뷰포트 렌더링 중지)해 모바일 GPU 비용 절감. GPU 렌더 파이프라인에 대한 이해를 바탕으로 보이지 않는 픽셀에 자원을 낭비하지 않는 원칙을 적용
 
 ```cpp
-// UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
+// 화면별 플래그로 뷰포트 렌더링 중지
 bIsDisableRenderingOnFullScreen = SolActivatableWidget->IsDisableViewportRenderingOnFullScreen();
 USolDisableGameRenderingSubsystem::Get()
     ->SetReason(ESolDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
@@ -94,14 +93,14 @@ USolDisableGameRenderingSubsystem::Get()
 - **Sector** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
 
 - 상태 기반 Tick 비활성화 적용 대상:
-  - 조작 불가/원격 상태 플레이어 (`GeoGameMode.cpp:276-277`)
-- FX 그림자 제거: `SetCastShadow(false)` (`ActionNotify_PlayParticleEffect.cpp:315`)
+  - 조작 불가/원격 상태 플레이어
+- FX 그림자 제거: 파티클 Notify에서 `SetCastShadow(false)`
 
 ---
 
 <div id="case-pooling-crash" class="case-anchor"></div>
 
-## 4. 메모리 관리 
+## 3. 메모리 관리
 
 - 모바일 메모리 예산·GC 스파이크 절감
 - 명시적 GC — 큰 UI 전환 직후
