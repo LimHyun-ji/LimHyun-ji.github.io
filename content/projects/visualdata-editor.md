@@ -1,7 +1,7 @@
 ---
 layout: project
 order: 6
-title: "VisualData 에디터 & Commandlet"
+title: "VisualData 에디터 & Commandlet (유지보수 및 개선)"
 role: "Tools / Editor"
 period: "2023 — 현재 (리팩토링)"
 summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터와, 데이터를 빌드 단계에서 export하는 Commandlet 담당."
@@ -39,6 +39,8 @@ highlights:
 
 
 ## 개요
+
+<img class="diagram" src="/images/diagrams/visualdata-editor.svg" alt="VisualData 에디터 구조: FVisualDataEditor → Preview/ActionTable/Property/Outliner 탭, UVisualDataEditorSubsystem, Visual PlayMode, Export → JSON → 서버 동기화" />
 
 - 인게임 시스템([VisualData 페이지](/projects/visualdata/))과 짝을 이루는 **에디터 저작 툴**
 - 에디터 전용 코드는 에디터 모듈(`Editor`)에 두고, 인게임과 같은 데이터·몽타주·Notify를 프리뷰

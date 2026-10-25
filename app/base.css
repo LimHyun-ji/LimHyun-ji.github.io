@@ -248,6 +248,102 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   background: var(--accent-soft); color: var(--accent);
 }
 
+/* ───────────── TOC / SideNav 사이드바 ───────────── */
+.toc-sidebar {
+  position: fixed;
+  top: 80px;
+  left: clamp(4px, 1.5vw, 20px);
+  width: 140px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  padding: 10px 0;
+  z-index: 40;
+}
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+  padding-left: 12px;
+}
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid var(--border);
+}
+.toc-item { margin: 0; }
+.toc-link {
+  display: block;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  margin-left: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  word-break: keep-all;
+}
+.toc-link:hover { color: var(--text); text-decoration: none; }
+.toc-link.toc-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+/* ### 헤더는 들여쓰기 */
+.toc-level-3 .toc-link { padding-left: 18px; font-size: 11px; }
+
+/* 사이드바 레이아웃 래퍼 — 프로젝트 상세 & 메인 페이지 공용 */
+.toc-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+.toc-layout-main {
+  min-width: 0;
+  flex: 1;
+}
+
+/* 메인 페이지 사이드 네비 — 왼쪽 고정 사이드바 */
+.side-nav {
+  position: fixed;
+  top: 80px;
+  left: clamp(4px, 1.5vw, 20px);
+  width: 140px;
+  height: calc(100vh - 60px);
+  z-index: 40;
+  padding: 10px 0;
+}
+.side-nav .toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid var(--border);
+}
+.side-nav .toc-item { margin: 0; }
+.side-nav .toc-link {
+  font-size: 12px;
+  padding: 8px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.side-nav .toc-level-3 .toc-link {
+  font-size: 11px;
+  padding-left: 18px;
+}
+
+/* 모바일에서 TOC / SideNav 숨기기 */
+@media (max-width: 1024px) {
+  .toc-sidebar { display: none; }
+  .side-nav { display: none; }
+  .toc-layout { display: block; }
+}
+
 /* ───────────── Responsive ───────────── */
 @media (max-width: 600px) {
   .hero { padding: 80px 0 40px; }

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" width="880" height="460" font-family="Inter, 'Malgun Gothic', sans-serif">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7787a2"/></marker>
+</defs>
+<!-- 배경 -->
+<rect x="0.5" y="0.5" width="879" height="459" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+<!-- 제목 -->
+<text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">채팅 채널 시스템 — UNetworkChannelSystem 구조</text>
+
+<!-- WebSocket 채널 서버 (왼쪽) -->
+<rect x="20" y="60" width="190" height="62" rx="9" fill="#e8f1ff" stroke="#4a80c8" stroke-width="1.5"/>
+<text x="115" y="86" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1e293b">WebSocket</text>
+<text x="115" y="103" text-anchor="middle" font-size="11" fill="#475569">채널 서버</text>
+
+<!-- UNetworkChannelSystem (가운데) -->
+<rect x="300" y="52" width="270" height="78" rx="9" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="435" y="80" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">UNetworkChannelSystem</text>
+<text x="435" y="97" text-anchor="middle" font-size="11" fill="#475569">단일 WebSocket 연결 관리</text>
+<text x="435" y="113" text-anchor="middle" font-size="10.5" fill="#475569">채널별 메시지 라우팅</text>
+
+<!-- 서버 → 시스템 화살표 -->
+<line x1="210" y1="91" x2="298" y2="91" stroke="#7787a2" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="254" y="85" text-anchor="middle" font-size="10" fill="#475569">WS 연결</text>
+
+<!-- 오른쪽 채널들 (5개) -->
+<!-- Channel_Geo -->
+<rect x="660" y="52" width="190" height="34" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="755" y="73" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Channel_Geo</text>
+
+<!-- Channel_Guild -->
+<rect x="660" y="96" width="190" height="34" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="755" y="117" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Channel_Guild</text>
+
+<!-- Channel_Party -->
+<rect x="660" y="140" width="190" height="34" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="755" y="161" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Channel_Party</text>
+
+<!-- Channel_World -->
+<rect x="660" y="184" width="190" height="34" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="755" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Channel_World</text>
+
+<!-- Channel_Direct -->
+<rect x="660" y="228" width="190" height="34" rx="8" fill="#dbe9ff" stroke="#3b6fb0" stroke-width="1.5"/>
+<text x="755" y="249" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Channel_Direct</text>
+
+<!-- 시스템 → 채널들 화살표 (분기선) -->
+<line x1="570" y1="91" x2="658" y2="69" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<line x1="570" y1="91" x2="658" y2="113" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<line x1="570" y1="91" x2="658" y2="157" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<line x1="570" y1="91" x2="658" y2="201" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<line x1="570" y1="91" x2="658" y2="245" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+<!-- 키 매핑 구조 -->
+<rect x="20" y="200" width="840" height="70" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.3"/>
+<text x="440" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">FNetworkChannelKey → Channel Instance 매핑</text>
+<text x="440" y="242" text-anchor="middle" font-size="11" fill="#475569">채널 타입 + 채널 ID(길드 ID · 파티 ID · 유저 ID 등) 조합으로 키 생성</text>
+<text x="440" y="258" text-anchor="middle" font-size="11" fill="#475569">TMap&lt;FNetworkChannelKey, UBaseNetworkChannel*&gt; 로 인스턴스 관리</text>
+
+<!-- 순서 보장 구조 -->
+<rect x="20" y="294" width="400" height="74" rx="9" fill="#e3f5ee" stroke="#2fa37a" stroke-width="1.5"/>
+<text x="220" y="318" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Sequence Index 순서 보장</text>
+<text x="220" y="336" text-anchor="middle" font-size="11" fill="#475569">서버가 메시지마다 시퀀스 번호 부여</text>
+<text x="220" y="352" text-anchor="middle" font-size="11" fill="#475569">클라 버퍼링 후 순서대로 ChatMessage 정렬</text>
+
+<!-- ChatMessage 렌더링 -->
+<rect x="460" y="294" width="400" height="74" rx="9" fill="#e3f5ee" stroke="#2fa37a" stroke-width="1.5"/>
+<text x="660" y="318" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">ChatMessage 렌더링</text>
+<text x="660" y="336" text-anchor="middle" font-size="11" fill="#475569">채널별 독립 메시지 큐 유지</text>
+<text x="660" y="352" text-anchor="middle" font-size="11" fill="#475569">UI 위젯에 채널 인스턴스 바인딩</text>
+
+<!-- 연결선 아래쪽 -->
+<line x1="220" y1="270" x2="220" y2="292" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<line x1="660" y1="270" x2="660" y2="292" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+<!-- 순서→채팅 화살표 -->
+<line x1="420" y1="331" x2="458" y2="331" stroke="#7787a2" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="439" y="325" text-anchor="middle" font-size="10" fill="#475569">정렬</text>
+
+<!-- 키매핑→ 아래 분기 안내선 -->
+<line x1="440" y1="198" x2="440" y2="294" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+</svg>

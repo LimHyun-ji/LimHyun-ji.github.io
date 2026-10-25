@@ -9,12 +9,9 @@ import ImageGallery from '@/components/ImageGallery';
 import ImageSlider from '@/components/ImageSlider';
 import CodeToggle from '@/components/CodeToggle';
 import KeepWords from '@/components/KeepWords';
+import TableOfContents, { type Heading } from '@/components/TableOfContents';
 import { glue, rehypeKeepWords } from '@/lib/keepWords';
-
-// 주요 작업 문구의 **강조**를 굵게 렌더링 (나머지는 glue로 줄바꿈 처리)
-function renderBold(text: string) {
-  return text.split(/\*\*(.+?)\*\*/).map((part, i) => (i % 2 ? <strong key={i}>{glue(part)}</strong> : glue(part)));
-}
+import type { Components } from 'react-markdown';
 
 export function generateStaticParams() {
   return getSlugs().map((slug) => ({ slug }));
@@ -25,11 +22,64 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   return { title: `${proj.title} · 임현지`, robots: { index: false, follow: false } };
 }
 
+/** 마크다운 본문에서 ## / ### 헤더를 추출해 TOC 배열로 반환 */
+function extractHeadings(markdown: string): Heading[] {
+  const lines = markdown.split('\n');
+  const headings: Heading[] = [];
+  for (const line of lines) {
+    const m = line.match(/^(#{2,3})\s+(.+)/);
+    if (!m) continue;
+    const level = m[1].length as 2 | 3;
+    // ### 세부 제목은 목차에서 제외
+    if (level === 3) continue;
+    const raw = m[2].replace(/\*\*/g, '').replace(/`[^`]*`/g, (s) => s.slice(1, -1)).trim();
+    // 사이드바용 축약: "— 설명" 부분 제거, 번호 접두사 제거
+    const text = raw.replace(/\s*[—–]\s*.+$/, '').replace(/^\d+\.\s*/, '').trim();
+    // id는 원본(raw) 기준으로 생성 — 헤더 렌더러와 일치시킴
+    const id = raw
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\uAC00-\uD7A3\uFF00-\uFFEF-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    if (id) headings.push({ id, text, level });
+  }
+  return headings;
+}
+
+/** ReactMarkdown 커스텀 heading 렌더러 — id 속성 부여 */
+function makeHeadingComponents(headings: Heading[]): Partial<Components> {
+  // 각 레벨별 등장 순서로 id 매핑
+  const idMap: Record<string, string> = {};
+  headings.forEach(({ id, text }) => { idMap[text] = id; });
+
+  function renderHeading(level: 2 | 3) {
+    const Tag = `h${level}` as 'h2' | 'h3';
+    return function HeadingRenderer({ children, ...rest }: React.HTMLAttributes<HTMLHeadingElement>) {
+      const text = String(children ?? '');
+      const id = idMap[text] ?? text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\uAC00-\uD7A3\uFF00-\uFFEF-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      return <Tag id={id} {...rest}>{children}</Tag>;
+    };
+  }
+
+  return {
+    h2: renderHeading(2),
+    h3: renderHeading(3),
+  };
+}
+
 export default function ProjectPage({ params }: { params: { slug: string } }) {
   const proj = getProject(params.slug);
   const images = (proj.images ?? []).map((img) =>
     typeof img === 'string' ? { src: img } : img
   );
+  const headings = extractHeadings(proj.body);
+  const headingComponents = makeHeadingComponents(headings);
 
   return (
     <article className="project-detail">
@@ -55,14 +105,22 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
       {proj.highlights && (
         <>
           <h2>주요 작업</h2>
-          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{renderBold(h)}</li>)}</ul>
+          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{h.split(/\*\*([^*]+)\*\*/).map((seg, j) => j % 2 === 1 ? <strong key={j}>{glue(seg)}</strong> : glue(seg))}</li>)}</ul>
         </>
       )}
 
-      <div className="detail-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeKeepWords]}>
-          {proj.body}
-        </ReactMarkdown>
+      {/* 본문 + 오른쪽 TOC */}
+      <div className="toc-layout">
+        <div className="detail-body toc-layout-main">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeKeepWords]}
+            components={headingComponents}
+          >
+            {proj.body}
+          </ReactMarkdown>
+        </div>
+        <TableOfContents headings={headings} />
       </div>
 
       <Link className="back bottom" href="/#projects">← 프로젝트 목록으로</Link>
