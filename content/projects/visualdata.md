@@ -27,11 +27,20 @@ highlights:
   <div class="case">
     <p class="case-title">구조 정립을 통한 전역 데이터 참조 문제 해결</p>
     <dl>
-      <dt>문제</dt><dd>모든 Entity가 산발적으로 VD데이터들 들고 있던 구조적 문제</dd>
+      <dt>문제</dt><dd>모든 Entity가 VD 데이터를 각자 산발적으로 들고 있던 구조</dd>
       <dt>해결</dt><dd>Module 시스템에서 각 Entity 타입별 Apply Module을 정의 후 필요한 컴포넌트에 데이터만 할당</dd>
-      <dt>결과</dt><dd>불필요한 전체 VD데이터 참조 제거</dd>
+      <dt>결과</dt><dd>불필요한 전체 VD 데이터 참조 제거</dd>
     </dl>
     <a class="case-more" href="#case-allocating">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">인게임 · 에디터 Notify 의존 분리</p>
+    <dl>
+      <dt>문제</dt><dd>전투 Notify를 인게임과 에디터 프리뷰가 함께 쓰면서 인게임 로직이 에디터 코드에 의존할 위험</dd>
+      <dt>해결</dt><dd>Custom ActionNotify의 처리를 <code>Notify_Game</code> / <code>Notify_Editor</code>로 분리</dd>
+      <dt>결과</dt><dd>인게임은 에디터 코드와 독립, 에디터는 서버 없이 같은 몽타주 · Notify 프리뷰</dd>
+    </dl>
+    <a class="case-more" href="#case-notify">자세히 ↓</a>
   </div>
 </div>
 
@@ -49,7 +58,7 @@ highlights:
 
 <div id="case-allocating" class="case-anchor"></div>
 
-- PC·NPC·Spirit필드오브젝트·아이템 등 **모든 Entity 부착 대상**
+- PC·NPC·Spirit·필드오브젝트·아이템 등 **모든 Entity 부착 대상**
 - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성·재적용
 
 ```cpp
@@ -101,6 +110,8 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
 2. Action Table에서 Entity 타입에 맞는 몽타주 조회
 3. 몽타주 **Play**
 4. 몽타주 재생 중 Notify 시점에 도달하면 **Custom ActionNotify** 실행 → 전투 연출(FX 등) 처리
+
+<div id="case-notify" class="case-anchor"></div>
 
 ### Custom ActionNotify — Notify_Game / Notify_Editor 분리
 

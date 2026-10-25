@@ -7,7 +7,7 @@ period: "2023 — 현재 (상시)"
 summary: "레벨 영역 · NPC 스폰 · 순찰 데이터를 배치하는 AreaTool의 검증자 체인, P4 연동 export, Commandlet 기반 CI."
 tags: ["Editor Tooling", "AreaTool", "Validator", "Commandlet", "CI", "Perforce"]
 highlights:
-  - "District영역을 레벨 기획자가 직접 지정하는 저작 툴 Mode 제공 2D Polygon"
+  - "District 영역을 레벨 기획자가 직접 지정하는 2D Polygon 저작 툴 Mode 제공"
   - "NPC 확률성 배치 및 Patrol 영역 지정"
   - "RID · 이름 · NavMesh · 폴더 · 리전 검증자 체인(IAreaToolValidator) — 잘못된 데이터의 런타임 유입 차단"
   - "Export 시 P4 reconcile로 변경분만 자동 체크아웃 · 추가"
@@ -18,7 +18,7 @@ highlights:
 >
 > **성과** — 잘못된 레벨 데이터의 런타임 유입 차단, 수작업 · 누락 감소
 >
-> **기여** — 3D Point Actor 저작 UX, 검증자 체인, P4 연동 export, Commandlet CI
+> **기여** — 2D Polygon · 3D Point Actor 저작 UX, 검증자 체인, P4 연동 export, Commandlet CI
 
 
 ## 문제 해결 요약
@@ -43,9 +43,10 @@ highlights:
 
 <img class="diagram" src="/images/diagrams/pipeline-flow.svg" alt="AreaTool 파이프라인: 원본(Excel·에셋·레벨)→AreaTool Generator→검증자 체인→Export+P4 Reconcile→Generated 메타데이터(RidType)→런타임 MetadataSubsystem, Commandlet(CI)이 실행" />
 
-## 1. 저작 UX — 2D Polygon , 3D Point Actor
+## 1. 저작 UX — 2D Polygon · 3D Point Actor
 
-**레벨 별로 구역을 직접 설정해 배치할 수 있는 2DPolygon툴을 제공하여 영역을 지정할 수 있는 Mode를 제공**
+**레벨별 구역(District)을 기획자가 직접 지정할 수 있는 2D Polygon 영역 지정 Mode를 제공**
+
 - **AreaTool Outliner**에서 `rid = 1`처럼 조건으로 배치 액터를 검색 → 넓은 맵에서도 대상 액터를 바로 찾아 수정
 
 <div class="shot-row">
@@ -101,7 +102,6 @@ void GetDynamicMeshElements(const TArray<const FSceneView*>& Views,
 **Visualizer — DynamicMeshBuilder로 솔리드 메시 + 삼각화된 캡 면 드로잉**
 
 ```cpp
-// SolEditor/AreaTool/CylinderComponentVisualizer.cpp
 void FCylinderComponentVisualizer::DrawVisualization(
     const UActorComponent* Component, const FSceneView* View,
     FPrimitiveDrawInterface* PDI)
@@ -154,7 +154,7 @@ class IAreaToolValidator { virtual bool Validate(const AAreaToolActor&, const FS
 - 월드 액터를 JSON으로 직렬화한 뒤 **P4 reconcile** → 변경분만 자동 체크아웃 · 추가 (수동 실수 방지)
 
 ```cpp
-// SolEditor/AreaTool/AreaToolGenerator.h — FAreaToolJsonGenerator
+// FAreaToolJsonGenerator
 void Export() override;
 void SaveAndReconcile(const TMap<FString, TArray<TSharedPtr<FJsonValue>>>& ExportedFileDatas); // P4 연동
 TArray<TSharedPtr<IAreaToolValidator>> Validators;
@@ -168,7 +168,6 @@ TArray<TSharedPtr<IAreaToolValidator>> Validators;
 - 사람 실수와 무관하게 빌드 단계에서 데이터 검증 · 생성 보장
 
 ```cpp
-// SolEditor/AreaTool/Commandlet/AreaToolExportCommandlet.h
 class UAreaToolExportCommandlet : public UCommandlet {
     virtual int32 Main(const FString& FullCommandLine) override; // → AreaToolSubsystem::ExportAllLevels()
 };
@@ -178,7 +177,7 @@ class UAreaToolExportCommandlet : public UCommandlet {
 
 | 영역 | 내용 |
 |------|------|
-| 저작 | 3D Point Actor 기반 스폰 · 순찰 · 영역 배치 |
+| 저작 | 2D Polygon 영역(District) 지정 · 3D Point Actor 기반 스폰 · 순찰 배치 |
 | 시각화 | `FPrimitiveSceneProxy` · `FComponentVisualizer` · `FDynamicMeshBuilder` 실린더 DrawMesh |
 | 검증 | `IAreaToolValidator` 체인 — RID · 이름 · NavMesh · 폴더 · 리전 |
 | Export | `FAreaToolJsonGenerator` JSON 직렬화 + P4 reconcile |

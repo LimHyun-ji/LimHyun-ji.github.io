@@ -187,7 +187,7 @@ export default function Home() {
             <h2 className="featured-title">Sol — UE5 MMORPG</h2>
             <p className="featured-sub">
               {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 · '
-                + '인게임 콘텐츠&네트워크 · 인게임 연출&비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지')}{' '}
+                + '인게임 컨텐츠&네트워크 · 인게임 연출&비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지')}{' '}
               <strong>{glue('설계·담당.')}</strong>
             </p>
           </div>

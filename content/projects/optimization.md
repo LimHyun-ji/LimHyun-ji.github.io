@@ -7,7 +7,7 @@ period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass"]
 highlights:
-  - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
+  - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 컨텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
 ---
 
@@ -61,32 +61,31 @@ highlights:
 - 무거운 화면·가벼운 HUD 구분 → **Global Invalidation 레이어 단위 동적 토글**
 
 ```cpp
-IsGlobalInvalidationEnabled = SolActivatableWidget->UseGlobalInvalidation();
+IsGlobalInvalidationEnabled = ActivatableWidget->UseGlobalInvalidation();
 ...
 FSlateApplication::Get().ToggleGlobalInvalidation(IsGlobalInvalidationEnabled);
 ```
 ```cpp
-// ActivatableWidget.h:102 — 화면별로 사용 여부를 데이터로 선택
+// 화면별로 사용 여부를 데이터로 선택
 bool bUseGlobalInvalidation = false;
 ```
 
 <div id="case-forcevolatile" class="case-anchor"></div>
 
-**그런데 Invalidation을 켜자 스크롤 리스트가 제대로 갱신되지 않는 문제가 생겼습니다.** Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 스크롤처럼 계속 바뀌는 콘텐츠까지 캐시 대상에 들어갔기 때문입니다. 그래서 스크롤 박스만 `ForceVolatile`로 캐시에서 빼고, 나머지 UI는 Invalidation을 유지했습니다.
+**그런데 Invalidation을 켜자 스크롤 리스트가 제대로 갱신되지 않는 문제가 생겼습니다.** Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 스크롤처럼 계속 바뀌는 컨텐츠까지 캐시 대상에 들어갔기 때문입니다. 그래서 스크롤 박스만 `ForceVolatile`로 캐시에서 빼고, 나머지 UI는 Invalidation을 유지했습니다.
 
 ```cpp
-// SSolScrollBox.cpp:30
-.ForceVolatile(true)  // 동적 콘텐츠 캐싱 이슈 방지를 위해 항상 volatile
+.ForceVolatile(true)  // 동적 컨텐츠 캐싱 이슈 방지를 위해 항상 volatile
 ```
 
-- 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감 (`GeoGameMode.cpp:177`/`:218`)
+- 게임 진입/종료 시 전역 토글 → 로딩 중 UI 재계산 절감
 - **풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않음** → `GameRendering`을 false로(뷰포트 렌더링 중지)해 모바일 GPU 비용 절감. GPU 렌더 파이프라인에 대한 이해를 바탕으로 보이지 않는 픽셀에 자원을 낭비하지 않는 원칙을 적용
 
 ```cpp
-// UI/Layer/GeoFullScreenUILayerWidget.cpp — 화면별 플래그로 뷰포트 렌더링 중지
-bIsDisableRenderingOnFullScreen = SolActivatableWidget->IsDisableViewportRenderingOnFullScreen();
-USolDisableGameRenderingSubsystem::Get()
-    ->SetReason(ESolDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
+// 화면별 플래그로 뷰포트 렌더링 중지
+bIsDisableRenderingOnFullScreen = ActivatableWidget->IsDisableViewportRenderingOnFullScreen();
+UDisableGameRenderingSubsystem::Get()
+    ->SetReason(EDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
 ```
 
 ## 2. Tick / 렌더 패스 비용 절감
@@ -94,14 +93,14 @@ USolDisableGameRenderingSubsystem::Get()
 - **Sector** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
 
 - 상태 기반 Tick 비활성화 적용 대상:
-  - 조작 불가/원격 상태 플레이어 (`GeoGameMode.cpp:276-277`)
-- FX 그림자 제거: `SetCastShadow(false)` (`ActionNotify_PlayParticleEffect.cpp:315`)
+  - 조작 불가/원격 상태 플레이어
+- FX 그림자 제거: 파티클 Notify에서 `SetCastShadow(false)`
 
 ---
 
 <div id="case-pooling-crash" class="case-anchor"></div>
 
-## 4. 메모리 관리 
+## 3. 메모리 관리
 
 - 모바일 메모리 예산·GC 스파이크 절감
 - 명시적 GC — 큰 UI 전환 직후

@@ -43,7 +43,7 @@ highlights:
 <img class="diagram" src="/images/diagrams/visualdata-editor.svg" alt="VisualData 에디터 구조: FVisualDataEditor → Preview/ActionTable/Property/Outliner 탭, UVisualDataEditorSubsystem, Visual PlayMode, Export → JSON → 서버 동기화" />
 
 - 인게임 시스템([VisualData 페이지](/projects/visualdata/))과 짝을 이루는 **에디터 저작 툴**
-- 에디터 전용 코드는 에디터 모듈(`SolEditor`)에 두고, 인게임과 같은 데이터·몽타주·Notify를 프리뷰
+- 에디터 전용 코드는 에디터 모듈(`Editor`)에 두고, 인게임과 같은 데이터·몽타주·Notify를 프리뷰
 - 전투 Notify는 **Notify_Editor**로 에디터 프리뷰 동작을 분리해, 인게임 로직(Notify_Game)이 에디터 코드에 의존하지 않음
 
 ## 1. 아트 테스트 환경 — 서버 없이 인게임과 동일하게
@@ -87,7 +87,7 @@ highlights:
 
 | 영역 | 내용 |
 |------|------|
-| 에디터 | UE5 Editor Module(`SolEditor`) · Slate UI · 타입별 클래스 · PreviewActor |
+| 에디터 | UE5 Editor Module(`Editor`) · Slate UI · 타입별 클래스 · PreviewActor |
 | 프리뷰 | 서버 없이 외형 · 몽타주 · Custom ActionNotify(Notify_Editor) 재생 · UPROPERTY 변경 즉시 반영 |
 | 마이그레이션 | AssetMigration — 구 에셋 → 신 타입 자동 변환 |
 | 자동화 | `VisualDataExportCommandlet` → `FVisualDataExport` JSON export · Jenkins CI · P4 |
