@@ -5,9 +5,10 @@ title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
-tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass"]
+tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass", "LOD"]
 highlights:
   - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 컨텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
+  - "LOD별 파츠 통합으로 원거리 Entity 드로콜 감소"
   - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
 ---
 
@@ -88,10 +89,13 @@ UDisableGameRenderingSubsystem::Get()
     ->SetReason(EDisableGameRenderingReason::FullScreen, bIsDisableRenderingOnFullScreen);
 ```
 
-## 2. Tick / 렌더 패스 비용 절감
+## 2. LOD별 파츠 통합
+
+- 원거리 Entity는 분리된 파츠(Master / Face / Torso / Helmet)를 LOD에 따라 통합 메시로 전환해 드로콜 감소
+
+## 3. Tick / 기타 비용 절감
 
 - **Sector** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
-
 - 상태 기반 Tick 비활성화 적용 대상:
   - 조작 불가/원격 상태 플레이어
 - FX 그림자 제거: 파티클 Notify에서 `SetCastShadow(false)`
@@ -100,7 +104,7 @@ UDisableGameRenderingSubsystem::Get()
 
 <div id="case-pooling-crash" class="case-anchor"></div>
 
-## 3. 메모리 관리
+## 4. 메모리 관리
 
 - 모바일 메모리 예산·GC 스파이크 절감
 - 명시적 GC — 큰 UI 전환 직후
