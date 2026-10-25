@@ -101,20 +101,24 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px auto 14px; }
 /* 마크다운 본문 내 이미지 — 절반 크기, 중앙 정렬 */
 .detail-body img:not(.diagram) { max-width: 50%; display: block; margin: 10px auto; }
-/* 문제 해결 요약 박스 (<div class="cases"><div class="case">…) — 문제 · 해결 · 결과 3줄 + 본문 이야기로 가는 "자세히" 링크 */
-.detail-body .cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin: 6px 0 12px; }
-.detail-body .case { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 12px;
-  padding: 16px 18px; background: color-mix(in srgb, var(--accent) 5%, transparent); }
-.detail-body .case-title { margin: 0 0 10px; font-weight: 800; font-size: 15.5px; line-height: 1.45; }
-.detail-body .case dl { display: grid; grid-template-columns: 42px 1fr; gap: 6px 10px; margin: 0; }
-.detail-body .case dt { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent-2); padding-top: 2px; }
-.detail-body .case dd { margin: 0; font-size: 14px; line-height: 1.6; }
-.detail-body .case dt:nth-of-type(3), .detail-body .case dt:nth-of-type(3) + dd { color: var(--accent); font-weight: 700; }
-.detail-body .case { display: flex; flex-direction: column; }
-.detail-body .case-more { align-self: flex-end; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--accent); }
+/* 문제 해결 요약 — 노션 콜아웃 형식 (<div class="cases"><div class="case">…)
+   띠 없는 연한 배경 + 왼쪽 아이콘(💡) + 본문, 세로로 쌓기. 마크다운은 그대로 두고 스타일만 적용 */
+.detail-body .cases { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 14px; }
+.detail-body .case { display: grid; grid-template-columns: 26px 1fr; column-gap: 10px;
+  padding: 14px 18px 14px 14px; border-radius: 6px; border: 0;
+  background: color-mix(in srgb, var(--text) 5%, var(--bg)); }
+.detail-body .case::before { content: "💡"; grid-column: 1; grid-row: 1 / span 3; font-size: 1.2rem; line-height: 1.35; }
+.detail-body .case > * { grid-column: 2; }
+.detail-body .case-title { margin: 0 0 6px; font-weight: 700; font-size: 15px; line-height: 1.5; }
+.detail-body .case dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0; }
+.detail-body .case dt { font-size: 13px; font-weight: 700; color: var(--muted); line-height: 1.65; }
+.detail-body .case dd { margin: 0; font-size: 14px; line-height: 1.65; }
+.detail-body .case dt:nth-of-type(3) + dd { font-weight: 700; }
+.detail-body .case-more { justify-self: start; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--muted);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent); }
+.detail-body .case-more:hover { color: var(--accent); }
 /* 본문 이야기 위치 표시 (자세히 링크 도착점) */
 .detail-body .case-anchor { scroll-margin-top: 20px; }
-@media (max-width: 520px) { .detail-body .cases { grid-template-columns: 1fr; } }
 
 /* 마크다운 본문의 스크린샷 묶음 (<div class="shot-row"><figure>…) — 나란히 배치, 좁은 화면에서는 세로로 */
 .detail-body .shot-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0 8px; }
