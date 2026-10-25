@@ -93,10 +93,12 @@ export default function Home() {
             {p.about && (
               <ul className="lead-bio">
                 {p.about.school && p.about.school.split('\n').map((line, i, arr) => (
-                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>{glue(line)}
-                    {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {glue(p.about.schoolPeriod)}</em>}</li>
+                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>
+                    {/* 학교 이름과 기간을 한 덩어리로 묶어 기간이 별도 칸으로 떨어지지 않게 함 */}
+                    <span className="bi-text">{glue(line)}
+                      {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {glue(p.about.schoolPeriod)}</em>}</span></li>
                 ))}
-                {p.about.highschool && <li><span className="bi">🏫</span>{glue(p.about.highschool)}</li>}
+                {p.about.highschool && <li><span className="bi">🏫</span><span className="bi-text">{glue(p.about.highschool)}</span></li>}
               </ul>
             )}
             <div className="lead-actions">
