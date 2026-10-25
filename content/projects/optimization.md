@@ -9,14 +9,13 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 highlights:
   - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 콘텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
   - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
-  - "데미지 표시를 BP 애니메이션 의존에서 순수 C++ 이벤트 릴레이 + 컨테이너 풀링으로 재설계"
 ---
 
 > **목적** — 모바일 타겟의 프레임·메모리 비용 상시 절감
 >
-> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓, freed-tick 크래시 구조적 차단
+> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓
 >
-> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC, 데미지 표시 BP→C++ 재설계
+> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC
 
 
 ## 문제 해결 요약
@@ -26,26 +25,17 @@ highlights:
     <p class="case-title">Slate Hitching</p>
     <dl>
       <dt>문제</dt><dd>UI 화면에서 Slate Hitching(프레임 튐) 발생</dd>
-      <dt>해결</dt><dd>Unreal Insights로 원인을 측정하고 화면 · 레이어 단위로 Global Invalidation 적용</dd>
+      <dt>해결</dt><dd>Unreal Insights로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
       <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감</dd>
     </dl>
     <a class="case-more" href="#case-slate-hitching">자세히 ↓</a>
   </div>
   <div class="case">
-    <p class="case-title">Invalidation 적용 후 스크롤 갱신 오류</p>
+    <p class="case-title">UObject Max Exceed Crash</p>
     <dl>
-      <dt>문제</dt><dd>Global Invalidation을 켜자 스크롤 리스트가 갱신되지 않음</dd>
-      <dt>해결</dt><dd>스크롤 박스만 <code>ForceVolatile</code>로 캐시에서 분리</dd>
-      <dt>결과</dt><dd>동적 콘텐츠 정상 갱신, 나머지 UI는 절감 효과 유지</dd>
-    </dl>
-    <a class="case-more" href="#case-forcevolatile">자세히 ↓</a>
-  </div>
-  <div class="case">
-    <p class="case-title">풀링 액터의 해제 메모리 접근 크래시</p>
-    <dl>
-      <dt>문제</dt><dd>풀에서 재사용하는 액터 주변의 해제 메모리 접근 크래시</dd>
-      <dt>해결</dt><dd>입출고 시 모든 컴포넌트 틱 토글 + 반납 시 로드 핸들 즉시 취소</dd>
-      <dt>결과</dt><dd>같은 유형의 크래시 구조적 차단</dd>
+      <dt>문제</dt><dd>List View 아이템이 많은 경우 인게임 액터 등 UObject의 한계 수량에 도달해 크래시(모바일 빈번)</dd>
+      <dt>해결</dt><dd>Actor Pooling으로 재사용성 향상, 및 풀스크린 진입시 명시적 GC</dd>
+      <dt>결과</dt><dd>UObject생성 재사용을 통해 구조적 차단</dd>
     </dl>
     <a class="case-more" href="#case-pooling-crash">자세히 ↓</a>
   </div>
@@ -71,14 +61,12 @@ highlights:
 - 무거운 화면·가벼운 HUD 구분 → **Global Invalidation 레이어 단위 동적 토글**
 
 ```cpp
-// GeoFullScreenUILayerWidget.cpp:154-157 — 활성 레이어에 따라 동적 토글
 IsGlobalInvalidationEnabled = SolActivatableWidget->UseGlobalInvalidation();
 ...
 FSlateApplication::Get().ToggleGlobalInvalidation(IsGlobalInvalidationEnabled);
 ```
 ```cpp
-// SolActivatableWidget.h:102 — 화면별로 사용 여부를 데이터로 선택
-UPROPERTY(EditDefaultsOnly, Category=Screen)
+// ActivatableWidget.h:102 — 화면별로 사용 여부를 데이터로 선택
 bool bUseGlobalInvalidation = false;
 ```
 
@@ -87,7 +75,7 @@ bool bUseGlobalInvalidation = false;
 **그런데 Invalidation을 켜자 스크롤 리스트가 제대로 갱신되지 않는 문제가 생겼습니다.** Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 스크롤처럼 계속 바뀌는 콘텐츠까지 캐시 대상에 들어갔기 때문입니다. 그래서 스크롤 박스만 `ForceVolatile`로 캐시에서 빼고, 나머지 UI는 Invalidation을 유지했습니다.
 
 ```cpp
-// SolScrollBox.cpp:30
+// SSolScrollBox.cpp:30
 .ForceVolatile(true)  // 동적 콘텐츠 캐싱 이슈 방지를 위해 항상 volatile
 ```
 
@@ -103,91 +91,23 @@ USolDisableGameRenderingSubsystem::Get()
 
 ## 2. Tick / 렌더 패스 비용 절감
 
-- **Significance** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
-
-```cpp
-// SIGMonsterBucketComponent.cpp:3-12
-float USIGMonsterBucketComponent::CalculateSignificance(
-    USignificanceManager::FManagedObjectInfo* ObjectInfo, const FTransform& Viewpoint) const
-{
-    AActor* Owner = GetOwner();
-    if (Owner == nullptr) return 0.f;
-    return 10 + (Owner->GetActorLocation() - Viewpoint.GetLocation()).SizeSquared();
-}
-```
+- **Sector** 기반으로 카메라 거리에 따른 NPC 틱 빈도 자동 조절
 
 - 상태 기반 Tick 비활성화 적용 대상:
   - 조작 불가/원격 상태 플레이어 (`GeoGameMode.cpp:276-277`)
-  - 파라미터 없을 때 머티리얼 매니저 (`MaterialManagerComponent.cpp:1047-1050`)
-  - 룰렛 시퀀스 대기 중 (`CineConstellationRoulette.cpp:203`)
 - FX 그림자 제거: `SetCastShadow(false)` (`ActionNotify_PlayParticleEffect.cpp:315`)
-- 단일 그림자 메시 메인/뎁스 패스 비활성화 (`SolSingleShadowComponent.cpp:336-340`) — 렌더 패스 레벨에서 불필요한 드로콜을 제거하는 접근
-
-## 3. 데미지 표시: BP → C++ 이벤트 릴레이
-
-- 기존 BP 애니메이션 기반 데미지 표시 → **순수 C++ 이벤트 릴레이 + 컨테이너 풀링**으로 재설계
-- BP 의존·Tweener 제거
-
-```cpp
-// DamageFloatSubsystem.h:26-44 — 월드가 위젯에 요청만 브로드캐스트
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageFloatRequested, const FDamageFloatRequest&);
-FOnDamageFloatRequested OnDamageFloatRequested;
-```
-```cpp
-// DamageFloatWidget.cpp:99-128 — 컨테이너 풀에서 빌려오고, 애니 종료 콜백에서 반납
-auto Container = ContainerPool.GetOrCreateInstance<UOverheadTargetDamageContainerWidget>(DamageContainerWidgetClass);
-TWeakObjectPtr<UOverheadTargetDamageContainerWidget> WeakContainer = Container;
-Container->SetOnAnimationFinishedCallback([this, WeakContainer]() {
-    if (WeakContainer.IsValid()) ReleaseContainer(WeakContainer.Get());
-});
-```
-
-- 투영 불가(카메라 뒤) 데미지 → 화면 밖 전송으로 렌더 스킵 (`DamageFloatWidget.cpp:85-86`)
 
 ---
 
-## 4. 메모리 관리 — 가장 신경 쓴 영역
+<div id="case-pooling-crash" class="case-anchor"></div>
 
-- 모바일 메모리 예산·GC 스파이크 절감을 위한 두 축: **(1) 명시적 GC, (2) 액터 풀링**
+## 4. 메모리 관리 
 
-### 4-1. 명시적 GC — 큰 UI 전환 직후
+- 모바일 메모리 예산·GC 스파이크 절감
+- 명시적 GC — 큰 UI 전환 직후
 
 - 무거운 탭 닫기 직후 즉시 GC → 메모리 스파이크 누적 방지
 
 ```cpp
-// SpiritScreen.cpp:205 — 탭 전환(닫기) 직후 강제 GC
-if (GEngine) GEngine->ForceGarbageCollection(true);
+GEngine->ForceGarbageCollection(true);
 ```
-
-- 비동기 로드 텍스처: 핸들 해제 + `RF_Standalone` 제거 → GC 대상 명시
-
-```cpp
-// BeginnerTipPopupWidget.cpp:118-125
-UObject* PrevTexture = BeginnerTipImageHandle->GetLoadedAsset();
-BeginnerTipImageHandle->ReleaseHandle();
-BeginnerTipImageHandle.Reset();
-if (PrevTexture) PrevTexture->ClearFlags(RF_Standalone);
-GEngine->ForceGarbageCollection(false);
-```
-
-<div id="case-pooling-crash" class="case-anchor"></div>
-
-### 4-2. 액터 풀링 — 풀링이 만드는 크래시까지 차단
-
-**풀에서 재사용하는 액터 주변에서 해제된 메모리에 접근하는 크래시가 드물게 발생했습니다.** 풀에 반납할 때 액터만 숨기고 컴포넌트 틱은 그대로 돌고 있었는데, Niagara 컴포넌트가 `bAutoDestroy`로 스스로 파괴된 뒤에도 틱이 호출되고 있었습니다. 반납 시 비동기 로드 핸들(`FStreamableHandle`)도 취소되지 않아, 뒤늦은 로드 완료 콜백이 이미 정리된 대상을 참조할 수 있었습니다. 그래서 풀 입출고 시 **모든 컴포넌트 틱을 함께 토글**하고, 반납 시 핸들을 즉시 취소하도록 수명 경계를 명시했습니다.
-
-```cpp
-// ObjectPoolSubsystem.cpp:313-332 — SetPoolActorHidden
-Actor->SetActorHiddenInGame(bHidden);
-Actor->SetActorEnableCollision(!bHidden);
-Actor->SetActorTickEnabled(!bHidden);
-TInlineComponentArray<UActorComponent*> Components;
-Actor->GetComponents(Components);
-for (UActorComponent* Comp : Components)               // 컴포넌트 틱까지 정지 → freed 접근 방지
-    if (IsValid(Comp) && Comp->PrimaryComponentTick.bCanEverTick)
-        Comp->SetComponentTickEnabled(!bHidden);
-```
-
-- Push 시 틱을 먼저 끈 뒤 정리 콜백 호출 (병렬 틱 태스크그래프 경쟁 방지)
-- Pull 시 최근 사용 액터 우선 반환 (캐시 적중↑)
-- 주기적 `ShrinkPool()`: 최근 피크 + 20% 버퍼 유지, 초과분 파괴 (`ObjectPoolSubsystem.cpp:120-170, 334-368`)

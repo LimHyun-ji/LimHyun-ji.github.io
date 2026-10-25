@@ -11,13 +11,16 @@ highlights:
   - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 비동기 로드"
   - "3D 오브젝트를 SceneCapture2D로 RenderTarget에 캡처해 UI에 합성, 연출 구간에만 캡처를 Visible 토글해 모바일 GPU 비용 절감"
   - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
+images:
+  - src: "/images/projects/rendering-cinema/constellation-preview.gif"
+    alt: "별자리 전환 연출"
 ---
 
 > **목적** — 연출을 인게임과 분리된 공간에서 비동기로 띄우고, 연출 구간에만 자원(시퀀스 · 액터 · 캡처)을 쓰는 구조
 >
 > **성과** — PocketLevel·시퀀스·캡처 수명을 연출 구간에 한정해 모바일 GPU/메모리 비용↓
 >
-> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 직접 설계
+> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 리팩토링
 
 
 ## 문제 해결 요약
@@ -27,19 +30,10 @@ highlights:
     <p class="case-title">연출 외 구간의 GPU 비용</p>
     <dl>
       <dt>문제</dt><dd>연출이 아닐 때도 캡처 렌더링 비용 발생</dd>
-      <dt>해결</dt><dd>SceneCapture를 연출 구간에만 켜고 끄도록 토글</dd>
+      <dt>해결</dt><dd>PocketLevel 진입·퇴장 시 연출 구간에만 켜고 끄도록 토글</dd>
       <dt>결과</dt><dd>연출 외 구간의 캡처 비용 제거</dd>
     </dl>
     <a class="case-more" href="#case-scenecapture">자세히 ↓</a>
-  </div>
-  <div class="case">
-    <p class="case-title">갓아머 연출 후 Niagara 잔상</p>
-    <dl>
-      <dt>문제</dt><dd>연출이 끝난 뒤 Niagara 잔상이 남음</dd>
-      <dt>해결</dt><dd>정리 방식을 <code>ReleaseToPool</code>에서 <code>Deactivate</code>로 교체</dd>
-      <dt>결과</dt><dd>연출 종료 후 잔상 제거</dd>
-    </dl>
-    <a class="case-more" href="#case-niagara">자세히 ↓</a>
   </div>
 </div>
 
@@ -61,7 +55,6 @@ highlights:
 - 별·결과별 시퀀스 런타임 생성·바인딩 → 종료 시 파괴 구조 (사전 일괄 로드 배제)
 
 ```cpp
-// Cinema/Constellation/CinemaConstellationManager.cpp
 // 시퀀스 에셋 + 바인딩 맵으로 LevelSequenceActor를 런타임 생성
 ALevelSequenceActor* UCinemaConstellationManager::CreateLevelSeqActor(
     UObject* Outer, const TSoftObjectPtr<ULevelSequence>& SequenceAsset, TMap<FName, AActor*> InBindingMap);
@@ -92,9 +85,6 @@ void DestroyLevelSeqActor(ALevelSequenceActor*& InActor);
 **연출이 아닐 때도 캡처 비용이 계속 드는 문제가 있었습니다.** SceneCapture2D는 켜져 있는 동안 매 프레임 씬을 한 번 더 렌더링하기 때문입니다. 그래서 연출이 시작될 때만 캡처를 켜고, 끝나면 끄도록 연출 구간에 맞춰 토글했습니다.
 
 ```cpp
-// Cinema/Pilgrimage/CinePilgrimageManager.cpp
-#include "Components/SceneCaptureComponent2D.h"
-#include "Engine/SceneCapture2D.h"
 
 // 태그로 배치된 캡처 카메라를 찾아, LevelSequence의 named binding에 주입
 UGameplayStatics::GetAllActorsWithTag(World, RenderTargetCamTag, RenderCams);
@@ -119,18 +109,6 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 - 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
 - MPC·머티리얼 기반 미니맵 및 월드맵 설계 상세 → [실시간 위치 기반 맵 설계 페이지](/projects/mapdesign/)
 
-<div id="case-niagara" class="case-anchor"></div>
-
-## 5. 갓아머 연출 — 런타임 본 트랜스폼 ↔ AnimBP
-
-- `TransformBonesComponent` 신규 설계 — 런타임 본 트랜스폼 계산 ↔ AnimBP 연동
-- 에디터 프리뷰 전용 `EditorTransformBonesComponent` 분리
-- **연출이 끝난 뒤 Niagara 잔상이 남는 문제가 있었습니다.** `ReleaseToPool`로 반납할 때 이펙트가 제대로 정리되지 않았기 때문이라, 정리 방식을 `Deactivate`로 교체했습니다.
-
-```
-Source/Sol/Entity/Character/TransformBonesComponent.{h,cpp}      // 런타임
-Source/SolEditor/VisualDataEditor/EditorTransformBonesComponent  // 에디터 프리뷰
-```
 
 ## 기술 요약
 

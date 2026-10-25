@@ -147,7 +147,7 @@ export default function Home() {
                     </div>
                   )}
                   <h3><KeepWords text={(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')} /></h3>
-                  <p>{glue(e.desc ?? '')}</p>
+                  <p>{(e.desc ?? '').split(/\\n/).map((line, i) => <span key={i}>{i > 0 && <br />}{glue(line.trim())}</span>)}</p>
                 </div>
               );
             })}
@@ -164,7 +164,7 @@ export default function Home() {
             <p className="featured-sub">
               {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 · '
                 + '인게임 콘텐츠&네트워크 · 인게임 연출&비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지')}{' '}
-              <strong>{glue('직접 설계·담당.')}</strong>
+              <strong>{glue('설계·담당.')}</strong>
             </p>
           </div>
           <figure className="featured-banner">
@@ -173,7 +173,7 @@ export default function Home() {
           </figure>
         </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="Sol 클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → USolGeoSubsystem·UNetworkNotiClient → Feature Managers (URL은 USolConfigSubsystem)" loading="lazy" />
+          alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
         {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
           <div className={`area-group tone-${g.tone}`} key={g.title}>
             <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>

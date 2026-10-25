@@ -3,7 +3,7 @@ layout: project
 order: 6
 title: "VisualData 에디터 & Commandlet"
 role: "Tools / Editor"
-period: "2023 — 현재 (2025 대규모 리팩토링)"
+period: "2023 — 현재 (리팩토링)"
 summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터와, 데이터를 빌드 단계에서 export하는 Commandlet 담당."
 tags: ["Editor Tooling", "VisualData", "Slate", "EditorModule", "AssetMigration", "Commandlet"]
 images:
@@ -11,10 +11,9 @@ images:
     alt: "VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰"
 highlights:
   - "서버 없이 인게임과 동일한 외형·전투 동작을 미리 보는 아트 테스트 환경 제공 — 아트팀 이터레이션 단축"
-  - "에디터 UI를 Slate로 직접 구현하고, UPROPERTY 변경이 프리뷰 화면에 바로 반영되도록 Preview 환경을 확장 · 유지보수"
-  - "2025 대규모 리팩토링: EditorModule 이전 · PreviewActor 병합 · 타입별(PC / NPC / FieldObject / Item / Spirit) 클래스 분리 · VisualDataInterface 제거"
+  - "에디터 UI를 Slate로 직접 구현하고, 변경이 프리뷰 화면에 바로 반영되도록 Editor Preview 환경을 확장 · 유지보수"
+  - "VD슈퍼클래스 리팩토링: EditorModule 이전 · PreviewActor 병합 · 타입별(PC / NPC / FieldObject / Item / Spirit) 클래스 분리 · VisualDataInterface 제거"
   - "구 에셋을 새 타입으로 자동 변환하는 AssetMigration 툴로 에디터 구조 부채를 일괄 정리"
-  - "VisualDataExportCommandlet으로 에디터 UI 없이 VisualData 매핑·액션 메타데이터를 JSON export — CI(Jenkins)에서 실행"
 ---
 
 > **목적** — 아트·기획이 서버 없이 외형과 전투 연출을 직접 확인하고, 데이터는 빌드 단계에서 자동으로 export되는 저작 환경
@@ -58,11 +57,11 @@ highlights:
 ### Preview 환경 확장 · 유지보수
 
 - 새 Entity 타입이나 기능이 추가될 때마다 **Preview 환경을 확장**하고 상시 유지보수
-- **UPROPERTY 변경 → Preview 화면 즉시 반영** — 디테일 패널에서 데이터 값을 바꾸면 프로퍼티 변경 이벤트를 받아 프리뷰에 바로 다시 적용 → 저장하거나 다시 실행하지 않아도 결과를 확인
+- **데이터 변경 → Preview 화면 즉시 반영** — 디테일 패널에서 데이터 값을 바꾸면 프로퍼티 변경 이벤트를 받아 프리뷰에 바로 다시 적용 → 저장하거나 다시 실행하지 않아도 결과를 확인
 
 <div id="case-refactor" class="case-anchor"></div>
 
-## 2. 2025 대규모 리팩토링
+## 2. 슈클래스 리팩토링
 
 **리팩토링 전에는 PC · NPC · FieldObject · Item · Spirit의 에디터 데이터가 하나의 슈퍼클래스에 모여, 타입마다 다른 외형 규칙을 한 클래스 안에서 분기하고 있었습니다.** 타입이 늘수록 유지보수가 어려워져 아래처럼 구조를 정리했고, 기존 에셋은 AssetMigration(3번)으로 새 타입에 옮겼습니다.
 
@@ -80,13 +79,6 @@ highlights:
 
 - **에디터 UI 없이 Commandlet**으로 VisualData 데이터를 JSON export → Jenkins CI에서 실행
 - NPC · 갓아머 · 정령 · 필드오브젝트 매핑과 액션 메타데이터를 export, 필요 시 P4 연동
-
-```cpp
-// VisualDataExportCommandlet → FVisualDataExport::Execute_ExportAllJson()
-// FVisualDataExport: NPC/갓아머/정령/필드오브젝트 매핑·액션 메타데이터 JSON export
-Execute_ExportAssetType(..., bUseP4v);
-```
-
 - export된 데이터는 런타임 메타데이터로 사용 → [메타데이터 파이프라인 페이지](/projects/metadata-pipeline/)
 
 ## 기술 요약

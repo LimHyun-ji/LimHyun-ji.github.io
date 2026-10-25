@@ -1,46 +1,37 @@
 ---
 layout: project
 order: 1
-title: "VisualData — 캐릭터 비주얼 데이터 시스템 (인게임 전투)"
+title: "외형 · 전투 시스템"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "모든 Entity에 외형을 세팅·로드하는 인게임 모듈 컴포넌트와, 서버 ActionEvt를 몽타주 · ActionNotify로 연결하는 Action Table 관리."
 tags: ["VisualData", "Character", "Action/전투", "AnimMontage", "ActionNotify"]
 highlights:
-  - "PC·NPC·정령·토템·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet / Wing / Cape) · Override Material · Attachment · 본 트랜스폼을 세팅·로드"
-  - "Action Table 관리 — Entity 타입별 동작에 맞는 몽타주를 데이터로 정의하고, 서버에서 받은 ActionEvt에 따라 해당 몽타주를 재생"
-  - "Custom ActionNotify 정의 — 몽타주 재생 중 Notify 시점에 FX 등 전투 연출을 실행하고, Notify를 Notify_Game / Notify_Editor로 나눠 인게임 로직과 에디터 프리뷰를 분리"
-  - "전이 규칙(FullReset / PartialUpdate / NoUpdate)으로 바뀐 파츠만 부분 갱신, Override Material · Color Tint · LOD로 에셋 재사용성 향상"
-  - "무기 / 방어구 / 헬멧 Attachment를 소켓 기반으로 부착 — 무기 애니메이션 · Niagara FX · 소켓 전환(장착 ↔ 납도)까지 처리"
+  - "PC·NPC·Spirit·필드오브젝트·아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet) · Override Material · Attachment · 본 트랜스폼을 세팅·로드"
+  - "**Action Table 관리** — Entity 타입별 동작에 맞는 몽타주를 데이터로 정의하고, 서버에서 받은 ActionEvt에 따라 해당 몽타주를 재생"
+  - "**Custom ActionNotify 정의** — 몽타주 재생 중 Notify 시점에 FX 등 전투 연출을 실행하고, Notify를 Notify_Game / Notify_Editor로 나눠 인게임 로직과 에디터 프리뷰를 분리"
+  - "**전이 규칙(FullReset / PartialUpdate / NoUpdate)**으로 바뀐 파츠만 부분 갱신, Override Material · Color Tint · LOD로 에셋 재사용성 향상"
+  - "무기 / 방어구 / 헬멧 Attachment를 소켓 기반으로 부착 — 무기 애니메이션 · Niagara FX 처리"
 ---
 
 > **목적** — 외형과 전투 액션을 각 캐릭터에 **데이터로** 세팅·로드하고, 서버 액션 이벤트를 몽타주·Notify로 연결하는 인게임 시스템
 >
 > **성과** — 외형·전투 표현 데이터 주도 일관화, 인게임/에디터 Notify 분리, 부분 갱신 최적화, 풀링 × 비동기 크래시 구조적 차단
 >
-> **기여** — 인게임 모듈 컴포넌트 · 타입별 모듈 · Action Table · Custom ActionNotify · Attachment 직접 개발
+> **기여** — 인게임 모듈 컴포넌트 · 타입별 모듈 · Action Table · Custom ActionNotify · Attachment 구조 설계
 
 
 ## 문제 해결 요약
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">헬멧만 바꿔도 전신 재로드</p>
+    <p class="case-title">구조 정립을 통한 전역 데이터 참조 문제 해결</p>
     <dl>
-      <dt>문제</dt><dd>외형 데이터가 바뀌면 바뀌지 않은 파츠까지 전부 다시 로드</dd>
-      <dt>해결</dt><dd>다음 데이터와 현재 상태를 비교하는 전이 규칙 도입</dd>
-      <dt>결과</dt><dd>실제로 바뀐 파츠만 다시 로드</dd>
+      <dt>문제</dt><dd>모든 Entity가 산발적으로 VD데이터들 들고 있던 구조적 문제</dd>
+      <dt>해결</dt><dd>Module 시스템에서 각 Entity 타입별 Apply Module을 정의 후 필요한 컴포넌트에 데이터만 할당</dd>
+      <dt>결과</dt><dd>불필요한 전체 VD데이터 참조 제거</dd>
     </dl>
-    <a class="case-more" href="#case-transition">자세히 ↓</a>
-  </div>
-  <div class="case">
-    <p class="case-title">풀링 × 비동기 로드 크래시</p>
-    <dl>
-      <dt>문제</dt><dd>풀 재사용 Entity의 외형 잔존 · 해제 메모리 접근</dd>
-      <dt>해결</dt><dd>반납 시 상태 정리 + 로드 핸들 즉시 취소 + 틱 토글</dd>
-      <dt>결과</dt><dd>경합 경로 구조적 차단</dd>
-    </dl>
-    <a class="case-more" href="#case-pooling">자세히 ↓</a>
+    <a class="case-more" href="#case-allocating">자세히 ↓</a>
   </div>
 </div>
 
@@ -56,12 +47,13 @@ highlights:
 
 ## 1. 인게임 모듈 컴포넌트 — 각 Entity에 Visual 세팅·로드
 
-- PC·NPC·정령·토템·필드오브젝트·아이템 등 **모든 Entity 부착 대상**
+<div id="case-allocating" class="case-anchor"></div>
+
+- PC·NPC·Spirit필드오브젝트·아이템 등 **모든 Entity 부착 대상**
 - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성·재적용
 
 ```cpp
-// System/VisualDataCharacter/VisualDataModuleComponent.h
-class SOL_API UVisualDataModuleComponent : public UActorComponent
+class UVisualDataModuleComponent : public UActorComponent
 {
     // 데이터(VisualGameData) → 모듈 생성 → 적용
     void SetVisualGameData(const UVisualGameDataBase* InVisualGameData);
@@ -85,10 +77,9 @@ class SOL_API UVisualDataModuleComponent : public UActorComponent
 - `UObject`가 아니라 `Cast<>`를 쓸 수 없으므로 커스텀 RTTI(`ModuleCast<T>`)로 안전 다운캐스트
 
 ```cpp
-// System/VisualDataCharacter/Module/VisualDataModuleBase.h
-enum class EVisualDataModuleKind : uint8 { Base, Character, PC, NPC, Spirit, Item, FieldObject, Totem, /* Editor* */ };
+enum class EVisualDataModuleKind : uint8 { Base, Character, PC, NPC, Spirit, Item, FieldObject };
 
-class SOL_API FVisualDataModuleBase : public TSharedFromThis<FVisualDataModuleBase>
+class FVisualDataModuleBase : public TSharedFromThis<FVisualDataModuleBase>
 {
     virtual void ApplyModule(EVisualDataModuleTransitionRule TransitionRule) {}
 };
@@ -116,9 +107,7 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
 - 전투 연출에 필요한 Notify를 **Custom ActionNotify**로 정의 (예: 파티클 재생 Notify)
 - Notify 처리를 **Notify_Game**(인게임)과 **Notify_Editor**(에디터 프리뷰)로 나눠 구현
   - 인게임 로직이 에디터 전용 코드에 의존하지 않고, 에디터에서는 서버 없이 같은 몽타주·Notify를 미리 볼 수 있음
-- 파티클 Notify의 FX 그림자 끄기 최적화 → [퍼포먼스 최적화 페이지](/projects/optimization/)
 
-<div id="case-transition" class="case-anchor"></div>
 
 ## 3. 전이 규칙으로 부분 갱신 최적화
 
@@ -140,15 +129,11 @@ enum class EVisualDataModuleTransitionRule { FullReset, PartialUpdate, NoUpdate 
 - Attachment 관리: 경량 RTTI(`AttachmentCast<T>`) + 비동기 로드·FX·소켓 전환 처리
 
 ```cpp
-// System/VisualDataCharacter/Module/PCModuleAttachment.h
 enum class EPCModuleAttachmentType : uint8 { None, Armor, Helmet, MainWeapon, SubWeapon };
 
-class SOL_API FPCModuleAttachment_Weapon : public FPCModuleAttachment
+class FPCModuleAttachment_Weapon : public FPCModuleAttachment
 {
     virtual void Attach(UVisualDataModuleComponent* InOwnerComponent) override;
-    void ChangeSocket(bool bInIsHeld);        // 장착 ↔ 납도 소켓 전환
-    void PlayAnimation(UAnimSequence*, float PlayRate, bool bLooping); // 무기 애니메이션
-    virtual void CreateFx() override;         // Niagara FX
 private:
     void LoadAsyncAssets();                    // StreamableHandle 비동기 로드
     TSharedPtr<FStreamableHandle> StreamingHandle;
@@ -158,8 +143,7 @@ private:
 ## 5. 로딩 · 렌더 최적화
 
 - **가시성 게이팅**: VisualData **로드가 끝난 Entity만 표시**(`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임·미완성 노출 방지
-- **렌더 비용 제어**: `OptimizeLOD`, `SetLightingChannels`, `bAllowNiagaraScalability`, 단일 그림자 캐시 갱신(`RefreshSingleShadowCaches`)
-- **수명 안전**: 모듈/컴포넌트는 `TWeakObjectPtr` · `TSharedPtr`로 관리, `OnUnregister`에서 정리
+- **렌더 비용 제어**: `OptimizeLOD`, LOD에 따라 파츠 통합으로 변경
 
 <div id="case-pooling" class="case-anchor"></div>
 
