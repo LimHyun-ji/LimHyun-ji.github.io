@@ -28,6 +28,15 @@ highlights:
 
 <div class="cases">
   <div class="case">
+    <p class="case-title">맵 종류 추가 시 View 중복</p>
+    <dl>
+      <dt>문제</dt><dd>던전 전용 맵을 추가하려면 같은 맵 View를 복제해야 하는 구조</dd>
+      <dt>해결</dt><dd>Strategy 패턴으로 View는 공유하고 Model 데이터만 교체</dd>
+      <dt>결과</dt><dd>View 수정 없이 새 맵 종류(던전맵) 추가</dd>
+    </dl>
+    <a class="case-more" href="#case-dungeon">자세히 ↓</a>
+  </div>
+  <div class="case">
     <p class="case-title">월드맵 텍스처 메모리</p>
     <dl>
       <dt>문제</dt><dd>월드맵 전체를 고해상도 한 장으로 올리면 모바일 메모리 예산 초과</dd>
@@ -76,6 +85,8 @@ highlights:
 ## 4. 월드맵 — 영역 이미지 동적 로딩
 
 **월드맵 전체를 고해상도 한 장으로 상시 메모리에 올리면 모바일 메모리 예산을 넘습니다.** 그래서 그리려는 영역만 **고해상도 이미지로 동적 로딩**하도록 했고, 이를 타일 단위로 세분화해 확대 수준에 맞는 해상도의 타일만 불러오도록 고도화했습니다(5번 참고).
+
+<div id="case-dungeon" class="case-anchor"></div>
 
 ## 5. 라이브 컨텐츠 고도화
 

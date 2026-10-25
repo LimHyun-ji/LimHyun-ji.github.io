@@ -28,6 +28,15 @@ highlights:
 
 <div class="cases">
   <div class="case">
+    <p class="case-title">순례 정산 로직과 연출의 결합</p>
+    <dl>
+      <dt>문제</dt><dd>연출과 정산 로직이 한곳에 얽히면 연출을 고칠 때마다 정산 로직까지 영향</dd>
+      <dt>해결</dt><dd>로직(<code>TravelManager</code>)과 연출 공간(<code>CinePilgrimageManager</code>)을 분리</dd>
+      <dt>결과</dt><dd>연출을 수정해도 정산 로직은 영향 없음</dd>
+    </dl>
+    <a class="case-more" href="#case-travel">자세히 ↓</a>
+  </div>
+  <div class="case">
     <p class="case-title">로그인 패킷 과부하</p>
     <dl>
       <dt>문제</dt><dd>로그인 시점에 받을 데이터가 많아 패킷 과부하</dd>
@@ -73,6 +82,8 @@ highlights:
 
 - 내 길드 관련 정보 전체 데이터와 상대 길드 관련 요약 정보 데이터 분리
 - 길드 정보 갱신에 따라 Guild Manager에서 NotiServer(WebSocket)이벤트 수신으로 UI 전파
+
+<div id="case-travel" class="case-anchor"></div>
 
 ### 별자리 · 순례 · 연구/연성
 

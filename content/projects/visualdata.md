@@ -33,6 +33,15 @@ highlights:
     </dl>
     <a class="case-more" href="#case-allocating">자세히 ↓</a>
   </div>
+  <div class="case">
+    <p class="case-title">인게임 · 에디터 Notify 의존 분리</p>
+    <dl>
+      <dt>문제</dt><dd>전투 Notify를 인게임과 에디터 프리뷰가 함께 쓰면서 인게임 로직이 에디터 코드에 의존할 위험</dd>
+      <dt>해결</dt><dd>Custom ActionNotify의 처리를 <code>Notify_Game</code> / <code>Notify_Editor</code>로 분리</dd>
+      <dt>결과</dt><dd>인게임은 에디터 코드와 독립, 에디터는 서버 없이 같은 몽타주 · Notify 프리뷰</dd>
+    </dl>
+    <a class="case-more" href="#case-notify">자세히 ↓</a>
+  </div>
 </div>
 
 
@@ -101,6 +110,8 @@ template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisu
 2. Action Table에서 Entity 타입에 맞는 몽타주 조회
 3. 몽타주 **Play**
 4. 몽타주 재생 중 Notify 시점에 도달하면 **Custom ActionNotify** 실행 → 전투 연출(FX 등) 처리
+
+<div id="case-notify" class="case-anchor"></div>
 
 ### Custom ActionNotify — Notify_Game / Notify_Editor 분리
 
