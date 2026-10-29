@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { getProfile, getProjects, getIdentity, type Project } from '@/lib/content';
+import { getProfile, getProjects, getIdentity, getCompetencies, type Project } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
+import CompetencyTabs from '@/components/CompetencyTabs';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
@@ -29,6 +30,7 @@ function ProjectCard({ a, no }: { a: Project; no: number }) {
 export default function Home() {
   const p = getProfile();
   const id = getIdentity();
+  const cp = getCompetencies();
   const areas = getProjects(); // Sol 내 세부 영역
   const grouped = PROJECT_GROUPS.map((g) => ({
     ...g,
@@ -38,6 +40,8 @@ export default function Home() {
   const rest = areas.filter((a) => !known.has(a.slug));
   if (rest.length) grouped[grouped.length - 1].items.push(...rest);
   let projectNo = 0;
+  // 역량 항목의 링크 표시용 — 카드 제목에서 ' — ' 앞부분만
+  const systemTitles = Object.fromEntries(areas.map((a) => [a.slug, a.title.split(' — ')[0]]));
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
 
@@ -53,6 +57,8 @@ export default function Home() {
     areatool: 'AreaTool',
   };
   const navItems: NavItem[] = [
+    { id: 'competency', label: '역량' },
+    { id: 'career', label: '이력' },
     { id: 'sol', label: 'Projects' },
     ...grouped.flatMap((g) =>
       g.items.map((a) => ({ id: `proj-${a.slug}`, label: shortLabel[a.slug] ?? a.title, indent: true }))
@@ -70,6 +76,7 @@ export default function Home() {
       <nav className="nav">
         <a className="nav-brand" href="#top">임현지 Portfolio</a>
         <div className="nav-links">
+          <a href="#competency">역량</a>
           <a href="#sol">Sol</a>
           <a href="#side">Side Projects</a>
           <a href="#skills">Skills</a>
@@ -147,6 +154,15 @@ export default function Home() {
         </header>
       </div>
 
+      {/* COMPETENCY — 역량별 병목 → 해결 (탭 + 페이지). 시스템 설명은 아래 담당 시스템 카드에 */}
+      {cp.groups.length > 0 && (
+        <section className="competency" id="competency">
+          <div className="featured-tag">◈ Competency · 역량별 문제 해결</div>
+          {cp.intro && <p className="career-intro">{glue(cp.intro)}</p>}
+          <CompetencyTabs groups={cp.groups} systemTitles={systemTitles} />
+        </section>
+      )}
+
       {/* CAREER — 이력 한눈에 (진입 시 바로 보이는 요약) */}
       {p.experience && (
         <section className="career" id="career">
@@ -198,6 +214,7 @@ export default function Home() {
         </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
+        <h3 className="systems-h">담당 시스템<span>{glue(' — 맡은 범위와 상세 설명')}</span></h3>
         {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
           <div className={`area-group tone-${g.tone}`} key={g.title}>
             <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>

@@ -34,6 +34,17 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
+export interface CompetencyItem { tag: string; link?: string; problem: string; fix: string; }
+export interface CompetencyGroup { id: string; title: string; sub?: string; items: CompetencyItem[]; }
+export interface Competencies { intro?: string; groups: CompetencyGroup[]; }
+
+// 역량별 병목 → 해결 (content/competencies.yml)
+export function getCompetencies(): Competencies {
+  const file = path.join(CONTENT, 'competencies.yml');
+  if (!fs.existsSync(file)) return { groups: [] };
+  return (yaml.load(fs.readFileSync(file, 'utf8')) as Competencies) ?? { groups: [] };
+}
+
 export function getIdentity(): Identity {
   const file = path.join(CONTENT, 'identity.yml');
   if (!fs.existsSync(file)) return {};
