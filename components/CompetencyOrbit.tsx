@@ -7,7 +7,8 @@ import { glue } from '@/lib/keepWords';
 
 // 역량별로 보기 — 역량 원 4개가 3D 회전목마처럼 세로축을 중심으로 원형 배치된다.
 // 원을 누르면 링이 가까운 방향으로 돌아 누른 원이 정면(앞)으로 오고, 나머지는 뒤쪽 원 궤도에 놓인다.
-// 아래에는 해당 시스템 카드(회전 등장) + 나머지 시스템("그 외"). CSS 3D transform만 사용.
+// 아래에는 해당 시스템 카드(회전 등장) + 나머지 시스템("그 외").
+// CSS 3D + @property 각도 애니메이션으로 타원 궤도를 따라 돈다(라이브러리 없음).
 export interface OrbitSystem { slug: string; title: string; tags?: string[]; }
 export interface OrbitGroup { id: string; title: string; sub?: string; systems: { slug: string; basis: string }[]; }
 
@@ -36,17 +37,12 @@ export default function CompetencyOrbit({ groups, systems }: { groups: OrbitGrou
     <div className="orbit">
       <div className="carousel" style={{ ['--rot' as string]: `${rot}deg` }}>
         <div className="carousel-ring" role="tablist" aria-label="역량">
-          {groups.slice(0, ANGLES.length).map((x, i) => {
-            // 정면에 가까울수록 진하게 (cos: 정면 1 → 뒤 -1)
-            const depth = Math.cos(((ANGLES[i] + rot) * Math.PI) / 180);
-            return (
-              <button key={x.id} role="tab" aria-selected={i === sel} className={`carousel-node${i === sel ? ' on' : ''}`}
-                style={{ ['--a' as string]: `${ANGLES[i]}deg`, opacity: 0.4 + 0.6 * ((depth + 1) / 2) }}
-                onClick={() => select(i)}>
-                <span>{glue(x.title)}</span>
-              </button>
-            );
-          })}
+          {groups.slice(0, ANGLES.length).map((x, i) => (
+            <button key={x.id} role="tab" aria-selected={i === sel} className={`carousel-node${i === sel ? ' on' : ''}`}
+              style={{ ['--a' as string]: `${ANGLES[i]}deg` }} onClick={() => select(i)}>
+              <span>{glue(x.title)}</span>
+            </button>
+          ))}
         </div>
       </div>
 
