@@ -34,6 +34,16 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
+export interface CompetencySystem { slug: string; basis: string; }
+export interface CompetencyGroup { id: string; title: string; sub?: string; systems: CompetencySystem[]; }
+
+// 메인 "역량별로 보기" (content/competencies.yml)
+export function getCompetencies(): CompetencyGroup[] {
+  const file = path.join(CONTENT, 'competencies.yml');
+  if (!fs.existsSync(file)) return [];
+  return ((yaml.load(fs.readFileSync(file, 'utf8')) as { groups?: CompetencyGroup[] })?.groups) ?? [];
+}
+
 export function getIdentity(): Identity {
   const file = path.join(CONTENT, 'identity.yml');
   if (!fs.existsSync(file)) return {};

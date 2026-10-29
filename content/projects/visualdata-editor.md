@@ -42,7 +42,7 @@ highlights:
 
 <img class="diagram" src="/images/diagrams/visualdata-editor.svg" alt="VisualData 에디터 구조: FVisualDataEditor → Preview/ActionTable/Property/Outliner 탭, UVisualDataEditorSubsystem, Visual PlayMode, Export → JSON → 서버 동기화" />
 
-- 인게임 시스템([VisualData 페이지](/projects/visualdata/))과 짝을 이루는 **에디터 저작 툴**
+- 인게임 시스템([외형 시스템](/projects/visualdata/) · [전투 시스템](/projects/combat/))과 짝을 이루는 **에디터 저작 툴**
 - 에디터 전용 코드는 에디터 모듈(`Editor`)에 두고, 인게임과 같은 데이터·몽타주·Notify를 프리뷰
 - 전투 Notify는 **Notify_Editor**로 에디터 프리뷰 동작을 분리해, 인게임 로직(Notify_Game)이 에디터 코드에 의존하지 않음
 

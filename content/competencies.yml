@@ -1,0 +1,57 @@
+# ─────────────────────────────────────────────────────────────
+# 메인 "역량별로 보기" — 원(역량) 4개 중 하나를 누르면 아래에 해당 역량의 시스템 카드가 크게,
+# 나머지 시스템은 "그 외"로 작게 표시된다. 한 시스템이 여러 역량에 들어갈 수 있다(한 번에 하나만 보이므로 중복 아님).
+# basis: 그 역량에서 이 시스템을 고른 근거 한 줄 (카드에 표시)
+# slug: content/projects/*.md
+# ─────────────────────────────────────────────────────────────
+
+groups:
+  - id: arch
+    title: "구조 설계"
+    sub: "데이터 소유권 · 수명 · 확장점을 정리해 같은 문제가 반복되지 않게"
+    systems:
+      - slug: visualdata
+        basis: "여러 객체가 나눠 갖던 VisualData를 컴포넌트별 할당 · 모듈 단일 생명주기로 정리, CreateModule Factory"
+      - slug: combat
+        basis: "Simulator(Has-A)로 에디터 재생을 인게임과 동일화, Notify_Game / Notify_Editor 분리"
+      - slug: visualdata-editor
+        basis: "에디터와 전투 모듈을 일원화해 서버 유무와 관계없이 같은 동작"
+      - slug: sol-content
+        basis: "채널마다 중복되던 채팅 로직을 ChannelSystem으로 통합, 채널 Key → 인스턴스 매핑"
+
+  - id: perf
+    title: "성능 · 메모리"
+    sub: "프로파일링으로 병목을 찾아 CPU · GPU · 메모리 비용을 줄임"
+    systems:
+      - slug: optimization
+        basis: "Global Invalidation 미갱신은 Invalidate · Volatile로, 드문 갱신 UI는 RetainerBox로 CPU ↔ GPU 비용 교환"
+      - slug: visualdata
+        basis: "Attachment UObject 개수 초과 → TSharedPtr 경량 객체, LOD 단계에 따라 파츠 통합"
+      - slug: sol-content
+        basis: "아이템 컬렉션 LookUp 캐시 O(1) · ListView 가상화 · Reserve / MoveTemp"
+      - slug: rendering-cinema
+        basis: "PocketLevel 진입 히칭 → 비동기 로드 + Key-Value 액터 풀"
+
+  - id: math
+    title: "렌더링 · 게임 수학"
+    sub: "벡터 · 좌표계 · 텍스처 포맷 수준에서 문제를 해결"
+    systems:
+      - slug: mapdesign
+        basis: "퀘스트 데이터를 Material Parameter로 GPU 표시, 모바일은 PF_R16F + 좌표 정규화"
+      - slug: combat
+        basis: "피격 지연을 등속 투영에서 이펙트와 같은 속도 커브 기준으로"
+      - slug: areatool
+        basis: "외적 · 내적으로 클릭 위치가 놓인 선분 판정, SceneProxy 와이어 · 폴리곤 삼각화"
+      - slug: sol-content
+        basis: "프레임 드랍 시 Death Spiral → 이동 선분과 목표점 거리로 도달 판정"
+
+  - id: tool
+    title: "툴 · 파이프라인"
+    sub: "사람의 실수를 툴과 자동화 단계에서 막음"
+    systems:
+      - slug: areatool
+        basis: "체인 검증자로 검증을 Export 앞으로, CI/CD로 Export 누락 제거"
+      - slug: visualdata-editor
+        basis: "Asset Migration으로 대규모 에셋 일괄 변환, Visual PlayMode로 서버 없이 Preview"
+      - slug: metadata-pipeline
+        basis: "테이블별 Custom Validation Script · Unit 단위계로 변환 단계에서 오류 차단"

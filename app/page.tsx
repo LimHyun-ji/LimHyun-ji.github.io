@@ -1,63 +1,26 @@
 import Link from 'next/link';
-import { getProfile, getProjects, getIdentity, type Project } from '@/lib/content';
+import { getProfile, getProjects, getIdentity, getCompetencies } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
+import CompetencyOrbit from '@/components/CompetencyOrbit';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
 import { glue } from '@/lib/keepWords';
 
-// 메인 프로젝트 그룹 — 역량별 소제목. 그룹 안 순서는 slugs 순서를 따름.
-// 목록에 없는 slug는 마지막 그룹으로.
-// tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
-const PROJECT_GROUPS = [
-  { title: '구조 설계', sub: '데이터 소유권 · 수명 · 확장점을 정리해 같은 문제가 반복되지 않게', tone: 'a', slugs: ['visualdata', 'sol-content'] },
-  { title: '성능 · 렌더링', sub: '프로파일링으로 병목을 찾아 CPU · GPU · 메모리 비용을 줄임', tone: 'b', slugs: ['optimization', 'mapdesign', 'rendering-cinema'] },
-  { title: '툴 · 파이프라인', sub: '사람의 실수를 툴과 자동화 단계에서 막음', tone: 'a', slugs: ['areatool', 'visualdata-editor', 'metadata-pipeline'] },
-];
-
-function ProjectCard({ a, no }: { a: Project; no: number }) {
-  return (
-    <Link id={`proj-${a.slug}`} className="area-card" href={`/projects/${a.slug}/`}>
-      <span className="area-no">{String(no).padStart(2, '0')}</span>
-      <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
-      <p>{glue(a.summary ?? '')}</p>
-      {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
-    </Link>
-  );
-}
-
 export default function Home() {
   const p = getProfile();
   const id = getIdentity();
   const areas = getProjects(); // Sol 내 세부 영역
-  const grouped = PROJECT_GROUPS.map((g) => ({
-    ...g,
-    items: g.slugs.map((s) => areas.find((a) => a.slug === s)).filter((a): a is Project => Boolean(a)),
-  }));
-  const known = new Set(PROJECT_GROUPS.flatMap((g) => g.slugs));
-  const rest = areas.filter((a) => !known.has(a.slug));
-  if (rest.length) grouped[grouped.length - 1].items.push(...rest);
-  let projectNo = 0;
+  const competencies = getCompetencies();
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
 
-  // 사이드 네비 항목 구성 — 라벨은 짧게
-  const shortLabel: Record<string, string> = {
-    visualdata: '외형/전투',
-    'sol-content': '컨텐츠',
-    mapdesign: '맵',
-    'rendering-cinema': '연출',
-    optimization: '최적화',
-    'visualdata-editor': '에디터',
-    'metadata-pipeline': '데이터',
-    areatool: 'AreaTool',
-  };
+  // 사이드 네비 항목 — 섹션 단위
   const navItems: NavItem[] = [
-    { id: 'sol', label: 'Projects' },
-    ...grouped.flatMap((g) =>
-      g.items.map((a) => ({ id: `proj-${a.slug}`, label: shortLabel[a.slug] ?? a.title, indent: true }))
-    ),
+    { id: 'career', label: '이력' },
+    { id: 'sol', label: 'Sol' },
+    { id: 'competency', label: '역량별 시스템', indent: true },
     { id: 'side', label: 'Side' },
     { id: 'skills', label: 'Skills' },
   ];
@@ -199,15 +162,11 @@ export default function Home() {
         </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
-        {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
-          <div className={`area-group tone-${g.tone}`} key={g.title}>
-            <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
-            {g.sub && <p className="area-group-sub">{glue(g.sub)}</p>}
-            <div className="area-grid">
-              {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
-            </div>
-          </div>
-        ))}
+        <div id="competency" className="orbit-wrap">
+          <h3 className="systems-h">역량별로 보기<span>{glue(' — 원을 누르면 해당 역량의 시스템이 위로')}</span></h3>
+          <CompetencyOrbit groups={competencies}
+            systems={areas.map((a) => ({ slug: a.slug, title: a.title, tags: a.tags }))} />
+        </div>
       </section>
 
       {/* SIDE PROJECTS (하단, 별도 밴드로 명확히 분리) */}
