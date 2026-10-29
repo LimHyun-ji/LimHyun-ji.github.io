@@ -34,18 +34,6 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
-export interface CompetencyItem { problem: string; fix: string; }
-export interface CompetencySystem { slug: string; items: CompetencyItem[]; }
-export interface CompetencyGroup { id: string; title: string; sub?: string; systems: CompetencySystem[]; }
-export interface Competencies { groups: CompetencyGroup[]; }
-
-// 역량 탭 — 담당 시스템을 역량별로 묶고 시스템마다 병목 → 해결 (content/competencies.yml)
-export function getCompetencies(): Competencies {
-  const file = path.join(CONTENT, 'competencies.yml');
-  if (!fs.existsSync(file)) return { groups: [] };
-  return (yaml.load(fs.readFileSync(file, 'utf8')) as Competencies) ?? { groups: [] };
-}
-
 export function getIdentity(): Identity {
   const file = path.join(CONTENT, 'identity.yml');
   if (!fs.existsSync(file)) return {};
