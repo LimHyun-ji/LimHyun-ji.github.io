@@ -5,12 +5,13 @@ import Link from 'next/link';
 import KeepWords from '@/components/KeepWords';
 import { glue } from '@/lib/keepWords';
 
-// 역량별로 보기 — 역량 원 4개가 바퀴처럼 배치되고, 원을 누르면 바퀴가 회전해 누른 원이 12시로 온다.
-// 가운데 원에는 선택된 역량, 아래에는 해당 시스템 카드(회전 등장) + 나머지 시스템("그 외").
+// 역량별로 보기 — 역량 원 4개가 3D 회전목마처럼 세로축을 중심으로 원형 배치된다.
+// 원을 누르면 링이 가까운 방향으로 돌아 누른 원이 정면(앞)으로 오고, 나머지는 뒤쪽 원 궤도에 놓인다.
+// 아래에는 해당 시스템 카드(회전 등장) + 나머지 시스템("그 외"). CSS 3D transform만 사용.
 export interface OrbitSystem { slug: string; title: string; tags?: string[]; }
 export interface OrbitGroup { id: string; title: string; sub?: string; systems: { slug: string; basis: string }[]; }
 
-// 원 위치(각도, 12시 = 0, 시계 방향). 1번 위 · 2번 왼쪽 · 3번 오른쪽 · 4번 아래
+// 링 위 각도(0 = 정면, 세로축 기준). 처음 정면은 1번, 2번 왼쪽 · 3번 오른쪽 · 4번 뒤
 const ANGLES = [0, 270, 90, 180];
 
 export default function CompetencyOrbit({ groups, systems }: { groups: OrbitGroup[]; systems: OrbitSystem[] }) {
@@ -33,19 +34,19 @@ export default function CompetencyOrbit({ groups, systems }: { groups: OrbitGrou
 
   return (
     <div className="orbit">
-      <div className="wheel" style={{ ['--rot' as string]: `${rot}deg` }}>
-        <span className="wheel-marker" aria-hidden="true">▼</span>
-        <div className="wheel-ring" role="tablist" aria-label="역량">
-          {groups.slice(0, ANGLES.length).map((x, i) => (
-            <button key={x.id} role="tab" aria-selected={i === sel} className={`wheel-node${i === sel ? ' on' : ''}`}
-              style={{ ['--a' as string]: `${ANGLES[i]}deg` }} onClick={() => select(i)}>
-              <span>{glue(x.title)}</span>
-            </button>
-          ))}
-        </div>
-        <div className="wheel-core" key={g.id}>
-          <strong>{picked.length}</strong>
-          <span>개 시스템</span>
+      <div className="carousel" style={{ ['--rot' as string]: `${rot}deg` }}>
+        <div className="carousel-ring" role="tablist" aria-label="역량">
+          {groups.slice(0, ANGLES.length).map((x, i) => {
+            // 정면에 가까울수록 진하게 (cos: 정면 1 → 뒤 -1)
+            const depth = Math.cos(((ANGLES[i] + rot) * Math.PI) / 180);
+            return (
+              <button key={x.id} role="tab" aria-selected={i === sel} className={`carousel-node${i === sel ? ' on' : ''}`}
+                style={{ ['--a' as string]: `${ANGLES[i]}deg`, opacity: 0.4 + 0.6 * ((depth + 1) / 2) }}
+                onClick={() => select(i)}>
+                <span>{glue(x.title)}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

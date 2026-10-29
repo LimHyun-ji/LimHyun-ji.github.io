@@ -163,7 +163,7 @@ export default function Home() {
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
         <div id="competency" className="orbit-wrap">
-          <h3 className="systems-h">역량별로 보기<span>{glue(' — 원을 누르면 해당 역량의 시스템이 위로')}</span></h3>
+          <h3 className="systems-h">역량별로 보기<span>{glue(' — 원을 누르면 해당 역량이 앞으로 돌아옵니다')}</span></h3>
           <CompetencyOrbit groups={competencies}
             systems={areas.map((a) => ({ slug: a.slug, title: a.title, tags: a.tags }))} />
         </div>
