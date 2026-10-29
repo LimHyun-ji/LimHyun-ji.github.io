@@ -383,60 +383,46 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   .career, .featured, .side-inner { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); }
 }
 
-/* 역량별로 보기 — 원(역량) 4개 → 큰 원 + 해당 시스템 카드(회전 등장) → 그 외 (components/CompetencyOrbit) */
-.orbit-wrap { margin-top: 34px; scroll-margin-top: 80px; }
-.systems-h { margin: 0 0 18px; font-size: 20px; font-weight: 800; }
+/* 역량별로 보기 — 세그먼트 탭 + 시스템 목록 (components/CompetencySegments). 무채색 + 얇은 선, 포인트 색은 최소한으로 */
+.seg-wrap { margin-top: 38px; scroll-margin-top: 80px; }
+.systems-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
 .systems-h span { font-size: 14px; font-weight: 600; color: var(--muted); }
-/* 역량 회전목마 — 노랑 계열 전용 팔레트(이 섹션만), 그림자 · 그라데이션 없이 면과 선으로 */
-.orbit { --oc: #E9B22E; --oc-ink: #1E1A10; --oc-line: color-mix(in srgb, var(--oc) 55%, transparent);
-  --oc-soft: color-mix(in srgb, var(--oc) 10%, var(--bg)); --oc-text: #9A7210; }
-:root[data-theme="dark"] .orbit { --oc: #F0BE4A; --oc-ink: #17140C; --oc-text: #F0BE4A; }
-@property --rot { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
-.carousel { --rx: clamp(118px, 21vw, 260px); --rz: clamp(80px, 8vw, 120px); --ty: clamp(48px, 4.6vw, 62px);
-  --node: clamp(86px, 9vw, 120px);
-  position: relative; height: calc(var(--node) * 1.6 + var(--ty) * 2 + 24px); margin: 18px 0 0;
-  perspective: 1100px; transition: --rot .8s cubic-bezier(.3,.8,.3,1); }
-.carousel-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
-/* 타원 궤도: x = sin(t)·rx, z = cos(t)·rz, 정면일수록 아래 · 앞, 뒤일수록 위 · 흐리게 */
-.carousel-node { --t: calc(var(--a) + var(--rot));
-  position: absolute; left: 0; top: 0; width: var(--node); height: var(--node);
-  margin: calc(var(--node) / -2) 0 0 calc(var(--node) / -2); border-radius: 50%; padding: 8px; cursor: pointer;
-  font: inherit; color: var(--muted); display: grid; place-items: center;
-  background: var(--bg); border: 1px solid var(--line);
-  transform: translate3d(calc(sin(var(--t)) * var(--rx)), calc(cos(var(--t)) * var(--ty)), calc(cos(var(--t)) * var(--rz)));
-  opacity: calc(.72 + .28 * (cos(var(--t)) + 1) / 2);
-  transition: background .35s, border-color .35s, color .35s; }
-.carousel-node span { text-align: center; font-size: clamp(12px, 1.25vw, 14.5px); font-weight: 650; line-height: 1.3; word-break: keep-all; letter-spacing: -.01em; }
-.carousel-node:hover { color: var(--text); border-color: var(--oc-line); }
-.carousel-node.on { color: var(--oc-ink); background: var(--oc); border-color: var(--oc); }
-.carousel-node.on span { font-weight: 750; }
-.orbit-stage { display: flex; flex-direction: column; align-items: center; perspective: 1200px; }
-.orbit-sub { margin: 14px 0 18px; font-size: 14px; color: var(--muted); text-align: center; word-break: keep-all; }
-.orbit-cards { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-.orbit-card { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; text-decoration: none; color: inherit;
-  padding: 18px 24px 18px 20px; border-radius: 12px; border: 1px solid var(--line);
-  border-left: 3px solid var(--oc); background: var(--bg);
-  transform-origin: top center; animation: orbit-flip .5s cubic-bezier(.2,.8,.2,1) both; transition: border-color .15s; }
-.orbit-card:hover { border-color: var(--oc-line); border-left-color: var(--oc); background: var(--oc-soft); }
-.orbit-card h4 { margin: 0; font-size: 17px; flex: 0 0 clamp(190px, 26%, 320px); word-break: keep-all; }
-.orbit-card .arrow { color: var(--oc-text); }
-.orbit-card p { margin: 0; flex: 1 1 320px; font-size: 14px; line-height: 1.6; word-break: keep-all; }
-.orbit-card .chips.small { margin: 0; flex: 1 1 100%; }
-.orbit-card .chips.small li { color: var(--muted); border-color: var(--line); background: transparent; }
-.orbit-others { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-top: 22px; padding-top: 18px;
-  border-top: 2px solid var(--line); }
-.orbit-others-h { font-size: 13px; font-weight: 800; color: var(--muted); }
-.orbit-others ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.orbit-others a { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
-  color: inherit; text-decoration: none; border: 1px solid var(--line); background: var(--surf); word-break: keep-all; }
-.orbit-others a:hover { border-color: var(--oc-line); color: var(--oc-text); }
-@keyframes orbit-flip { from { transform: rotateX(-75deg); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .orbit-card { animation: none; } .carousel { transition: none; } }
+.seg-bar { position: relative; display: grid; grid-template-columns: repeat(var(--n), 1fr); padding: 4px; border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 5%, var(--bg)); border: 1px solid var(--line); max-width: 760px; }
+.seg-thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n)); border-radius: 9px;
+  background: var(--bg); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+  transform: translateX(calc(var(--i) * 100%)); transition: transform .35s cubic-bezier(.3,.8,.3,1); }
+:root[data-theme="dark"] .seg-thumb { background: color-mix(in srgb, var(--text) 10%, var(--bg)); box-shadow: none; }
+.seg-btn { position: relative; z-index: 1; padding: 10px 8px; border: 0; background: none; cursor: pointer; font: inherit;
+  font-size: 14px; font-weight: 600; color: var(--muted); border-radius: 9px; word-break: keep-all; line-height: 1.3;
+  transition: color .2s; }
+.seg-btn:hover { color: var(--text); }
+.seg-btn.on { color: var(--text); font-weight: 700; }
+.seg-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg-panel { animation: seg-in .35s ease-out; }
+.seg-sub { margin: 18px 0 6px; font-size: 14px; color: var(--muted); word-break: keep-all; }
+.seg-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.seg-list li { border-bottom: 1px solid var(--line); }
+.seg-item { display: grid; grid-template-columns: minmax(200px, 30%) 1fr; gap: 4px 28px; align-items: baseline;
+  padding: 18px 4px; color: inherit; text-decoration: none; transition: background .2s; }
+.seg-item:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+.seg-item h4 { margin: 0; font-size: 16.5px; font-weight: 750; word-break: keep-all; grid-row: span 2; }
+.seg-item .arrow { color: var(--muted); transition: color .2s, margin .2s; }
+.seg-item:hover .arrow { color: var(--accent); }
+.seg-item p { margin: 0; font-size: 14.5px; line-height: 1.6; word-break: keep-all; }
+.seg-tags { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); word-break: keep-all; }
+.seg-others { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 0; margin-top: 16px; font-size: 13.5px; }
+.seg-others-h { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); margin-right: 12px; }
+.seg-others a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); word-break: keep-all; }
+.seg-others a:hover { border-bottom-color: var(--accent); }
+.seg-dot { font-style: normal; color: var(--muted); margin: 0 10px; }
+@keyframes seg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .seg-panel { animation: none; } .seg-thumb { transition: none; } }
 @media (max-width: 640px) {
-  .orbit-card { padding: 15px 16px 15px 14px; }
-  .orbit-card h4 { flex-basis: 100%; }
+  .seg-btn { font-size: 12.5px; padding: 9px 4px; }
+  .seg-item { grid-template-columns: 1fr; padding: 16px 2px; }
+  .seg-item h4 { grid-row: auto; }
 }
-.orbit-card, .orbit-card:hover { text-decoration: none; }
 /* 모바일 상단 네비: 브랜드와 링크가 두 줄로 깨지지 않게 */
 @media (max-width: 560px) { .nav { gap: 14px; } .nav-brand { white-space: nowrap; font-size: 16px; } .nav-links { gap: 12px; } .nav-links a { white-space: nowrap; font-size: 13px; } }
 @media (max-width: 380px) { .nav-links a:nth-child(2) { display: none; } }
