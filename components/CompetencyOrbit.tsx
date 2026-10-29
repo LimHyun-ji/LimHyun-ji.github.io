@@ -5,15 +5,27 @@ import Link from 'next/link';
 import KeepWords from '@/components/KeepWords';
 import { glue } from '@/lib/keepWords';
 
-// 역량별로 보기 — 위쪽 원(역량) 중 하나를 고르면 아래 큰 원 + 해당 시스템 카드가 회전하며 바뀌고,
-// 나머지 시스템은 "그 외"로 작게 표시. 모든 시스템이 항상 화면에 보인다.
+// 역량별로 보기 — 역량 원 4개가 바퀴처럼 배치되고, 원을 누르면 바퀴가 회전해 누른 원이 12시로 온다.
+// 가운데 원에는 선택된 역량, 아래에는 해당 시스템 카드(회전 등장) + 나머지 시스템("그 외").
 export interface OrbitSystem { slug: string; title: string; tags?: string[]; }
 export interface OrbitGroup { id: string; title: string; sub?: string; systems: { slug: string; basis: string }[]; }
 
+// 원 위치(각도, 12시 = 0, 시계 방향). 1번 위 · 2번 왼쪽 · 3번 오른쪽 · 4번 아래
+const ANGLES = [0, 270, 90, 180];
+
 export default function CompetencyOrbit({ groups, systems }: { groups: OrbitGroup[]; systems: OrbitSystem[] }) {
   const [sel, setSel] = useState(0);
+  const [rot, setRot] = useState(0); // 바퀴 누적 회전각 (가까운 방향으로 돌기 위해 누적)
   const g = groups[sel];
   if (!g) return null;
+
+  const select = (i: number) => {
+    const target = -ANGLES[i % ANGLES.length];
+    const delta = ((((target - rot) % 360) + 540) % 360) - 180; // -180 ~ 180
+    setRot(rot + delta);
+    setSel(i);
+  };
+
   const bySlug = new Map(systems.map((s) => [s.slug, s]));
   const picked = g.systems.filter((x) => bySlug.has(x.slug));
   const pickedSet = new Set(picked.map((x) => x.slug));
@@ -21,21 +33,23 @@ export default function CompetencyOrbit({ groups, systems }: { groups: OrbitGrou
 
   return (
     <div className="orbit">
-      <div className="orbit-row" role="tablist" aria-label="역량">
-        {groups.map((x, i) => (
-          <button key={x.id} role="tab" aria-selected={i === sel} className={`orbit-dot${i === sel ? ' on' : ''}`}
-            onClick={() => setSel(i)}>
-            <span>{glue(x.title)}</span>
-          </button>
-        ))}
+      <div className="wheel" style={{ ['--rot' as string]: `${rot}deg` }}>
+        <span className="wheel-marker" aria-hidden="true">▼</span>
+        <div className="wheel-ring" role="tablist" aria-label="역량">
+          {groups.slice(0, ANGLES.length).map((x, i) => (
+            <button key={x.id} role="tab" aria-selected={i === sel} className={`wheel-node${i === sel ? ' on' : ''}`}
+              style={{ ['--a' as string]: `${ANGLES[i]}deg` }} onClick={() => select(i)}>
+              <span>{glue(x.title)}</span>
+            </button>
+          ))}
+        </div>
+        <div className="wheel-core" key={g.id}>
+          <strong>{picked.length}</strong>
+          <span>개 시스템</span>
+        </div>
       </div>
 
-      {/* key가 바뀌면 다시 마운트되어 회전 애니메이션이 재생됨 */}
       <div className="orbit-stage" role="tabpanel" key={g.id}>
-        <div className="orbit-core">
-          <strong>{glue(g.title)}</strong>
-          <span>{picked.length}개 시스템</span>
-        </div>
         {g.sub && <p className="orbit-sub">{glue(g.sub)}</p>}
         <div className="orbit-cards">
           {picked.map((x, i) => {
