@@ -394,17 +394,17 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   position: relative; height: calc(var(--node) * 1.55 + var(--ty) * 2 + 20px); margin: 6px 0 0;
   perspective: 1100px; transition: --rot .8s cubic-bezier(.3,.8,.3,1); }
 .carousel-orbit { position: absolute; left: 50%; top: 50%; width: calc(var(--rx) * 2); height: calc(var(--ty) * 2);
-  transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--line); pointer-events: none; }
+  transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid color-mix(in srgb, var(--text) 18%, var(--bg)); pointer-events: none; }
 .carousel-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
 .carousel-node { --t: calc(var(--a) + var(--rot));
   position: absolute; left: 0; top: 0; width: var(--node); height: var(--node);
   margin: calc(var(--node) / -2) 0 0 calc(var(--node) / -2); border-radius: 50%; padding: 8px; cursor: pointer;
-  font: inherit; color: var(--muted); display: grid; place-items: center;
-  background: var(--bg); border: 1px solid color-mix(in srgb, var(--text) 16%, var(--bg));
+  font: inherit; color: color-mix(in srgb, var(--text) 78%, var(--bg)); display: grid; place-items: center;
+  background: var(--bg); border: 1px solid color-mix(in srgb, var(--text) 26%, var(--bg));
   transform: translate3d(calc(sin(var(--t)) * var(--rx)), calc(cos(var(--t)) * var(--ty)), calc(cos(var(--t)) * var(--rz)));
-  opacity: calc(.78 + .22 * (cos(var(--t)) + 1) / 2);
+  opacity: calc(.92 + .08 * (cos(var(--t)) + 1) / 2);
   transition: background .35s, border-color .35s, color .35s; }
-.carousel-node span { text-align: center; font-size: clamp(12px, 1.2vw, 14px); font-weight: 600; line-height: 1.3;
+.carousel-node span { text-align: center; font-size: clamp(12px, 1.2vw, 14px); font-weight: 650; line-height: 1.3;
   word-break: keep-all; letter-spacing: -.01em; }
 .carousel-node:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 40%, var(--bg)); }
 .carousel-node.on { color: var(--text); background: color-mix(in srgb, var(--text) 7%, var(--bg));
