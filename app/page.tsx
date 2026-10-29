@@ -1,68 +1,39 @@
 import Link from 'next/link';
-import { getProfile, getProjects, getIdentity, getCompetencies, type Project } from '@/lib/content';
+import { getProfile, getProjects, getIdentity, getCompetencies } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
-import CompetencyTabs from '@/components/CompetencyTabs';
+import CompetencyTabs, { type CompetencyTab } from '@/components/CompetencyTabs';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
 import { glue } from '@/lib/keepWords';
-
-// 메인 프로젝트 그룹 — 인게임 클라이언트 / 기술 기반(성능 · 툴 · 파이프라인). 그룹 안 순서는 slugs 순서를 따름.
-// 목록에 없는 slug는 마지막 그룹으로.
-// tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
-const PROJECT_GROUPS = [
-  { title: '인게임 클라이언트 — 시스템 · 연출', tone: 'a', slugs: ['visualdata', 'sol-content', 'mapdesign', 'rendering-cinema'] },
-  { title: '기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'visualdata-editor', 'metadata-pipeline', 'areatool'] },
-];
-
-function ProjectCard({ a, no }: { a: Project; no: number }) {
-  return (
-    <Link id={`proj-${a.slug}`} className="area-card" href={`/projects/${a.slug}/`}>
-      <span className="area-no">{String(no).padStart(2, '0')}</span>
-      <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
-      <p>{glue(a.summary ?? '')}</p>
-      {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
-    </Link>
-  );
-}
 
 export default function Home() {
   const p = getProfile();
   const id = getIdentity();
   const cp = getCompetencies();
   const areas = getProjects(); // Sol 내 세부 영역
-  const grouped = PROJECT_GROUPS.map((g) => ({
-    ...g,
-    items: g.slugs.map((s) => areas.find((a) => a.slug === s)).filter((a): a is Project => Boolean(a)),
+  // 역량 탭에 시스템(상세 페이지) 정보를 붙임. competencies.yml에 없는 시스템은 마지막 탭으로.
+  const listed = new Set(cp.groups.flatMap((g) => g.systems.map((x) => x.slug)));
+  const tabs: CompetencyTab[] = cp.groups.map((g) => ({
+    id: g.id, title: g.title, sub: g.sub,
+    systems: g.systems.flatMap((x) => {
+      const a = areas.find((y) => y.slug === x.slug);
+      return a ? [{ slug: a.slug, title: a.title, role: a.role, period: a.period, items: x.items }] : [];
+    }),
   }));
-  const known = new Set(PROJECT_GROUPS.flatMap((g) => g.slugs));
-  const rest = areas.filter((a) => !known.has(a.slug));
-  if (rest.length) grouped[grouped.length - 1].items.push(...rest);
-  let projectNo = 0;
-  // 역량 항목의 링크 표시용 — 카드 제목에서 ' — ' 앞부분만
-  const systemTitles = Object.fromEntries(areas.map((a) => [a.slug, a.title.split(' — ')[0]]));
+  const unlisted = areas.filter((a) => !listed.has(a.slug));
+  if (tabs.length && unlisted.length) {
+    tabs[tabs.length - 1].systems.push(...unlisted.map((a) => ({ slug: a.slug, title: a.title, role: a.role, period: a.period, items: [] })));
+  }
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
 
-  // 사이드 네비 항목 구성 — 라벨은 짧게
-  const shortLabel: Record<string, string> = {
-    visualdata: '외형/전투',
-    'sol-content': '컨텐츠',
-    mapdesign: '맵',
-    'rendering-cinema': '연출',
-    optimization: '최적화',
-    'visualdata-editor': '에디터',
-    'metadata-pipeline': '데이터',
-    areatool: 'AreaTool',
-  };
+  // 사이드 네비 항목 — 섹션 단위
   const navItems: NavItem[] = [
-    { id: 'competency', label: '역량' },
     { id: 'career', label: '이력' },
-    { id: 'sol', label: 'Projects' },
-    ...grouped.flatMap((g) =>
-      g.items.map((a) => ({ id: `proj-${a.slug}`, label: shortLabel[a.slug] ?? a.title, indent: true }))
-    ),
+    { id: 'sol', label: 'Sol' },
+    { id: 'competency', label: '역량별 시스템', indent: true },
     { id: 'side', label: 'Side' },
     { id: 'skills', label: 'Skills' },
   ];
@@ -76,8 +47,8 @@ export default function Home() {
       <nav className="nav">
         <a className="nav-brand" href="#top">임현지 Portfolio</a>
         <div className="nav-links">
-          <a href="#competency">역량</a>
           <a href="#sol">Sol</a>
+          <a href="#competency">역량</a>
           <a href="#side">Side Projects</a>
           <a href="#skills">Skills</a>
           {p.links?.github && <a href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
@@ -154,15 +125,6 @@ export default function Home() {
         </header>
       </div>
 
-      {/* COMPETENCY — 역량별 병목 → 해결 (탭 + 페이지). 시스템 설명은 아래 담당 시스템 카드에 */}
-      {cp.groups.length > 0 && (
-        <section className="competency" id="competency">
-          <div className="featured-tag">◈ Competency · 역량별 문제 해결</div>
-          {cp.intro && <p className="career-intro">{glue(cp.intro)}</p>}
-          <CompetencyTabs groups={cp.groups} systemTitles={systemTitles} />
-        </section>
-      )}
-
       {/* CAREER — 이력 한눈에 (진입 시 바로 보이는 요약) */}
       {p.experience && (
         <section className="career" id="career">
@@ -187,7 +149,6 @@ export default function Home() {
                     </div>
                   )}
                   <h3><KeepWords text={(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')} /></h3>
-                  <p>{(e.desc ?? '').split(/\\n/).map((line, i) => <span key={i}>{i > 0 && <br />}{glue(line.trim())}</span>)}</p>
                 </div>
               );
             })}
@@ -202,9 +163,7 @@ export default function Home() {
           <div className="featured-text">
             <h2 className="featured-title">Sol — UE5 MMORPG</h2>
             <p className="featured-sub">
-              {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일/PC MMORPG. VisualData 캐릭터 시스템 · 퍼포먼스/메모리 최적화 · '
-                + '인게임 컨텐츠&네트워크 · 인게임 연출&비동기 로딩 · 실시간 맵 설계 · 데이터 파이프라인 · 라이브 안정화까지')}{' '}
-              <strong>{glue('설계·담당.')}</strong>
+              {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일 / PC MMORPG. 2023년부터 클라이언트 시스템 · 툴 · 최적화를 담당하고 있습니다.')}
             </p>
           </div>
           <figure className="featured-banner">
@@ -214,15 +173,10 @@ export default function Home() {
         </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
-        <h3 className="systems-h">담당 시스템<span>{glue(' — 맡은 범위와 상세 설명')}</span></h3>
-        {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
-          <div className={`area-group tone-${g.tone}`} key={g.title}>
-            <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
-            <div className="area-grid">
-              {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
-            </div>
-          </div>
-        ))}
+        <div id="competency" className="cp-wrap">
+          <h3 className="systems-h">역량별 담당 시스템<span>{glue(' — 시스템마다 부딪힌 병목과 해결')}</span></h3>
+          <CompetencyTabs tabs={tabs} />
+        </div>
       </section>
 
       {/* SIDE PROJECTS (하단, 별도 밴드로 명확히 분리) */}

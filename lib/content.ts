@@ -34,11 +34,12 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
-export interface CompetencyItem { tag: string; link?: string; problem: string; fix: string; }
-export interface CompetencyGroup { id: string; title: string; sub?: string; items: CompetencyItem[]; }
-export interface Competencies { intro?: string; groups: CompetencyGroup[]; }
+export interface CompetencyItem { problem: string; fix: string; }
+export interface CompetencySystem { slug: string; items: CompetencyItem[]; }
+export interface CompetencyGroup { id: string; title: string; sub?: string; systems: CompetencySystem[]; }
+export interface Competencies { groups: CompetencyGroup[]; }
 
-// 역량별 병목 → 해결 (content/competencies.yml)
+// 역량 탭 — 담당 시스템을 역량별로 묶고 시스템마다 병목 → 해결 (content/competencies.yml)
 export function getCompetencies(): Competencies {
   const file = path.join(CONTENT, 'competencies.yml');
   if (!fs.existsSync(file)) return { groups: [] };

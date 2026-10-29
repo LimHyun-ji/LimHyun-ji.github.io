@@ -1,148 +1,88 @@
 # ─────────────────────────────────────────────────────────────
-# 역량별 병목 → 해결 (메인 "역량" 섹션에 탭 + 페이지로 표시)
-# 카드(담당 시스템)는 "무엇을 담당했나", 이 파일은 "어떤 병목을 어떻게 풀었나"만 다룬다.
-# 같은 내용이 카드 summary와 겹치지 않게 작성할 것.
-# link: 관련 시스템 상세 페이지 slug (없으면 링크 없음)
+# 역량 탭 = 메인 페이지의 유일한 작업 목록 (담당 시스템 카드를 역량별로 묶음)
+# - 시스템은 주 역량 하나에만 둔다. 다른 역량의 병목도 같은 카드 안에 넣는다.
+# - 카드에는 시스템 설명 대신 "병목 → 해결"만 2~4줄. 시스템 설명은 상세 페이지에.
+# - systems의 key는 content/projects/*.md의 slug
 # ─────────────────────────────────────────────────────────────
-
-intro: "부딪힌 병목을 역량별로 묶었습니다. 각 항목은 병목 → 해결 순서이고, 시스템 전체 설명은 아래 담당 시스템에 있습니다."
 
 groups:
   - id: arch
     title: "구조 설계"
     sub: "데이터 소유권 · 수명 · 확장점을 정리해 같은 문제가 반복되지 않게"
-    items:
-      - tag: "외형 Module"
-        link: visualdata
-        problem: "여러 객체가 VisualData를 각자 소유해 데이터 생명주기가 흩어져 있음"
-        fix: "컴포넌트에는 필요한 데이터만 할당(필요 시 WeakPtr)하고 생명주기는 모듈 한 곳에서 관리, 모듈 생성은 CreateModule Factory로 통일"
-      - tag: "전투 Action"
-        link: visualdata
-        problem: "에디터에서 재생한 ActionNotify가 인게임과 다르게 동작"
-        fix: "Simulator 객체를 Has-A로 두어 에디터 재생을 인게임과 동일화, VD 툴과 전투 모듈을 일원화해 서버 유무와 관계없이 같은 동작"
-      - tag: "전투 동기화"
-        link: visualdata
-        problem: "서버 ActionEvt 수신 시점에 맞춰 연출하면 클라이언트 몽타주 타이밍과 어긋남"
-        fix: "처리 시점을 ActionNotify Begin으로 옮기고, 서버와 Export한 ActionData를 공유해 같은 데이터로 시점 계산(200ms 지연 렌더링 위에서 정합)"
-      - tag: "채팅"
-        link: sol-content
-        problem: "채널 종류마다 통신 로직이 중복"
-        fix: "ChannelSystem에서 통합 관리하고 채널 타입별 클래스로 분리, 채널 Key → 채널 인스턴스 매핑"
-      - tag: "월드맵 · 던전맵"
-        link: mapdesign
-        problem: "레이아웃은 같고 데이터 종류만 다른 맵 화면이 늘어남"
-        fix: "Model-View 분리 + Strategy 패턴으로 데이터 출처만 교체"
-      - tag: "인벤토리"
-        problem: "아이템 사용 방식이 늘어날 때마다 분기 추가"
-        fix: "IInventoryItemUseInterface로 사용 동작(Use-Behavior)을 분리해 새 방식은 클래스 추가로 확장"
+    systems:
+      - slug: visualdata
+        items:
+          - problem: "여러 객체가 VisualData를 각자 소유해 데이터 생명주기가 흩어져 있음"
+            fix: "컴포넌트에는 필요한 데이터만 할당(필요 시 WeakPtr)하고 생명주기는 모듈 한 곳에서 관리, CreateModule Factory로 생성 통일"
+          - problem: "Attachment를 UObject로 만들어 UObject 최대 개수 초과(Exceed) 크래시"
+            fix: "UObject 대신 TSharedPtr 기반 경량 객체로 전환"
+          - problem: "에디터에서 재생한 ActionNotify가 인게임과 다르게 동작"
+            fix: "Simulator 객체를 Has-A로 두어 에디터 재생을 인게임과 동일화, 전투 모듈을 툴과 일원화"
+          - problem: "피격 지연을 진행 방향 투영 · 등속으로 계산해 실제 이펙트 이동과 어긋남"
+            fix: "지연 계산과 이펙트 이동이 같은 속성(속도 커브)을 참조하도록 변경"
+      - slug: sol-content
+        items:
+          - problem: "채널 종류마다 채팅 통신 로직이 중복"
+            fix: "ChannelSystem에서 통합 관리하고 채널 타입별 클래스로 분리, 채널 Key → 인스턴스 매핑"
+          - problem: "아이템 컬렉션의 대량 데이터 조회 · 갱신 병목"
+            fix: "LookUp 캐시로 조회 O(1), 페이징을 ListView 가상화로 전환, Reserve · MoveTemp로 재할당 · 복사 제거"
+          - problem: "프레임 드랍 시 경험치 파티클이 목표를 지나쳐 계속 도는 Death Spiral"
+            fix: "이번 프레임 이동 선분과 목표점의 거리로 도달을 판정해 목표 위치로 스냅"
 
   - id: perf
-    title: "성능 · 메모리"
+    title: "성능 · 렌더링"
     sub: "프로파일링으로 병목을 찾아 CPU · GPU · 메모리 비용을 줄임"
-    items:
-      - tag: "외형 Attachment"
-        link: visualdata
-        problem: "Attachment를 UObject로 만들어 UObject 최대 개수 초과(Exceed) 크래시"
-        fix: "UObject 대신 TSharedPtr 기반 경량 객체로 전환"
-      - tag: "Slate UI"
-        link: optimization
-        problem: "Global Invalidation 적용 후 타이밍 문제로 일부 위젯이 갱신되지 않음"
-        fix: "필요한 시점에 Invalidate를 호출하고, 계속 바뀌는 위젯은 Volatile로 캐시에서 제외"
-      - tag: "Slate UI"
-        link: optimization
-        problem: "갱신 빈도가 낮은 UI도 매 프레임 그리는 비용 발생"
-        fix: "RetainerBox로 결과를 캐시해 CPU 비용을 GPU 메모리 비용과 교환"
-      - tag: "풀스크린 UI"
-        link: optimization
-        problem: "풀스크린 UI에 가려진 3D 월드도 계속 렌더링"
-        fix: "풀스크린 진입 시 게임 렌더링을 중지해 GPU 비용 감소"
-      - tag: "외형 LOD"
-        link: optimization
-        problem: "파츠를 조합한 캐릭터는 메시별 LOD만으로 드로콜 절감이 부족"
-        fix: "LOD 단계에 따라 파츠를 통합 메시로 전환"
-      - tag: "아이템 컬렉션"
-        link: sol-content
-        problem: "대량 데이터 조회 · 갱신 병목"
-        fix: "LookUp 캐시로 조회 비용을 O(1)로, 페이징을 ListView 가상화로 바꾸고 Reserve · MoveTemp로 재할당 · 복사 제거"
-      - tag: "별자리 연출"
-        link: rendering-cinema
-        problem: "PocketLevel 진입 시 연출 액터 생성으로 히칭 발생"
-        fix: "비동기 로드 + Key-Value 액터 풀로 재사용, 자주 도는 로직은 연출이 안정된 뒤 BP → C++ 이관"
-      - tag: "외형 로딩"
-        link: visualdata
-        problem: "외형 에셋 로딩이 게임 스레드를 막는 병목"
-        fix: "FStreamableHandle 비동기 로딩과 사전 로딩으로 전환"
-
-  - id: math
-    title: "렌더링 · 게임 수학"
-    sub: "벡터 · 좌표계 · 텍스처 포맷 수준에서 문제를 해결"
-    items:
-      - tag: "미니맵"
-        link: mapdesign
-        problem: "퀘스트 아이콘이 많아지고 스케일이 바뀔 때마다 위젯 비용 증가"
-        fix: "퀘스트 데이터를 Material Parameter로 넘겨(Custom Material Node) GPU에서 영역 표시"
-      - tag: "미니맵 · 모바일"
-        link: mapdesign
-        problem: "퀘스트 데이터 텍스처 포맷을 지원하지 않는 모바일 기기 존재"
-        fix: "HasCapabilities로 PF_R32_FLOAT 지원 여부를 확인하고 PF_R16F(FFloat16)로 축소, MapOrigin을 -0.5 ~ 0.5로 정규화해 정밀도 유지"
-      - tag: "월드맵"
-        link: mapdesign
-        problem: "월드 좌표와 맵 이미지 해상도가 맞지 않고, 고해상도 이미지는 메모리 부담"
-        fix: "축척 파이프라인으로 월드 ↔ 맵 해상도를 계산하고 고해상도는 타일링으로 대응"
-      - tag: "피격 연출"
-        link: visualdata
-        problem: "피격 지연을 진행 방향 투영 · 등속 duration으로 계산해 실제 이펙트 이동과 어긋남"
-        fix: "지연 계산과 이펙트 이동이 같은 속성(속도 커브)을 참조하도록 변경"
-      - tag: "경험치 획득 연출"
-        link: sol-content
-        problem: "프레임 드랍 시 파티클이 목표를 지나쳐 주위를 계속 도는 Death Spiral"
-        fix: "이번 프레임 이동 선분과 목표점의 거리로 도달을 판정해 목표 위치로 스냅"
-      - tag: "AreaTool"
-        link: areatool
-        problem: "에디터에서 클릭한 위치가 어느 선분 위인지 판별 필요"
-        fix: "외적으로 평행 여부, 내적으로 같은 평면 여부를 확인한 뒤 매개변수로 선분 범위 안 교차 판정"
+    systems:
+      - slug: optimization
+        items:
+          - problem: "Global Invalidation 적용 후 타이밍 문제로 일부 위젯이 갱신되지 않음"
+            fix: "필요한 시점에 Invalidate를 호출하고 계속 바뀌는 위젯은 Volatile로 캐시에서 제외"
+          - problem: "갱신이 드문 UI도 매 프레임 그리는 비용"
+            fix: "RetainerBox로 결과를 캐시해 CPU 비용을 GPU 메모리 비용과 교환"
+          - problem: "풀스크린 UI에 가려진 3D 월드도 계속 렌더링"
+            fix: "풀스크린 진입 시 게임 렌더링을 중지해 GPU 비용 감소"
+          - problem: "파츠를 조합한 캐릭터는 메시별 LOD만으로 드로콜 절감이 부족"
+            fix: "LOD 단계에 따라 파츠를 통합 메시로 전환"
+      - slug: mapdesign
+        items:
+          - problem: "퀘스트 아이콘이 많아지고 스케일이 바뀔 때마다 위젯 비용 증가"
+            fix: "퀘스트 데이터를 Material Parameter로 넘겨(Custom Material Node) GPU에서 영역 표시"
+          - problem: "퀘스트 데이터 텍스처 포맷을 지원하지 않는 모바일 기기 존재"
+            fix: "HasCapabilities로 PF_R32_FLOAT 지원을 확인하고 PF_R16F(FFloat16)로 축소, MapOrigin을 -0.5 ~ 0.5로 정규화해 정밀도 유지"
+          - problem: "월드 좌표와 맵 이미지 해상도가 맞지 않고, 고해상도 이미지는 메모리 부담"
+            fix: "축척 파이프라인으로 월드 ↔ 맵 해상도를 계산하고 고해상도는 타일링으로 대응"
+          - problem: "상위 위젯 Visibility 문제로 일부 위젯이 클릭을 소비해 하위로 전달되지 않음"
+            fix: "InputProcessor로 입력을 한곳에서 받아 모바일 · PC 입력 처리를 단일화"
+      - slug: rendering-cinema
+        items:
+          - problem: "PocketLevel 진입 시 연출 액터 생성으로 히칭 발생"
+            fix: "비동기 로드 + Key-Value 액터 풀로 재사용, 자주 도는 로직은 연출이 안정된 뒤 BP → C++ 이관"
+          - problem: "서버 응답이 오지 않으면 연출이 간헐적으로 멈춤(Hang)"
+            fix: "TimeOut을 두어 임계 시간이 지나면 정상 상태로 복구"
 
   - id: tool
     title: "툴 · 파이프라인"
     sub: "사람의 실수를 툴과 자동화 단계에서 막음"
-    items:
-      - tag: "AreaTool"
-        link: areatool
-        problem: "잘못된 레벨 데이터가 사용자 Export 이후에야 발견"
-        fix: "체인 검증자로 검증 시점을 Export 이전으로 앞당김"
-      - tag: "AreaTool"
-        link: areatool
-        problem: "사용자가 직접 Export하면서 일부 데이터가 누락"
-        fix: "CI/CD 빌드 자동화로 Export를 빌드 단계에서 실행"
-      - tag: "AreaTool"
-        link: areatool
-        problem: "넓은 맵에서 특정 값을 가진 배치 액터를 찾기 어려움"
-        fix: "리플렉션 기반 Outliner를 구현해 템플릿 재귀 탐색으로 변수 값 검색 지원"
-      - tag: "AreaTool"
-        link: areatool
-        problem: "에디터에서 메시를 많이 배치하면 히칭 발생"
-        fix: "Custom SceneProxy를 정의해 거리 기반 컬링"
-      - tag: "VisualData 툴"
-        link: visualdata-editor
-        problem: "구조 변경 후 기존 에셋을 새 타입으로 옮겨야 함"
-        fix: "Asset Migration 툴로 대규모 에셋을 일괄 변환"
-
-  - id: debug
-    title: "안정성 · 디버깅"
-    sub: "재현이 어려운 라이브 문제의 원인을 좁혀 구조적으로 수정"
-    items:
-      - tag: "월드맵 입력"
-        link: mapdesign
-        problem: "상위 위젯 Visibility 문제로 일부 위젯이 클릭 입력을 소비해 하위로 전달되지 않음"
-        fix: "InputProcessor로 입력을 한곳에서 받아 모바일 · PC 입력 처리를 단일화"
-      - tag: "CommonButton"
-        problem: "UI 애니메이션 재생 중 팝업이 닫히거나 Collapse되면 그 상태로 Tick이 멈춤"
-        fix: "Watch로 애니메이션 정지 여부를 감시해 멈춘 상태를 감지"
-      - tag: "연출 · 서버 응답"
-        link: rendering-cinema
-        problem: "서버 응답이 오지 않으면 연출이 간헐적으로 멈춤(Hang)"
-        fix: "TimeOut을 두어 임계 시간이 지나면 정상 상태로 복구"
-      - tag: "AreaTool 뷰"
-        link: areatool
-        problem: "TopView(직교 뷰)에서 메시가 사라짐"
-        fix: "원인은 직교 뷰의 ViewOrigin으로 거리를 계산한 것 → Perspective일 때의 ViewDistance를 참조하도록 변경"
+    systems:
+      - slug: areatool
+        items:
+          - problem: "잘못된 레벨 데이터가 Export 뒤에야 발견되고, 사용자 Export 과정에서 일부 누락"
+            fix: "체인 검증자로 검증 시점을 Export 이전으로 앞당기고, CI/CD 빌드 자동화로 Export를 빌드 단계에서 실행"
+          - problem: "에디터에서 메시를 많이 배치하면 히칭 발생"
+            fix: "Custom SceneProxy를 정의해 거리 기반 컬링"
+          - problem: "TopView(직교 뷰)에서 메시가 사라짐"
+            fix: "직교 뷰의 ViewOrigin으로 거리를 계산한 것이 원인 → Perspective의 ViewDistance를 참조하도록 변경"
+          - problem: "에디터에서 클릭한 위치가 어느 선분 위인지 판별 필요"
+            fix: "외적으로 평행 여부, 내적으로 같은 평면 여부를 확인한 뒤 매개변수로 선분 범위 안 교차 판정"
+      - slug: visualdata-editor
+        items:
+          - problem: "구조 변경 후 기존 에셋을 새 타입으로 옮겨야 함"
+            fix: "Asset Migration 툴로 대규모 에셋을 일괄 변환"
+          - problem: "서버 없이는 FX · 몽타주를 인게임과 같은 조건으로 확인할 수 없음"
+            fix: "Visual PlayMode로 서버 없이 인게임과 같은 동작을 Preview"
+      - slug: metadata-pipeline
+        items:
+          - problem: "잘못된 값 · 단위 착오가 변환을 거쳐 런타임까지 반영"
+            fix: "테이블별 Custom Validation Script와 Unit 단위계로 변환 단계에서 검사"
+          - problem: "반복 일정 데이터를 사람이 풀어서 입력"
+            fix: "UTC · KR 기준 Cron식 입력을 파이프라인이 변환"
