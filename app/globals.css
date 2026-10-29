@@ -387,7 +387,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .seg-wrap { margin-top: 38px; scroll-margin-top: 80px; }
 .systems-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
 .systems-h span { font-size: 14px; font-weight: 600; color: var(--muted); }
-/* 역량 회전목마 — 타원 궤도(x = sin·rx, y = cos·ty, z = cos·rz). 무채색: 선택 = 잉크색 면, 나머지 = 얇은 선 */
+/* 역량 회전목마 — 타원 궤도(x = sin·rx, y = cos·ty, z = cos·rz). 무채색: 선택 = 옅은 면 + 진한 선, 나머지 = 얇은 선 */
 @property --rot { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
 .carousel { --rx: clamp(118px, 21vw, 260px); --rz: clamp(80px, 8vw, 120px); --ty: clamp(46px, 4.4vw, 58px);
   --node: clamp(84px, 8.6vw, 116px);
@@ -407,7 +407,8 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .carousel-node span { text-align: center; font-size: clamp(12px, 1.2vw, 14px); font-weight: 600; line-height: 1.3;
   word-break: keep-all; letter-spacing: -.01em; }
 .carousel-node:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 40%, var(--bg)); }
-.carousel-node.on { color: var(--bg); background: var(--text); border-color: var(--text); }
+.carousel-node.on { color: var(--text); background: color-mix(in srgb, var(--text) 7%, var(--bg));
+  border: 1.5px solid color-mix(in srgb, var(--text) 55%, var(--bg)); }
 .carousel-node.on span { font-weight: 700; }
 .carousel-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .seg-panel { animation: seg-in .35s ease-out; }
