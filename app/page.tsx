@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getProfile, getProjects, getIdentity, getCompetencies } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
-import CompetencySegments from '@/components/CompetencySegments';
+import CompetencyCarousel from '@/components/CompetencyCarousel';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
@@ -163,8 +163,8 @@ export default function Home() {
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
         <div id="competency" className="seg-wrap">
-          <h3 className="systems-h">역량별로 보기<span>{glue(' — 역량을 고르면 관련 시스템과 근거가 보입니다')}</span></h3>
-          <CompetencySegments groups={competencies}
+          <h3 className="systems-h">역량별로 보기<span>{glue(' — 원을 누르면 해당 역량이 앞으로 돌아옵니다')}</span></h3>
+          <CompetencyCarousel groups={competencies}
             systems={areas.map((a) => ({ slug: a.slug, title: a.title, tags: a.tags }))} />
         </div>
       </section>
