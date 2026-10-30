@@ -34,10 +34,10 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
-export interface CompetencySystem { slug: string; basis: string; }
-export interface CompetencyGroup { id: string; title: string; sub?: string; systems: CompetencySystem[]; }
+export interface CompetencyCase { title: string; slug?: string; situation: string; decision: string; result: string; }
+export interface CompetencyGroup { id: string; title: string; headline?: string; cases: CompetencyCase[]; }
 
-// 메인 "역량별로 보기" (content/competencies.yml)
+// 메인 "어떻게 일하나" — 행동 패턴별 사례 (content/competencies.yml)
 export function getCompetencies(): CompetencyGroup[] {
   const file = path.join(CONTENT, 'competencies.yml');
   if (!fs.existsSync(file)) return [];

@@ -1,57 +1,87 @@
 # ─────────────────────────────────────────────────────────────
-# 메인 "역량별로 보기" — 원(역량) 4개 중 하나를 누르면 아래에 해당 역량의 시스템 카드가 크게,
-# 나머지 시스템은 "그 외"로 작게 표시된다. 한 시스템이 여러 역량에 들어갈 수 있다(한 번에 하나만 보이므로 중복 아님).
-# basis: 그 역량에서 이 시스템을 고른 근거 한 줄 (카드에 표시)
-# slug: content/projects/*.md
+# 메인 "어떻게 일하나" — 시스템이 달라도 반복해서 나타나는 일하는 방식(행동 패턴).
+# 원(패턴) 하나를 고르면 그 패턴이 드러난 사례 2~3개를 상황 → 판단 → 결과로 보여 준다.
+# 시스템 설명(무엇을 만들었나)은 아래 "담당 시스템"에 있으므로 여기서는 판단만 쓴다.
+# slug: 사례가 속한 시스템 상세 페이지 (content/projects/*.md)
 # ─────────────────────────────────────────────────────────────
 
 groups:
-  - id: arch
-    title: "구조 설계"
-    sub: "데이터 소유권 · 수명 · 확장점을 정리해 같은 문제가 반복되지 않게"
-    systems:
-      - slug: visualdata
-        basis: "여러 객체가 나눠 갖던 VisualData를 컴포넌트별 할당 · 모듈 단일 생명주기로 정리, CreateModule Factory"
-      - slug: combat
-        basis: "Simulator(Has-A)로 에디터 재생을 인게임과 동일화, Notify_Game / Notify_Editor 분리"
-      - slug: visualdata-editor
-        basis: "에디터와 전투 모듈을 일원화해 서버 유무와 관계없이 같은 동작"
-      - slug: sol-content
-        basis: "채널마다 중복되던 채팅 로직을 ChannelSystem으로 통합, 채널 Key → 인스턴스 매핑"
+  - id: root-cause
+    title: "원인을 고친다"
+    headline: "증상을 덮지 않고, 왜 생겼는지까지 내려가 고칩니다"
+    cases:
+      - title: "Global Invalidation 적용 후 위젯 미갱신"
+        slug: optimization
+        situation: "Slate Global Invalidation을 켠 뒤 일부 UI가 간헐적으로 갱신되지 않음"
+        decision: "다음 틱으로 미루는 식의 타이밍 우회는 재발해서 되돌리고, 갱신이 필요한 시점에 Invalidate를 호출하도록 원인 쪽을 수정"
+        result: "계속 바뀌는 위젯만 Volatile로 분리하고 나머지는 캐시 효과 유지"
+      - title: "TopView에서 메시가 사라짐"
+        slug: areatool
+        situation: "레벨 툴에서 직교(TopView) 뷰로 바꾸면 배치한 메시가 보이지 않음"
+        decision: "컬링 거리를 직교 뷰의 ViewOrigin 기준으로 계산하고 있던 것이 원인임을 확인"
+        result: "Perspective일 때의 ViewDistance를 참조하도록 바꿔 뷰 종류와 관계없이 표시"
+      - title: "피격 연출과 이펙트의 시점 불일치"
+        slug: combat
+        situation: "피격 연출이 날아가는 이펙트보다 먼저 또는 늦게 표시됨"
+        decision: "지연은 진행 방향 투영 · 등속으로, 이펙트는 속도 커브로 각각 다른 값을 참조하는 게 원인"
+        result: "둘이 같은 속성(속도 커브)을 참조하게 해 이펙트가 닿는 순간 피격 표시"
 
-  - id: perf
-    title: "성능 · 메모리"
-    sub: "프로파일링으로 병목을 찾아 CPU · GPU · 메모리 비용을 줄임"
-    systems:
-      - slug: optimization
-        basis: "Global Invalidation 미갱신은 Invalidate · Volatile로, 드문 갱신 UI는 RetainerBox로 CPU ↔ GPU 비용 교환"
-      - slug: visualdata
-        basis: "Attachment UObject 개수 초과 → TSharedPtr 경량 객체, LOD 단계에 따라 파츠 통합"
-      - slug: sol-content
-        basis: "아이템 컬렉션 LookUp 캐시 O(1) · ListView 가상화 · Reserve / MoveTemp"
-      - slug: rendering-cinema
-        basis: "PocketLevel 진입 히칭 → 비동기 로드 + Key-Value 액터 풀"
+  - id: prevent
+    title: "재발을 막는다"
+    headline: "사람이 조심하는 대신, 같은 문제가 다시 생길 수 없는 구조를 만듭니다"
+    cases:
+      - title: "잘못된 레벨 데이터 · Export 누락"
+        slug: areatool
+        situation: "잘못된 레벨 데이터가 Export 후 런타임에서야 발견되고, 사용자가 직접 Export하며 일부 누락"
+        decision: "확인 시점을 앞당겨 Export 전에 검증자 체인을 통과하도록 하고, Export 자체를 사람 손에서 뺌"
+        result: "CI/CD 빌드 단계에서 검증과 Export를 실행해 누락 · 오류 유입 차단"
+      - title: "흩어진 VisualData 소유"
+        slug: visualdata
+        situation: "여러 객체가 VisualData를 각자 들고 있어 데이터 생명주기가 흩어짐"
+        decision: "컴포넌트에는 필요한 데이터만 할당(필요 시 WeakPtr)하고, 생명주기는 모듈 한 곳에서만 관리"
+        result: "모듈 생성을 CreateModule Factory로 통일해 새 Entity 타입도 같은 규칙으로 추가"
+      - title: "잘못된 기획 데이터의 런타임 유입"
+        slug: metadata-pipeline
+        situation: "잘못된 값 · 단위 착오가 Excel → JSON 변환을 거쳐 런타임까지 반영"
+        decision: "테이블별 Custom Validation Script와 Unit 단위계를 변환 단계에 넣음"
+        result: "규칙에 맞지 않는 데이터는 변환 시점에서 차단"
 
-  - id: math
-    title: "렌더링 · 게임 수학"
-    sub: "벡터 · 좌표계 · 텍스처 포맷 수준에서 문제를 해결"
-    systems:
-      - slug: mapdesign
-        basis: "퀘스트 데이터를 Material Parameter로 GPU 표시, 모바일은 PF_R16F + 좌표 정규화"
-      - slug: combat
-        basis: "피격 지연을 등속 투영에서 이펙트와 같은 속도 커브 기준으로"
-      - slug: areatool
-        basis: "외적 · 내적으로 클릭 위치가 놓인 선분 판정, SceneProxy 와이어 · 폴리곤 삼각화"
-      - slug: sol-content
-        basis: "프레임 드랍 시 Death Spiral → 이동 선분과 목표점 거리로 도달 판정"
+  - id: tradeoff
+    title: "비용을 고른다"
+    headline: "CPU · GPU · 메모리 · 정밀도 중 무엇을 내줄지 알고 고릅니다"
+    cases:
+      - title: "갱신이 드문 UI의 그리기 비용"
+        slug: optimization
+        situation: "거의 바뀌지 않는 UI도 매 프레임 다시 그려 CPU 비용 발생"
+        decision: "RetainerBox로 결과를 캐시해 CPU 비용을 GPU 메모리 비용과 맞바꿈"
+        result: "갱신 빈도가 낮은 UI에만 적용해 이득이 큰 곳에서만 교환"
+      - title: "미니맵 퀘스트 표시 · 모바일 포맷"
+        slug: mapdesign
+        situation: "퀘스트 아이콘 위젯 비용이 크고, 데이터 텍스처 포맷을 지원하지 않는 모바일 기기 존재"
+        decision: "퀘스트 데이터를 Material Parameter로 넘겨 GPU에서 그리고, PF_R32_FLOAT 미지원 기기는 PF_R16F로 정밀도를 낮춤"
+        result: "MapOrigin을 -0.5 ~ 0.5로 정규화해 낮춘 정밀도에서도 위치 오차 보완"
+      - title: "Attachment의 UObject 개수 초과"
+        slug: visualdata
+        situation: "Attachment를 UObject로 만들어 Entity가 많은 장면에서 UObject 최대 개수 초과 크래시"
+        decision: "리플렉션 · GC 관리 대신 TSharedPtr 기반 경량 객체를 택함"
+        result: "Attachment가 UObject 개수와 GC 추적 대상에서 빠짐"
 
-  - id: tool
-    title: "툴 · 파이프라인"
-    sub: "사람의 실수를 툴과 자동화 단계에서 막음"
-    systems:
-      - slug: areatool
-        basis: "체인 검증자로 검증을 Export 앞으로, CI/CD로 Export 누락 제거"
-      - slug: visualdata-editor
-        basis: "Asset Migration으로 대규모 에셋 일괄 변환, Visual PlayMode로 서버 없이 Preview"
-      - slug: metadata-pipeline
-        basis: "테이블별 Custom Validation Script · Unit 단위계로 변환 단계에서 오류 차단"
+  - id: ownership
+    title: "끝까지 간다"
+    headline: "내 변경이 만든 문제까지 추적해 마무리합니다"
+    cases:
+      - title: "VisualData 대규모 구조 변경"
+        slug: visualdata-editor
+        situation: "하나의 슈퍼클래스에 모여 있던 타입별 데이터를 분리하면서 기존 에셋을 모두 옮겨야 함"
+        decision: "병합 과정의 크래시로 두 번 롤백한 뒤 원인을 고쳐 재서밋, Asset Migration 툴로 일괄 변환"
+        result: "기존 에셋 3,343개를 손실 없이 새 타입으로 이전"
+      - title: "ListView 전환 뒤 생긴 연출 중복"
+        slug: sol-content
+        situation: "아이템 컬렉션을 ListView 가상화로 바꾼 뒤 완료 연출이 겹쳐 재생"
+        decision: "재활용되는 위젯이 이전 데이터의 이벤트 구독을 유지하던 것을 찾아냄"
+        result: "재활용 시점에 구독을 해제하고, 완료 연출은 한 번만 실행되도록 멱등 처리"
+      - title: "풀링 도입 뒤 생긴 컴포넌트 누수"
+        slug: sol-content
+        situation: "획득 연출에 풀링을 적용한 뒤 Niagara 컴포넌트가 계속 늘어남"
+        decision: "순회 중 삭제한 항목이 지연 콜백 시점에 풀로 돌아가지 못하는 생명주기 불일치를 추적"
+        result: "반환 대상을 따로 모아 지연 반환하고, EndPlay에서 컴포넌트를 파괴"

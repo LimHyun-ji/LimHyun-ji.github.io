@@ -1,26 +1,55 @@
 import Link from 'next/link';
-import { getProfile, getProjects, getIdentity, getCompetencies } from '@/lib/content';
+import { getProfile, getProjects, getIdentity, getCompetencies, type Project } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
-import CompetencyCarousel from '@/components/CompetencyCarousel';
+import WorkStyleCarousel from '@/components/WorkStyleCarousel';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
 import { glue } from '@/lib/keepWords';
+
+// 담당 시스템 그룹 — 직무 대조용(클라이언트 / 엔진 툴). 그룹 안 순서는 slugs 순서를 따름. 목록에 없는 slug는 마지막 그룹으로.
+// tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
+const PROJECT_GROUPS = [
+  { title: '인게임 클라이언트 — 시스템 · 전투 · 연출', tone: 'a', slugs: ['visualdata', 'combat', 'sol-content', 'mapdesign', 'rendering-cinema'] },
+  { title: '엔진 툴 · 기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'areatool', 'visualdata-editor', 'metadata-pipeline'] },
+];
+
+function ProjectCard({ a, no }: { a: Project; no: number }) {
+  return (
+    <Link id={`proj-${a.slug}`} className="area-card" href={`/projects/${a.slug}/`}>
+      <span className="area-no">{String(no).padStart(2, '0')}</span>
+      <h3><KeepWords text={a.title} /><span className="arrow">{'\u00a0'}→</span></h3>
+      <p>{glue(a.summary ?? '')}</p>
+      {a.tags && <ul className="chips small">{a.tags.slice(0, 4).map((t) => <li key={t}>{t}</li>)}</ul>}
+    </Link>
+  );
+}
 
 export default function Home() {
   const p = getProfile();
   const id = getIdentity();
   const areas = getProjects(); // Sol 내 세부 영역
   const competencies = getCompetencies();
+  const grouped = PROJECT_GROUPS.map((g) => ({
+    ...g,
+    items: g.slugs.map((x) => areas.find((a) => a.slug === x)).filter((a): a is Project => Boolean(a)),
+  }));
+  const known = new Set(PROJECT_GROUPS.flatMap((g) => g.slugs));
+  const rest = areas.filter((a) => !known.has(a.slug));
+  if (rest.length) grouped[grouped.length - 1].items.push(...rest);
+  let projectNo = 0;
+  // 사례 링크 표시용 시스템 이름 — 카드 제목에서 ' — ' 앞부분만
+  const systemTitles = Object.fromEntries(areas.map((a) => [a.slug, a.title.split(' — ')[0]]));
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
 
   // 사이드 네비 항목 — 섹션 단위
   const navItems: NavItem[] = [
     { id: 'career', label: '이력' },
+    { id: 'how', label: '일하는 방식' },
     { id: 'sol', label: 'Sol' },
-    { id: 'competency', label: '역량별 시스템', indent: true },
+    { id: 'systems', label: '담당 시스템', indent: true },
     { id: 'side', label: 'Side' },
     { id: 'skills', label: 'Skills' },
   ];
@@ -143,6 +172,15 @@ export default function Home() {
         </section>
       )}
 
+      {/* HOW — 어떻게 일하나: 행동 패턴 회전목마 + 사례(상황 → 판단 → 결과). 시스템 설명은 아래 담당 시스템에 */}
+      {competencies.length > 0 && (
+        <section className="how" id="how">
+          <div className="featured-tag">◈ How I Work · 어떻게 일하나</div>
+          <h2 className="how-h">{glue('시스템이 달라도 반복되는 일하는 방식')}</h2>
+          <WorkStyleCarousel groups={competencies} systemTitles={systemTitles} />
+        </section>
+      )}
+
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
         <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
@@ -162,10 +200,16 @@ export default function Home() {
         </div>
         <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
           alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
-        <div id="competency" className="seg-wrap">
-          <h3 className="systems-h">역량별로 보기<span>{glue(' — 원을 누르면 해당 역량이 앞으로 돌아옵니다')}</span></h3>
-          <CompetencyCarousel groups={competencies}
-            systems={areas.map((a) => ({ slug: a.slug, title: a.title, tags: a.tags }))} />
+        <div id="systems" className="systems">
+          <h3 className="systems-h">담당 시스템<span>{glue(' — 무엇을 맡았나')}</span></h3>
+          {grouped.filter((g) => g.items.length > 0).map((g, gi) => (
+            <div className={`area-group tone-${g.tone}`} key={g.title}>
+              <h3 className="area-group-title"><span className="area-group-no">{String(gi + 1).padStart(2, '0')}</span><KeepWords text={g.title} /></h3>
+              <div className="area-grid">
+                {g.items.map((a) => <ProjectCard a={a} no={++projectNo} key={a.slug} />)}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

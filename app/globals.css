@@ -380,14 +380,13 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 /* 데스크톱 사이드 네비(왼쪽 고정, 폭 ~160px)가 본문을 덮지 않도록 왼쪽 여백 확보 */
 @media (min-width: 1025px) {
   .lead { padding-left: max(clamp(20px, 5vw, 40px), calc(176px - max(0px, (100vw - 1200px) / 2))); }
-  .career, .featured, .side-inner { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); }
+  .career, .how, .featured, .side-inner { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); }
 }
 
-/* 역량별로 보기 — 회전목마 + 시스템 목록 (components/CompetencyCarousel). 무채색 + 얇은 선, 포인트 색은 최소한으로 */
-.seg-wrap { margin-top: 38px; scroll-margin-top: 80px; }
-.systems-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
-.systems-h span { font-size: 14px; font-weight: 600; color: var(--muted); }
-/* 역량 회전목마 — 타원 궤도(x = sin·rx, y = cos·ty, z = cos·rz). 무채색: 선택 = 옅은 면 + 진한 선, 나머지 = 얇은 선 */
+/* 어떻게 일하나 — 행동 패턴 회전목마 + 사례(상황 → 판단 → 결과) (components/WorkStyleCarousel) */
+.how { max-width: 1600px; margin: 0 auto; padding: 34px clamp(20px, 5vw, 48px) 26px; scroll-margin-top: 70px; }
+.how-h { margin: 0 0 2px; font-size: clamp(20px, 2.6vw, 26px); font-weight: 800; letter-spacing: -.3px; word-break: keep-all; }
+/* 일하는 방식 회전목마 — 타원 궤도(x = sin·rx, y = cos·ty, z = cos·rz). 무채색: 선택 = 옅은 면 + 진한 선, 나머지 = 얇은 선 */
 @property --rot { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
 .carousel { --rx: clamp(118px, 21vw, 260px); --rz: clamp(80px, 8vw, 120px); --ty: clamp(46px, 4.4vw, 58px);
   --node: clamp(84px, 8.6vw, 116px);
@@ -411,29 +410,27 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   border: 1.5px solid color-mix(in srgb, var(--text) 55%, var(--bg)); }
 .carousel-node.on span { font-weight: 700; }
 .carousel-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.seg-panel { animation: seg-in .35s ease-out; }
-.seg-sub { margin: 10px 0 8px; font-size: 14px; color: var(--muted); text-align: center; word-break: keep-all; }
-.seg-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.seg-list li { border-bottom: 1px solid var(--line); }
-.seg-item { display: grid; grid-template-columns: minmax(200px, 30%) 1fr; gap: 4px 28px; align-items: baseline;
-  padding: 18px 4px; color: inherit; text-decoration: none; transition: background .2s; }
-.seg-item:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
-.seg-item h4 { margin: 0; font-size: 16.5px; font-weight: 750; word-break: keep-all; grid-row: span 2; }
-.seg-item .arrow { color: var(--muted); transition: color .2s, margin .2s; }
-.seg-item:hover .arrow { color: var(--accent); }
-.seg-item p { margin: 0; font-size: 14.5px; line-height: 1.6; word-break: keep-all; }
-.seg-tags { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); word-break: keep-all; }
-.seg-others { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 0; margin-top: 16px; font-size: 13.5px; }
-.seg-others-h { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); margin-right: 12px; }
-.seg-others a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); word-break: keep-all; }
-.seg-others a:hover { border-bottom-color: var(--accent); }
-.seg-dot { font-style: normal; color: var(--muted); margin: 0 10px; }
-@keyframes seg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .seg-panel { animation: none; } .carousel { transition: none; } }
-@media (max-width: 640px) {
-  .seg-item { grid-template-columns: 1fr; padding: 16px 2px; }
-  .seg-item h4 { grid-row: auto; }
-}
+.ws-panel { animation: ws-in .35s ease-out; }
+.ws-headline { margin: 8px 0 14px; text-align: center; font-size: clamp(15px, 1.6vw, 17px); font-weight: 700; word-break: keep-all; }
+.ws-cases { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.ws-case { display: grid; grid-template-columns: minmax(220px, 30%) 1fr; gap: 6px 28px; padding: 18px 4px; border-bottom: 1px solid var(--line); }
+.ws-case-head h4 { margin: 0 0 6px; font-size: 16px; font-weight: 750; word-break: keep-all; }
+.ws-case-head a { font-size: 12.5px; font-weight: 600; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); word-break: keep-all; }
+.ws-case-head a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.ws-case dl { margin: 0; display: grid; grid-template-columns: 36px 1fr; gap: 4px 10px; }
+.ws-case dt { font-size: 12px; font-weight: 700; color: var(--muted); line-height: 1.75; }
+.ws-case dd { margin: 0; font-size: 14px; line-height: 1.6; word-break: keep-all; }
+.ws-case dt:nth-of-type(3) + dd { font-weight: 650; }
+@keyframes ws-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ws-panel { animation: none; } .carousel { transition: none; } }
+@media (max-width: 720px) { .ws-case { grid-template-columns: 1fr; padding: 16px 2px; } }
+/* 담당 시스템 (직무 대조용 두 그룹) */
+.systems { margin-top: 38px; scroll-margin-top: 80px; }
+.systems-h { margin: 0 0 18px; font-size: 20px; font-weight: 800; }
+.systems-h span { font-size: 14px; font-weight: 600; color: var(--muted); }
 /* 모바일 상단 네비: 브랜드와 링크가 두 줄로 깨지지 않게 */
 @media (max-width: 560px) { .nav { gap: 14px; } .nav-brand { white-space: nowrap; font-size: 16px; } .nav-links { gap: 12px; } .nav-links a { white-space: nowrap; font-size: 13px; } }
 @media (max-width: 380px) { .nav-links a:nth-child(2) { display: none; } }
+/* .how는 위 사이드 네비 여백 규칙보다 뒤에 정의되어 padding이 덮이므로 다시 지정 */
+@media (min-width: 1025px) { .how { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); } }
+.area-card, .area-card:hover { text-decoration: none; }
