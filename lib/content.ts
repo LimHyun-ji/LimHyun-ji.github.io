@@ -35,7 +35,9 @@ export function getProfile(): Profile {
 }
 
 export interface CompetencyCase { title: string; slug?: string; situation: string; decision: string; result: string; }
-export interface CompetencyGroup { id: string; title: string; headline?: string; cases: CompetencyCase[]; }
+export interface CompetencyGroup {
+  id: string; title: string; name: string; headline?: string; proof?: string; proofLabel?: string; cases: CompetencyCase[];
+}
 
 // 메인 "어떻게 일하나" — 행동 패턴별 사례 (content/competencies.yml)
 export function getCompetencies(): CompetencyGroup[] {

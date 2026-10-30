@@ -383,47 +383,46 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   .career, .how, .featured, .side-inner { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); }
 }
 
-/* 어떻게 일하나 — 행동 패턴 회전목마 + 사례(상황 → 판단 → 결과) (components/WorkStyleCarousel) */
+/* 어떻게 일하나 — 역량 카드 4장 (components/WorkStyleCards) */
 .how { max-width: 1600px; margin: 0 auto; padding: 34px clamp(20px, 5vw, 48px) 26px; scroll-margin-top: 70px; }
 .how-h { margin: 0 0 2px; font-size: clamp(20px, 2.6vw, 26px); font-weight: 800; letter-spacing: -.3px; word-break: keep-all; }
-/* 일하는 방식 회전목마 — 타원 궤도(x = sin·rx, y = cos·ty, z = cos·rz). 무채색: 선택 = 옅은 면 + 진한 선, 나머지 = 얇은 선 */
-@property --rot { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
-.carousel { --rx: clamp(118px, 21vw, 260px); --rz: clamp(80px, 8vw, 120px); --ty: clamp(46px, 4.4vw, 58px);
-  --node: clamp(84px, 8.6vw, 116px);
-  position: relative; height: calc(var(--node) * 1.55 + var(--ty) * 2 + 20px); margin: 6px 0 0;
-  perspective: 1100px; transition: --rot .8s cubic-bezier(.3,.8,.3,1); }
-.carousel-orbit { position: absolute; left: 50%; top: 50%; width: calc(var(--rx) * 2); height: calc(var(--ty) * 2);
-  transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid color-mix(in srgb, var(--text) 18%, var(--bg)); pointer-events: none; }
-.carousel-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
-.carousel-node { --t: calc(var(--a) + var(--rot));
-  position: absolute; left: 0; top: 0; width: var(--node); height: var(--node);
-  margin: calc(var(--node) / -2) 0 0 calc(var(--node) / -2); border-radius: 50%; padding: 8px; cursor: pointer;
-  font: inherit; color: color-mix(in srgb, var(--text) 78%, var(--bg)); display: grid; place-items: center;
-  background: var(--bg); border: 1px solid color-mix(in srgb, var(--text) 26%, var(--bg));
-  transform: translate3d(calc(sin(var(--t)) * var(--rx)), calc(cos(var(--t)) * var(--ty)), calc(cos(var(--t)) * var(--rz)));
-  opacity: calc(.92 + .08 * (cos(var(--t)) + 1) / 2);
-  transition: background .35s, border-color .35s, color .35s; }
-.carousel-node span { text-align: center; font-size: clamp(12px, 1.2vw, 14px); font-weight: 650; line-height: 1.3;
-  word-break: keep-all; letter-spacing: -.01em; }
-.carousel-node:hover { color: var(--text); border-color: color-mix(in srgb, var(--text) 40%, var(--bg)); }
-.carousel-node.on { color: var(--text); background: color-mix(in srgb, var(--text) 7%, var(--bg));
-  border: 1.5px solid color-mix(in srgb, var(--text) 55%, var(--bg)); }
-.carousel-node.on span { font-weight: 700; }
-.carousel-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.ws-panel { animation: ws-in .35s ease-out; }
-.ws-headline { margin: 8px 0 14px; text-align: center; font-size: clamp(15px, 1.6vw, 17px); font-weight: 700; word-break: keep-all; }
-.ws-cases { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.ws-case { display: grid; grid-template-columns: minmax(220px, 30%) 1fr; gap: 6px 28px; padding: 18px 4px; border-bottom: 1px solid var(--line); }
-.ws-case-head h4 { margin: 0 0 6px; font-size: 16px; font-weight: 750; word-break: keep-all; }
-.ws-case-head a { font-size: 12.5px; font-weight: 600; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); word-break: keep-all; }
-.ws-case-head a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-.ws-case dl { margin: 0; display: grid; grid-template-columns: 36px 1fr; gap: 4px 10px; }
-.ws-case dt { font-size: 12px; font-weight: 700; color: var(--muted); line-height: 1.75; }
-.ws-case dd { margin: 0; font-size: 14px; line-height: 1.6; word-break: keep-all; }
-.ws-case dt:nth-of-type(3) + dd { font-weight: 650; }
-@keyframes ws-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .ws-panel { animation: none; } .carousel { transition: none; } }
-@media (max-width: 720px) { .ws-case { grid-template-columns: 1fr; padding: 16px 2px; } }
+/* 역량 카드 4장 — 앞면: 역량 · 주장 · 대표 증거 / 뒷면: 사례. 무채색 + 얇은 선, 앞뒷면은 같은 칸에 겹쳐 높이를 맞춤 */
+.wc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.wc { perspective: 1400px; }
+.wc-inner { display: grid; height: 100%; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3,.8,.3,1); }
+.wc.flipped .wc-inner { transform: rotateY(180deg); }
+.wc-face { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 10px; padding: 20px 20px 16px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, var(--bg)); border-radius: 14px; background: var(--bg);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.wc-back { transform: rotateY(180deg); background: color-mix(in srgb, var(--text) 3%, var(--bg)); }
+.wc-no { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.wc-face h3 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.2px; word-break: keep-all; }
+.wc-claim { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); word-break: keep-all; }
+.wc-proof { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.wc-proof strong { font-size: clamp(22px, 2.2vw, 28px); font-weight: 800; letter-spacing: -.5px; line-height: 1.15; word-break: keep-all; }
+.wc-proof span { font-size: 12.5px; color: var(--muted); line-height: 1.45; word-break: keep-all; }
+.wc-flip { align-self: flex-start; margin-top: 6px; padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit;
+  font-size: 12.5px; font-weight: 600; color: var(--text); background: transparent; border: 1px solid var(--line); transition: border-color .2s; }
+.wc-flip:hover { border-color: color-mix(in srgb, var(--text) 45%, var(--bg)); }
+.wc-flip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wc-back ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.wc-back li { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
+.wc-back li b, .wc-back li a { font-size: 13.5px; font-weight: 700; color: var(--text); text-decoration: none; word-break: keep-all; }
+.wc-back li span { font-size: 12.5px; line-height: 1.5; color: var(--muted); word-break: keep-all; }
+.wc-back li a:hover { color: var(--accent); }
+.wc-back .wc-flip { margin-top: auto; }
+@media (prefers-reduced-motion: reduce) { .wc-inner { transition: none; } }
+@media (max-width: 1100px) { .wc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 한 줄 배치(모바일)에서는 앞뒷면을 겹치지 않고 바꿔 보여 줘 앞면에 빈 공간이 생기지 않게 */
+@media (max-width: 600px) {
+  .wc-grid { grid-template-columns: 1fr; }
+  .wc-inner, .wc.flipped .wc-inner { display: block; transform: none; }
+  .wc-face { backface-visibility: visible; -webkit-backface-visibility: visible; }
+  .wc-back { display: none; transform: none; }
+  .wc.flipped .wc-front { display: none; }
+  .wc.flipped .wc-back { display: flex; }
+  .wc-proof { margin-top: 6px; }
+}
 /* 담당 시스템 (직무 대조용 두 그룹) */
 .systems { margin-top: 38px; scroll-margin-top: 80px; }
 .systems-h { margin: 0 0 18px; font-size: 20px; font-weight: 800; }

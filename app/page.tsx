@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getProfile, getProjects, getIdentity, getCompetencies, type Project } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
 import HeroParticles from '@/components/HeroParticles';
-import WorkStyleCarousel from '@/components/WorkStyleCarousel';
+import WorkStyleCards from '@/components/WorkStyleCards';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
 import SideNav, { type NavItem } from '@/components/SideNav';
@@ -172,12 +172,12 @@ export default function Home() {
         </section>
       )}
 
-      {/* HOW — 어떻게 일하나: 행동 패턴 회전목마 + 사례(상황 → 판단 → 결과). 시스템 설명은 아래 담당 시스템에 */}
+      {/* HOW — 어떻게 일하나: 역량 카드 4장(앞면 역량 · 주장 · 대표 증거, 뒤집으면 사례). 시스템 설명은 아래 담당 시스템에 */}
       {competencies.length > 0 && (
         <section className="how" id="how">
           <div className="featured-tag">◈ How I Work · 어떻게 일하나</div>
           <h2 className="how-h">{glue('시스템이 달라도 반복되는 일하는 방식')}</h2>
-          <WorkStyleCarousel groups={competencies} systemTitles={systemTitles} />
+          <WorkStyleCards groups={competencies} systemTitles={systemTitles} />
         </section>
       )}
 
