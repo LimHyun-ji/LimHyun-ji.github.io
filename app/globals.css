@@ -217,6 +217,18 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .sp-sm-body .chips.small { margin: auto 0 0; }
 .sp-sm-body .chips.small li { font-size: 10px; padding: 2px 7px; }
 
+/* 그 외 사이드 프로젝트 — 아주 작은 가로형 카드 */
+.side-grid-xs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+@media (max-width: 900px) { .side-grid-xs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .side-grid-xs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sp-card-xs { display: flex; align-items: center; gap: 9px; padding: 6px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--surf); text-decoration: none; color: inherit; transition: border-color .15s; min-width: 0; }
+.sp-card-xs:hover { border-color: var(--accent); }
+.sp-card-xs img { width: 56px; height: 36px; object-fit: cover; border-radius: 5px; flex: none; background: #000; }
+.sp-xs-body { min-width: 0; }
+.sp-card-xs h4 { margin: 0; font-size: 12.5px; line-height: 1.3; }
+.sp-xs-sub { margin: 2px 0 0; font-size: 10.5px; opacity: .65; font-family: 'JetBrains Mono', monospace; }
+
 @media (max-width: 560px) { .nav-links a:nth-child(3) { display: none; } }
 
 /* ───────────── 코드 토글 ───────────── */

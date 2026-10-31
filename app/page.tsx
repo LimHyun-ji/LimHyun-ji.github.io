@@ -183,7 +183,7 @@ export default function Home() {
         <div className="featured-tag">▚ Side Projects · 학부 · 개인 프로젝트</div>
         <p className="section-note">{glue(`개인 · 학습 · 팀 프로젝트 (${sideProjects.length})`)}</p>
         <div className="side-grid-sm">
-          {sideProjects.map((sp) => (
+          {sideProjects.slice(0, 4).map((sp) => (
             <Link className="sp-card-sm" href={`/side/${sp.slug}/`} key={sp.slug}>
               <div className="sp-sm-hero">
                 <img src={sp.image} alt={sp.title} loading="lazy" />
@@ -192,6 +192,17 @@ export default function Home() {
               <div className="sp-sm-body">
                 <h4><KeepWords text={sp.title} /></h4>
                 <p className="sp-sm-sub">{glue(sp.subtitle)}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div className="side-grid-xs" aria-label="그 외 프로젝트">
+          {sideProjects.slice(4).map((sp) => (
+            <Link className="sp-card-xs" href={`/side/${sp.slug}/`} key={sp.slug}>
+              <img src={sp.image} alt="" loading="lazy" />
+              <div className="sp-xs-body">
+                <h4><KeepWords text={sp.title} /></h4>
+                <p className="sp-xs-sub">{glue(sp.engine)}</p>
               </div>
             </Link>
           ))}
