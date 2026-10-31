@@ -25,6 +25,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # 저장소 Variables에 등록하면 GA4 방문 분석이 켜진다 (비어 있으면 분석 코드 미포함)
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
