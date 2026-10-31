@@ -516,6 +516,9 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 40%),
     color-mix(in srgb, var(--accent) 26%, transparent), color-mix(in srgb, var(--accent-2) 8%, transparent) 45%, transparent 70%); }
 .hero-wrap.glow-on::after { opacity: 1; }
+/* 히어로 영역 경계에서 빛이 잘려 선이 생기지 않도록 위 · 아래 가장자리를 서서히 지움 */
+.hero-wrap::after { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 72%, transparent 100%); }
 @media (hover: none), (prefers-reduced-motion: reduce) { .hero-wrap::after { display: none; } }
 
 /* GIF 대체 영상 — 같은 자리의 이미지 규칙과 동일하게 */
