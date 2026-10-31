@@ -4,7 +4,7 @@ order: 8
 title: "AreaTool — 레벨 · 스폰 데이터 저작 & 검증 자동화"
 role: "Tools / Pipeline"
 period: "2023 — 현재 (상시)"
-summary: "레벨 영역 · NPC 스폰 · 순찰 데이터를 배치하는 AreaTool의 검증자 체인, P4 연동 export, Commandlet 기반 CI."
+summary: "레벨 영역 저작툴, Commandlet 기반 검증 CI."
 tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI", "Perforce"]
 ---
 
@@ -19,6 +19,15 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
       <dt>결과</dt><dd>잘못된 데이터를 export 시점에 차단</dd>
     </dl>
     <a class="case-more" href="#case-validation">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">폴리곤 영역 편집 불편</p>
+    <dl>
+      <dt>문제</dt><dd>꼭짓점 추가가 선택한 점을 Alt + 드래그로 복제하는 방식이라 원하는 변 위치에 넣기 어렵고, 회전된 영역에서는 드래그 방향과 점 이동 방향이 어긋남</dd>
+      <dt>해결</dt><dd>클릭 지점의 월드 광선과 각 변의 교차 판정으로 클릭한 변 위에 꼭짓점 삽입, 이동량은 액터 회전의 역으로 로컬 변환</dd>
+      <dt>결과</dt><dd>클릭한 위치에 바로 꼭짓점 추가, 회전된 영역에서도 드래그 방향대로 편집</dd>
+    </dl>
+    <a class="case-more" href="#case-polygon-edit">자세히 ↓</a>
   </div>
 </div>
 
@@ -119,13 +128,14 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     ```
 
   - `GetViewRelevance` — `bDrawOnlyIfSelected`로 에디터에서 선택된 액터만 표시
+
+<div id="case-polygon-edit" class="case-anchor"></div>
+
 - <strong>폴리곤 편집 — 클릭한 변 위에 꼭짓점 삽입 (광선 · 선분 교차)</strong>
-  - Territory · District 폴리곤에서 Alt + 클릭한 지점의 변을 찾아 그 위치에 꼭짓점을 삽입
-  - 화면 좌표를 월드 광선으로 바꾼 뒤, 폴리곤의 각 변과의 3D 직선 교차 판정을 직접 구현
-  - `DeprojectFVector2D`로 클릭 좌표 → 월드 광선(원점 O, 방향 d), 각 변은 `TransformPosition`으로 월드 변환 후 e = Q − P
-  - 평행 판정: n = d × e 가 0이면 제외 / 동일 평면 판정: w = P − O 와 n 의 내적이 0에 가까운지 확인 (허용 오차는 툴 설정값)
-  - 교차 매개변수 t, s 가 모두 [0, 1] 범위면 실제 교차, 교차점 = O + t · d
-  - 교차점을 `InverseTransformPosition`으로 로컬화해 해당 변 다음 인덱스에 삽입, `Modify()`로 Undo 지원
+  - 기존에는 선택한 점을 Alt + 드래그로 복제해 추가 → 선택한 점 옆에만 생겨 원하는 변 위치를 지정하기 어려움
+  - Alt + 클릭한 화면 좌표를 월드 광선으로 바꾸고, 폴리곤의 각 변과 3D 교차 판정을 직접 구현
+  - 외적 · 내적으로 평행 · 동일 평면 여부를 거른 뒤, 교차 매개변수 t, s 가 모두 [0, 1] 안이면 그 변 위의 점으로 판정
+  - 교차점을 로컬 좌표로 바꿔 해당 변 다음 인덱스에 삽입 (Undo 지원)
 
     ```cpp
     // Polygon2dComponentVisualizer.cpp
