@@ -9,13 +9,13 @@ from gen_diagrams import N, emit
 # ── 월드맵 입력: FSolWidgetInputProcessor → URegionMapWidget ──
 wi_nodes = [
     N("slate",  "FSlateApplication\n입력 전처리기 등록",            20, 60, 190, 52, "core"),
-    N("proc",   "FSolWidgetInputProcessor\n터치 · 마우스 판별",      250, 60, 230, 52, "manager"),
+    N("proc",   "FSolWidgetInputProcessor\n터치 · 마우스 판별",      310, 60, 230, 52, "manager"),
     N("zoom",   "OnZoom\n핀치 거리 변화 · 휠",                       20, 170, 190, 52, "data"),
-    N("drag",   "OnDrag\n한 손가락 · 마우스 누름 이동",              250, 170, 230, 52, "data"),
-    N("click",  "OnClick\n이동 8px 이하 · 핀치 아님",                520, 170, 200, 52, "data"),
+    N("drag",   "OnDrag\n한 손가락 · 마우스 누름 이동",              290, 170, 230, 52, "data"),
+    N("click",  "OnClick\n이동 8px 이하 · 핀치 아님",                560, 170, 200, 52, "data"),
     N("region", "URegionMapWidget\nZoom() · Drag()",                 150, 280, 230, 52, "ui"),
-    N("adjust", "GetAdjustMapPos\n줌 · DPI 기준 이동 범위 Clamp",    430, 280, 250, 52, "accent"),
-    N("apply",  "SetAdjustMapPos\nRenderTranslation · Scale 보간",   430, 380, 250, 52, "ui"),
+    N("adjust", "GetAdjustMapPos\n줌 · DPI 기준 이동 범위 Clamp",    490, 280, 250, 52, "accent"),
+    N("apply",  "SetAdjustMapPos\nRenderTranslation · Scale 보간",   490, 380, 250, 52, "ui"),
 ]
 wi_edges = [
     dict(src="slate", dst="proc", label="PreProcess"),

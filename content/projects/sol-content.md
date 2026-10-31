@@ -11,18 +11,7 @@ images:
   - src: "/images/projects/sol-content/Screenshot_26.png"
   - src: "/images/projects/sol-content/Screenshot_27.png"
   - src: "/images/projects/sol-content/Screenshot_28.png"
-highlights:
-  - "길드 시스템 성장 컨텐츠 담당 — 기획 요구사항에 따른 Schema 설계 → Manager-NotiServer 수신 구조 정립"
-  - "수집/연구, 별자리·순례, 채팅, 리텐션 리워드, 세금·신권 등 성장·편의·경제 컨텐츠를 기획 연동부터 UI·서버 동기화까지 구현"
-  - "CommonUI 레이어 스택 기반 UI와 Protobuf 서버 동기화, 수집은 ListView 전환·UObject→FClass 변환으로 GC 부담 감소"
 ---
-
-> **목적** — 컨텐츠를 기획 연동부터 서버 동기화까지 구현하되, 컨텐츠 특성에 맞는 네트워크 방식 선택
->
-> **성과** — 길드 장기 담당, 메시지 시스템 리팩토링으로 확장 비용↓, 성장 컨텐츠 지연 조회로 로그인 패킷 과부하 완화
->
-> **기여** — 길드/수집/연구/채팅 초기 설계~리팩토링 전 주기, 수집 ListView·FClass GC 개선, TCP · WebSocket · HTTP API 구조 위에서 컨텐츠별 통신 구현
-
 
 ## 문제 해결 요약
 

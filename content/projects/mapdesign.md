@@ -9,20 +9,7 @@ tags: ["Minimap", "World Map", "MPC", "Material", "InputProcessor", "Mobile"]
 images:
   - src: "/images/projects/mapdesign/mapdesign-preview.gif"
     alt: "맵 설계 동작 미리보기"
-highlights:
-  - "미니맵: PC 위치를 MPC(Material Parameter Collection)로 머티리얼에 실시간 위치 parameter 전송해 동기화"
-  - "미니맵: Quest Data를 머티리얼에 직접 동적 표시 — 별도 아이콘 위젯 없이 영역 제공하도록 최적화"
-  - "월드맵: 모바일·PC 모두 대응하기 위해 InputProcessor 기반으로 설계해 확대·드래그 제공"
-  - "월드맵: 그리고자 하는 영역을 고해상도 이미지로 동적 로딩해 텍스처 비용 절감"
-  - "라이브 고도화: 월드맵 고해상도 타일링, 던전맵 등 맵 컨텐츠 확장"
 ---
-
-> **목적** — PC 위치·퀘스트 데이터를 실시간 반영하는 미니맵과, PC·모바일 공통 입력을 지원하는 월드맵 설계
->
-> **성과** — 별도 아이콘 위젯 없이 머티리얼 표시로 최적화, 영역 이미지 동적 로딩으로 텍스처 비용↓
->
-> **기여** — MPC 기반 미니맵 위치 동기화·머티리얼 Quest Data 표시, InputProcessor 기반 월드맵 확대·드래그 직접 설계
-
 
 ## 문제 해결 요약
 

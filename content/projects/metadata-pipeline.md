@@ -6,19 +6,7 @@ role: "Tools / Pipeline"
 period: "2023.02 — 현재 (상시)"
 summary: "기획 Excel ↔ JSON 메타데이터 변환 파이프라인(Python)에 Cron식 변환 확장 · Unit 단위계 지원 · Custom Validation Script 지원을 추가."
 tags: ["Python", "Data Pipeline", "Validation", "Cron", "Metadata"]
-highlights:
-  - "Python 기반 Excel ↔ JSON 메타데이터 변환 파이프라인 개선"
-  - "Cron식 변환 확장 — 기존 Cron 변환에 한글 반복 일정(매일 · 매월 N일 · 주말 · 주중) 입력과 KR 시간 기준 저장 추가"
-  - "Unit 단위계 지원 — 단위가 붙은 값을 파이프라인에서 일관된 단위로 처리"
-  - "Custom Validation Script 지원 — 데이터별 검증 스크립트를 붙여 변환 단계에서 잘못된 값을 차단"
 ---
-
-> **목적** — 기획이 Excel에 입력한 데이터를 사람이 다시 손보지 않고, 검증된 형태로 런타임 메타데이터까지 전달
->
-> **성과** — 잘못된 데이터의 런타임 유입 차단, 기획 데이터 작성 편의성 향상
->
-> **기여** — Python 변환 파이프라인에 Cron식 변환 확장 · Unit 단위계 · Custom Validation Script 기능 추가
-
 
 ## 문제 해결 요약
 

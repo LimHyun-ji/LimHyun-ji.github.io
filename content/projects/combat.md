@@ -6,18 +6,7 @@ role: "Client Developer"
 period: "2023 — 현재"
 summary: "서버 ActionEvt를 Action Table · 몽타주 · Custom ActionNotify로 연결하고, 서버가 확정한 판정 위에서 클라이언트 연출 시점을 맞추는 전투 액션."
 tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/Lazy Hit", "StatusEffect"]
-highlights:
-  - "**Action Table 관리** — Entity 타입별 동작에 맞는 몽타주를 데이터로 정의하고, 서버에서 받은 ActionEvt에 따라 해당 몽타주를 재생"
-  - "**Custom ActionNotify 정의** — 몽타주 재생 중 Notify 시점에 FX 등 전투 연출을 실행하고, Notify_Game / Notify_Editor로 나눠 인게임 로직과 에디터 프리뷰를 분리"
-  - "**에디터 재생 동일화** — Simulator 객체(Has-A)로 에디터에서도 인게임과 같은 경로로 ActionNotify를 재생, 툴과 전투 모듈 일원화"
-  - "**피격 연출 지연** — 진행 방향 투영 · 등속 계산을 이펙트와 같은 속도 커브 기준으로 바꿔 표시 시점 일치"
 ---
-
-> **목적** — 서버가 확정한 전투 판정을 바꾸지 않으면서, 클라이언트의 몽타주 · Notify · 이펙트 연출 시점을 판정과 맞추는 것
->
-> **성과** — 인게임 · 에디터 Notify 분리, 에디터 재생 동일화, 피격 연출과 이펙트 시점 일치
->
-> **기여** — Action Table · Custom ActionNotify · 피격 연출 지연 계산 구현, 서버 동기화 구조 위에서 Notify 처리 시점 조정
 
 ## 문제 해결 요약
 

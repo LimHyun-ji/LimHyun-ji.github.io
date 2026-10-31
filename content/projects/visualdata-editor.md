@@ -9,19 +9,7 @@ tags: ["Editor Tooling", "VisualData", "Slate", "EditorModule", "AssetMigration"
 images:
   - src: "/images/projects/visualdata/Screenshot_25.png"
     alt: "VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰"
-highlights:
-  - "서버 없이 인게임과 동일한 외형·전투 동작을 미리 보는 아트 테스트 환경 제공 — 아트팀 이터레이션 단축"
-  - "에디터 UI를 Slate로 직접 구현하고, 변경이 프리뷰 화면에 바로 반영되도록 Editor Preview 환경을 확장 · 유지보수"
-  - "VD슈퍼클래스 리팩토링: EditorModule 이전 · PreviewActor 병합 · 타입별(PC / NPC / FieldObject / Item / Spirit) 클래스 분리 · VisualDataInterface 제거"
-  - "구 에셋을 새 타입으로 자동 변환하는 AssetMigration 툴로 에디터 구조 부채를 일괄 정리"
 ---
-
-> **목적** — 아트·기획이 서버 없이 외형과 전투 연출을 직접 확인하고, 데이터는 빌드 단계에서 자동으로 export되는 저작 환경
->
-> **성과** — 아트 이터레이션 단축, 에디터 구조 부채 일괄 정리, 데이터 export 자동화
->
-> **기여** — VisualData 에디터 Slate UI · Preview 환경 개발 · 리팩토링, AssetMigration 툴, VisualData Export Commandlet
-
 
 ## 문제 해결 요약
 

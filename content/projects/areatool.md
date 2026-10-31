@@ -6,21 +6,7 @@ role: "Tools / Pipeline"
 period: "2023 — 현재 (상시)"
 summary: "레벨 영역 · NPC 스폰 · 순찰 데이터를 배치하는 AreaTool의 검증자 체인, P4 연동 export, Commandlet 기반 CI."
 tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI", "Perforce"]
-highlights:
-  - "District 영역을 레벨 기획자가 직접 지정하는 2D Polygon 저작 툴 Mode 제공"
-  - "폴리곤 편집 기하 처리 — 화면 클릭 광선과 변의 교차 판정(외적 · 내적)으로 꼭짓점 삽입, Shoelace 공식으로 다각형 무게중심 계산"
-  - "NPC 확률성 배치 및 Patrol 영역 지정"
-  - "이름 · NavMesh · 폴더 · 리전 검증자 체인(IAreaToolValidator) — 잘못된 데이터를 export 단계에서 걸러냄"
-  - "Export 시 기존 파일과 비교해 바뀐 파일만 P4 체크아웃 · 추가 · 삭제"
-  - "AreaToolExportCommandlet + Jenkins CI로 레벨 데이터 검증 · export를 빌드 단계에서 강제"
 ---
-
-> **목적** — 레벨 · 스폰 데이터를 레벨 위에서 직접 배치하고, 검증과 export를 사람 손을 거치지 않게 자동화
->
-> **성과** — 잘못된 레벨 데이터의 런타임 유입 차단, 수작업 · 누락 감소
->
-> **기여** — 2D Polygon · 3D Point Actor 저작 UX, 검증자 체인, P4 연동 export, Commandlet CI
-
 
 ## 문제 해결 요약
 

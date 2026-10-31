@@ -6,23 +6,10 @@ role: "Client Developer"
 period: "2023 — 현재 (연출·렌더링 영역)"
 summary: "별자리 · 순례 · 갓아머 등 인게임 연출을 PocketLevel과 LevelSequence로 구성하고, 연출 에셋 수명과 모바일 GPU 비용을 관리."
 tags: ["PocketLevel", "LevelSequence", "SceneCapture", "RenderTarget", "MaterialParameter", "Niagara", "Mobile"]
-highlights:
-  - "별자리·순례 등 연출을 PocketLevel Instance로 인게임과 별도 공간에 구성하고 LevelSequence로 재생하는 연출 공간 제공"
-  - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 보유해 필요 시점에 로드"
-  - "3D 오브젝트를 SceneCapture2D로 RenderTarget에 캡처해 UI에 합성, 연출 구간에만 캡처를 Visible 토글해 모바일 GPU 비용 절감"
-  - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
-  - "UI 파티클: 부모 위젯의 누적 RenderTransform 행렬에서 Atan2로 회전각을 구하고 회전 행렬로 크기 · 위치를 변환해, 회전 · 스케일된 UI 안에서도 파티클 배치를 맞춤"
 images:
   - src: "/images/projects/rendering-cinema/constellation-preview.gif"
     alt: "별자리 전환 연출"
 ---
-
-> **목적** — 연출을 인게임과 분리된 공간에서 띄우고, 연출 구간에만 자원(시퀀스 · 액터 · 캡처)을 쓰는 구조
->
-> **성과** — PocketLevel·시퀀스·캡처 수명을 연출 구간에 한정해 모바일 GPU/메모리 비용↓
->
-> **기여** — 별자리 룰렛 LevelSequence 동적 생성/파괴, 순례 주사위 SceneCapture 합성, 갓아머 연출 리팩토링
-
 
 ## 문제 해결 요약
 
@@ -47,6 +34,10 @@ images:
   </div>
 </div>
 
+
+## 개요
+
+- 별자리 · 순례 · 갓아머 연출을 인게임과 분리된 공간(PocketLevel)에서 재생하고, 시퀀스 · 액터 · 캡처 자원은 연출 구간에만 쓰는 구조
 
 <img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
 

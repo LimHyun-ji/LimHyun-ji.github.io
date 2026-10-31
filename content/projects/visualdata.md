@@ -6,19 +6,7 @@ role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "모든 Entity에 외형을 세팅 · 로드하는 VisualData 인게임 모듈과 데이터 소유 · 수명 구조."
 tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"]
-highlights:
-  - "PC · NPC · 아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet) · Override Material · Attachment · 본 트랜스폼을 세팅 · 로드"
-  - "**데이터 소유 일원화** — 여러 객체가 나눠 갖던 VisualData를 컴포넌트별로 필요한 데이터만 할당하고, 생명주기는 모듈 한 곳에서 관리"
-  - "**전이 규칙(FullReset / PartialUpdate / NoUpdate)**으로 바뀐 파츠만 부분 갱신, Override Material · Color Tint · LOD로 에셋 재사용성 향상"
-  - "Entity 별 모듈을 UObject 대신 TSharedPtr C++Class 객체로 UObject 개수 초과 방지"
 ---
-
-> **목적** — 외형을 각 Entity에 **데이터로** 세팅 · 로드하고, 데이터의 소유와 수명을 한곳에서 관리하는 인게임 시스템
->
-> **성과** — 외형 표현 데이터 주도 일관화, 데이터 소유 일원화, 부분 갱신 최적화, UObject 개수 초과 · 풀링 × 비동기 크래시 구조적 차단
->
-> **기여** — 인게임 모듈 컴포넌트 · 타입별 모듈 · 전이 규칙 · Attachment 구조 설계
-
 
 ## 문제 해결 요약
 

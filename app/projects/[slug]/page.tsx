@@ -102,13 +102,6 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
           : <ImageGallery images={images} slug={proj.slug} />
       )}
 
-      {proj.highlights && (
-        <>
-          <h2>주요 작업</h2>
-          <ul className="highlights big">{proj.highlights.map((h, i) => <li key={i}>{h.split(/\*\*([^*]+)\*\*/).map((seg, j) => j % 2 === 1 ? <strong key={j}>{glue(seg)}</strong> : glue(seg))}</li>)}</ul>
-        </>
-      )}
-
       {/* 본문 + 오른쪽 TOC */}
       <div className="toc-layout">
         <div className="detail-body toc-layout-main">

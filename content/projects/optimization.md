@@ -6,18 +6,7 @@ role: "Client Developer · 핵심 담당"
 period: "상시"
 summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass", "LOD"]
-highlights:
-  - "Unreal Insights로 Slate Tick 비용을 측정해 Slate Global Invalidation을 화면/레이어 단위로 동적 토글하고, 동적 컨텐츠는 ForceVolatile로 캐시에서 제외해 UI 재계산 비용 절감"
-  - "LOD별 파츠 통합으로 원거리 Entity 드로콜 감소"
-  - "위젯/액터 오브젝트 풀링(용량 상한 · 최근 사용 우선 반환 LIFO) + 큰 UI 전환 직후 명시적 GC(UObject Exceed 방지)로 CPU·메모리 비용 절감"
 ---
-
-> **목적** — 모바일 타겟의 프레임·메모리 비용 상시 절감
->
-> **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓
->
-> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링 · 명시적 GC
-
 
 ## 문제 해결 요약
 
@@ -42,6 +31,10 @@ highlights:
   </div>
 </div>
 
+
+## 개요
+
+- 모바일 타겟에서 UI 렌더링 · Tick · 메모리 비용을 상시 줄이기 위한 작업 모음
 
 <img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Sector 거리별·상태별), 메모리(오브젝트 풀링·명시적 GC로 UObject 개수 초과 방지)" />
 
