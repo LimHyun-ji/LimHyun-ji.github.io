@@ -233,7 +233,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .sp-card-sm { display: flex; flex-direction: column; overflow: hidden;
   border: 1px solid var(--line); border-radius: 11px; background: var(--surf);
   text-decoration: none; color: inherit; transition: transform .15s, border-color .15s; }
-.sp-card-sm:hover { transform: translateY(-2px); border-color: var(--accent); }
+.sp-card-sm:hover { border-color: var(--accent); }
 .sp-sm-hero { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
 .sp-sm-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sp-sm-engine { position: absolute; top: 6px; right: 6px; font-family: 'JetBrains Mono', monospace;
@@ -461,7 +461,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
   border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--line)); border-left: 4px solid var(--tone);
   background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 13%, transparent), color-mix(in srgb, var(--tone) 3%, transparent) 70%);
   transition: transform .15s, border-color .15s, background .15s; }
-.sys-row:hover { transform: translateX(4px); border-color: var(--tone);
+.sys-row:hover { border-color: var(--tone);
   background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 20%, transparent), color-mix(in srgb, var(--tone) 5%, transparent) 70%); }
 .sys-row h4 { margin: 0 0 6px; font-size: 18px; font-weight: 750; word-break: keep-all; }
 .sys-row .arrow { color: var(--tone); }
@@ -476,3 +476,21 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 @media (min-width: 1025px) { .cases-sec { padding-left: max(clamp(20px, 5vw, 48px), calc(176px - max(0px, (100vw - 1600px) / 2))); } }
 .area-card, .area-card:hover { text-decoration: none; }
 .sys-row, .sys-row:hover, .ci-item, .ci-item:hover { text-decoration: none; }
+
+/* ───────────── 인터랙션 — 스크롤 등장 · hover 확대 ───────────── */
+.reveal-ready .reveal { opacity: 0; transform: translateY(26px);
+  transition: opacity .6s ease var(--reveal-delay, 0ms), transform .6s cubic-bezier(.2,.7,.2,1) var(--reveal-delay, 0ms); }
+.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
+
+.ci-item, .sys-row, .sp-card-sm, .sp-card-xs, .detail-body .case {
+  transition: transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s ease, border-color .2s ease, background .2s ease; }
+.ci-item:hover, .sys-row:hover, .sp-card-sm:hover, .sp-card-xs:hover, .detail-body .case:hover,
+.reveal-ready .reveal.is-visible:is(.sys-row, .sp-card-sm, .sp-card-xs, .case):hover {
+  transform: scale(1.025); box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--accent) 45%, transparent); position: relative; z-index: 1; }
+/* 등장 애니메이션 transition이 hover transition을 덮지 않도록, 보인 뒤에는 hover용 transition으로 교체 */
+.reveal-ready .reveal.settled {
+  transition: transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s ease, border-color .2s ease, background .2s ease, opacity .6s ease; }
+.ci-item { border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .ci-item:hover, .sys-row:hover, .sp-card-sm:hover, .sp-card-xs:hover, .detail-body .case:hover { transform: none; }
+}

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import ScrollReveal from '@/components/ScrollReveal';
 
 export const metadata: Metadata = {
   title: '임현지 · Game Client Developer',
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <main>{children}</main>
+        <ScrollReveal />
         <footer>
           <p>© {new Date().getFullYear()} 임현지. Built with Next.js.</p>
         </footer>
