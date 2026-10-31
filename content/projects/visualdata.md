@@ -52,105 +52,90 @@ highlights:
 
 <img class="diagram" src="/images/diagrams/visualdata-flow.svg" alt="VisualData 구성 구조: VisualGameData→UVisualDataModuleComponent(파츠 맵·현재 모듈 보유)→FVisualDataModuleBase 상속(PC·NPC·Spirit·Item·FieldObject·Totem)→FPCModuleAttachment 소켓 부착" />
 
-## 1. 인게임 모듈 컴포넌트 — 각 Entity에 Visual 세팅·로드
+## 구현 내용
 
 <div id="case-allocating" class="case-anchor"></div>
 
-**처음에는 여러 객체가 VisualData를 각자 들고 있어서, 데이터가 언제 만들어지고 사라지는지가 흩어져 있었습니다.** 그래서 각 컴포넌트에는 필요한 데이터만 할당하고(필요하면 WeakPtr로 참조), 데이터의 생명주기는 모듈 한 곳에서 관리하도록 바꿨습니다. 모듈 생성은 `CreateModule` Factory로 통일했습니다.
+- <strong>인게임 모듈 컴포넌트 — 각 Entity에 Visual 세팅 · 로드</strong>
 
-- PC · NPC · Spirit · 필드오브젝트 · 아이템 등 **모든 Entity 부착 대상**
-- 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성 · 재적용
+  - 처음에는 여러 객체가 VisualData를 각자 들고 있어, 데이터가 언제 만들어지고 사라지는지가 흩어져 있었음
+  - 각 컴포넌트에는 필요한 데이터만 할당(필요하면 WeakPtr로 참조)하고, 데이터 생명주기는 모듈 한 곳에서 관리
+  - 모듈 생성은 `CreateModule` Factory로 통일
+  - PC · NPC · Spirit · 필드오브젝트 · 아이템 등 <strong>모든 Entity 부착 대상</strong>
+  - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성 · 재적용
 
-```cpp
-class UVisualDataModuleComponent : public UActorComponent
-{
-    // 데이터(VisualGameData) → 모듈 생성 → 적용
-    void SetVisualGameData(const UVisualGameDataBase* InVisualGameData);
-    void SetModule(TSharedPtr<FVisualDataModuleBase> InNewModule);
-    virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* InVisualGameData);
+    ```cpp
+    class UVisualDataModuleComponent : public UActorComponent
+    {
+        // 데이터(VisualGameData) → 모듈 생성 → 적용
+        void SetVisualGameData(const UVisualGameDataBase* InVisualGameData);
+        virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* InVisualGameData);
 
-    // 파츠별 스켈레탈 메시 (Master/Face/Torso/Helmet/Wing/Cape)
-    TMap<EVisualDataCharacterPartType, USkeletalMeshComponent*> SkeletalMeshComponents;
+        // 파츠별 스켈레탈 메시 (Master / Face / Torso / Helmet / Wing / Cape)
+        TMap<EVisualDataCharacterPartType, USkeletalMeshComponent*> SkeletalMeshComponents;
 
-    // 비동기 로드 (StreamableManager) + 완료 델리게이트
-    TSharedPtr<FStreamableHandle> LoadAssets(const TArray<FSoftObjectPath>& AssetList, FStreamableDelegate&& OnCompleted);
-    bool bUseAsyncLoading = true;
-    FSimpleMulticastDelegate OnModuleLoaded;
-};
-```
+        // 비동기 로드 (StreamableManager) + 완료 델리게이트
+        TSharedPtr<FStreamableHandle> LoadAssets(const TArray<FSoftObjectPath>& AssetList, FStreamableDelegate&& OnCompleted);
+    };
+    ```
 
-### 타입별 모듈 + 경량 폴리모피즘
+  - <strong>타입별 모듈 + 경량 폴리모피즘</strong>
+    - `UObject` 대신 `TSharedPtr` 경량 모듈 채택 — 대량 Entity 생성 · GC 등록 · 추적 비용 회피
+    - Entity 종류별 외형 규칙 차이 → `FVisualDataModuleBase` 상속 타입별 분리(PC / NPC / Spirit / Item / FieldObject / Totem)
+    - `UObject`가 아니라 `Cast<>`를 쓸 수 없으므로 커스텀 RTTI(`ModuleCast<T>`)로 안전 다운캐스트
 
-- `UObject` 대신 `TSharedPtr` 경량 모듈 채택 — 대량 Entity 생성·GC 등록·추적 비용 회피
-- Entity 종류별 외형 규칙 차이 → `FVisualDataModuleBase` 상속 타입별 분리(PC / NPC / Spirit / Item / FieldObject / Totem)
-- `UObject`가 아니라 `Cast<>`를 쓸 수 없으므로 커스텀 RTTI(`ModuleCast<T>`)로 안전 다운캐스트
+- <strong>전이 규칙으로 부분 갱신 최적화</strong>
 
-```cpp
-enum class EVisualDataModuleKind : uint8 { Base, Character, PC, NPC, Spirit, Item, FieldObject };
+  - 헬멧 하나만 바꿔도 전신 파츠와 Attachment를 전부 다시 로드하고 있었음 → 외형 데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조였기 때문
+  - 다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 <strong>전이 규칙</strong>(`EvaluateTransitionRule`) 도입
+    - <strong>NoUpdate</strong>: 동일 → 아무것도 안 함
+    - <strong>PartialUpdate</strong>: 바뀐 파츠만 교체 (예: 헬멧만)
+    - <strong>FullReset</strong>: 전면 재구성
+  - 실제 변경 파츠로 재로드 범위 한정 → 불필요한 전신 재로드 제거
 
-class FVisualDataModuleBase : public TSharedFromThis<FVisualDataModuleBase>
-{
-    virtual void ApplyModule(EVisualDataModuleTransitionRule TransitionRule) {}
-};
-template<typename T> FORCEINLINE TSharedPtr<T> ModuleCast(const TSharedPtr<FVisualDataModuleBase>& P);
-```
+- <strong>Override Material — 파츠 단위 공통화</strong>
 
-## 2. 전이 규칙으로 부분 갱신 최적화
-
-**헬멧 하나만 바꿔도 전신 파츠와 Attachment를 전부 다시 로드하고 있었습니다.** 외형 데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조였기 때문입니다. 그래서 다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 **전이 규칙**을 도입했습니다.
-
-```cpp
-// EvaluateTransitionRule → 갱신 범위 결정
-enum class EVisualDataModuleTransitionRule { FullReset, PartialUpdate, NoUpdate };
-```
-
-- **NoUpdate**: 동일 → 아무것도 안 함
-- **PartialUpdate**: 바뀐 파츠만 교체 (예: 헬멧만)
-- **FullReset**: 전면 재구성
-- 전이 규칙 도입 → 실제 변경 파츠로 재로드 범위 한정, 불필요한 전신 재로드 제거
+  - NPC · Spirit 등 타입별 클래스에 따로 있던 Override Material 필드(본체 / Helmet / Torso 배열)를 캐릭터 공통 클래스(`UVisualGameData_Character`)의 파츠 키 맵 하나로 통합
+  - 에디터에서 파츠 메시를 바꾸면 해당 파츠의 기본 머티리얼 목록을 맵에 다시 채우고, 런타임은 파츠 타입으로 찾아 적용
+  - 통합 후 기존 VisualData 에셋을 새 필드 구조로 갱신하고, PC 헬멧에 Override Material이 적용되지 않던 누락을 수정
 
 <div id="case-attachment" class="case-anchor"></div>
 
-## 3. Attachment — 무기 / 방어구 / 헬멧
+- <strong>Attachment — 무기 / 방어구 / 헬멧</strong>
 
-**Attachment를 UObject로 만들고 있어서, Entity가 많은 장면에서 UObject 최대 개수를 넘어 크래시가 났습니다.** 그래서 Attachment를 `TSharedPtr` 기반 경량 객체로 바꿔 UObject 개수와 GC 추적 대상에서 뺐습니다.
+  - PC 모듈은 방어구 · 헬멧 · 주 / 보조 무기를 <strong>소켓 기반 Attachment</strong>(`FPCModuleAttachment` 파생)로 부착
+  - Attachment는 `TSharedPtr` 기반 경량 객체 → Entity가 많은 장면에서도 UObject 개수 · GC 추적 대상에 포함되지 않음
+  - 경량 RTTI(`AttachmentCast<T>`) + 비동기 로드 · FX · 소켓 전환 처리
+    - 무기 메시 · 추가 메시 · 이펙트를 한 번의 `FStreamableHandle`로 비동기 로드, 다시 로드하거나 Detach할 때 이전 핸들을 취소
+  - <strong>무기 FX 정리</strong>
+    - FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기를 바꾸면 이전 무기의 나이아가라가 남는 문제
+    - `ReleaseToPool()`만으로는 이펙트가 꺼지지 않아, 매니저가 없을 때 Detach에서 직접 즉시 비활성화
 
+      ```cpp
+      // PCModuleAttachment.cpp — FPCModuleAttachment_Weapon::Detach
+      if (UFXSystemManagerComponent* FXSystemManagerComponent = UFXSystemManagerComponent::Get(OwnerActor))
+      {
+          FXSystemManagerComponent->RemoveFXSystemComponentsByTag(GetFXTagName(), true);
+      }
+      else // FX System Manager가 없는 경우 별도로 정리
+      {
+          for (const auto& NiagaraComp : NiagaraComponents)
+          {
+              if (NiagaraComp.IsValid())
+                  NiagaraComp->DeactivateImmediate();
+          }
+      }
+      NiagaraComponents.Empty();
+      ```
 
-- PC 모듈: 방어구·헬멧·주/보조 무기를 **소켓 기반 Attachment** 부착
-- Attachment 관리: 경량 RTTI(`AttachmentCast<T>`) + 비동기 로드·FX·소켓 전환 처리
+- <strong>로딩 · 렌더 최적화</strong>
 
-```cpp
-enum class EPCModuleAttachmentType : uint8 { None, Armor, Helmet, MainWeapon, SubWeapon };
+  - <strong>가시성 게이팅</strong>: VisualData <strong>로드가 끝난 Entity만 표시</strong>(`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임 · 미완성 노출 방지
+  - <strong>렌더 비용 제어</strong>: `OptimizeLOD`(2) 이상에서 Helmet / Face 파츠를 숨기는 LOD별 파츠 통합 — 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고
 
-class FPCModuleAttachment_Weapon : public FPCModuleAttachment
-{
-    virtual void Attach(UVisualDataModuleComponent* InOwnerComponent) override;
-private:
-    void LoadAsyncAssets();                    // StreamableHandle 비동기 로드
-    TSharedPtr<FStreamableHandle> StreamingHandle;
-};
-```
+  <div id="case-pooling" class="case-anchor"></div>
 
-## 4. 로딩 · 렌더 최적화
-
-- **가시성 게이팅**: VisualData **로드가 끝난 Entity만 표시**(`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임·미완성 노출 방지
-- **렌더 비용 제어**: `OptimizeLOD`, LOD에 따라 파츠 통합으로 변경
-
-<div id="case-pooling" class="case-anchor"></div>
-
-### 풀링 × 비동기 로드 크래시
-
-**풀에서 재사용한 Entity에 이전 외형이 남거나, 해제된 메모리에 접근하는 크래시가 드물게 발생했습니다.** 풀 반납 시 VisualData 상태가 정리되지 않았고, 취소되지 않은 `FStreamableHandle` 콜백이 이미 사라진 Entity에 뒤늦게 도달했기 때문입니다. 그래서 `OnUnregister`에서 상태를 명시적으로 정리하고, 풀 입출고 시 틱을 토글하며, 반납 시 `FStreamableHandle`을 즉시 취소해 경합 경로를 막았습니다. 풀링 구조 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고.
-
-## 기술 요약
-
-| 영역 | 내용 |
-|------|------|
-| 컴포넌트 | `UVisualDataModuleComponent` (전 Entity 공통) |
-| 파츠 | `EVisualDataCharacterPartType` (Master · Face · Torso · Helmet · Wing · Cape) |
-| 모듈 | 타입별(`PC / NPC / Spirit / Item / FieldObject / Totem`) + 커스텀 RTTI `ModuleCast<T>` |
-| 데이터 소유 | 컴포넌트별 필요 데이터만 할당(WeakPtr) · 모듈 단일 생명주기 |
-| 갱신 | `EvaluateTransitionRule` → FullReset / PartialUpdate / NoUpdate |
-| Attachment | 무기 · 방어구 · 헬멧, 소켓 부착, `TSharedPtr` 경량 객체 |
-| 로딩 | `StreamableManager` 비동기 + 로드 완료 기준 EntityVisibility 게이팅 |
-| 관련 | [전투 시스템](/projects/combat/) · [VisualData 에디터 & Commandlet](/projects/visualdata-editor/) |
+  - <strong>풀링 × 비동기 로드</strong>
+    - 풀에서 재사용한 Entity에 이전 외형이 남거나, 취소되지 않은 `FStreamableHandle` 콜백이 이미 사라진 Entity에 뒤늦게 도달하는 경합 경로
+    - 컴포넌트 `OnUnregister`에서 모듈 상태를 정리하고, 모듈의 틱 필요 여부에 따라 컴포넌트 틱을 토글하며, Attachment 해제 시 `FStreamableHandle`을 취소하는 구조
+    - 풀링 구조 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고

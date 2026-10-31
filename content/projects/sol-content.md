@@ -272,15 +272,3 @@ SingleEffect.RandomVelocity = TargetDirection * Data.CurveForce * CurveDistanceI
 ```
 
 - 확산 범위(`MinRandomRange` / `MaxRandomRange`)는 재화 타입별로 데이터에서 조정
-
----
-
-## 기술 요약
-
-| 영역 | 내용 |
-|------|------|
-| 언어 / 엔진 | C++ · Unreal Engine 5 (커스텀 브랜치) |
-| 매니저 | `UGameInstanceSubsystem` 기반 Manager (예: `UGuildManager`) — `Get()` 싱글톤, 서버 푸시 수신(`INetworkNotiClientListener`) |
-| 서버 동기화 | `UGeoSubsystem` (TCP · WebSocket Noti) · Protobuf 직렬화 |
-| UI | CommonUI(`UCommonActivatableWidget`) · `UPrimaryGameLayout` 레이어 스택 |
-| 데이터 | `MetaDataSubsystem` 메타데이터 테이블 · `RidType` 키 |

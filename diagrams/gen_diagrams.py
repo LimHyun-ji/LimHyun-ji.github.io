@@ -377,8 +377,8 @@ dp_nodes = [
     N("cmdlet","Export Commandlet\n(UAreaToolExport · CI/Jenkins)", 40, 64, 210, 56, "core"),
     N("src",   "원본 데이터\nExcel · 에셋 · 레벨",                  40, 150, 210, 56, "data"),
     N("gen",   "AreaTool Generator\n(FAreaToolJsonGenerator)",       300, 107, 190, 56, "ui"),
-    N("val",   "검증자 체인\nRid·Name·NavMesh·Folder·Region",       300, 214, 220, 56, "core"),
-    N("exp",   "Export + P4 Reconcile\n(SaveAndReconcile)",          560, 214, 200, 56, "core"),
+    N("val",   "검증자 체인\nName·NavMesh·Folder·Region",       300, 214, 220, 56, "core"),
+    N("exp",   "Export + P4 반영\n(SaveAndReconcile)",          560, 214, 200, 56, "core"),
     N("out",   "Generated 메타데이터\n(RidType 키)",                 560, 107, 200, 56, "data"),
     N("rt",    "런타임\nUMetadataSubsystem",                         800, 107, 180, 56, "manager"),
 ]
