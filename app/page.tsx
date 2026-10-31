@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getProfile, getProjects, getIdentity, getCases, type Project } from '@/lib/content';
 import { sideProjects } from '@/lib/sideProjects';
-import HeroParticles from '@/components/HeroParticles';
+import HeroFluid from '@/components/HeroFluid';
 import CaseIndex from '@/components/CaseIndex';
 import ThemeToggle from '@/components/ThemeToggle';
 import KeepWords from '@/components/KeepWords';
@@ -81,7 +81,7 @@ export default function Home() {
 
       {/* HERO */}
       <div className="hero-wrap">
-        <HeroParticles />
+        <HeroFluid />
         <header className="lead" id="top">
           <div className="lead-main">
             {/* 프로필 사진 + 이름 영역 */}

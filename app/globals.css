@@ -20,10 +20,8 @@
   backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
   border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
   box-shadow: 0 10px 34px -14px rgba(0, 0, 0, .35), inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent); }
-.nav-brand { font-weight: 800; font-size: 18px; letter-spacing: -.01em; text-decoration: none; white-space: nowrap;
-  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 55%, var(--accent-3) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
-.nav-brand-sub { font-weight: 600; opacity: .85; }
+.nav-brand { font-weight: 800; font-size: 18px; letter-spacing: -.01em; text-decoration: none; white-space: nowrap; color: var(--text); }
+.nav-brand-sub { font-weight: 500; color: var(--muted); }
 .nav-links { display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px;
   background: color-mix(in srgb, var(--text) 5%, transparent); border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); }
 .nav-links a { text-decoration: none; color: var(--muted); font-size: 13px; font-weight: 600; white-space: nowrap;
@@ -509,16 +507,6 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 @media (max-width: 520px) { .nav { height: 52px; padding: 0 6px 0 16px; gap: 8px; } .nav-links a { padding: 6px 10px; font-size: 12.5px; }
   .nav-links a:nth-child(2) { display: none; } }
 
-/* 히어로 — 커서를 따라다니는 빛 번짐 (HeroParticles가 --mx/--my 갱신) */
-.hero-wrap::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .5s ease;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 40%),
-    color-mix(in srgb, var(--accent) 26%, transparent), color-mix(in srgb, var(--accent-2) 8%, transparent) 45%, transparent 70%); }
-.hero-wrap.glow-on::after { opacity: 1; }
-/* 히어로 영역 경계에서 빛이 잘려 선이 생기지 않도록 위 · 아래 가장자리를 서서히 지움 */
-.hero-wrap::after { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 72%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 72%, transparent 100%); }
-@media (hover: none), (prefers-reduced-motion: reduce) { .hero-wrap::after { display: none; } }
-
 /* GIF 대체 영상 — 같은 자리의 이미지 규칙과 동일하게 */
 .detail-body video { max-width: 50%; height: auto; display: block; margin: 10px auto; }
 .detail-body .shot-row figure video { width: 100%; max-width: 100%; margin: 0; border-radius: 10px; border: 1px solid var(--line); }
@@ -528,9 +516,6 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 
 /* 큰 섹션 제목 — Main Project / Side Projects (배경 띠 없이 제목으로 구분) */
 .section-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 26px;
-  font-size: clamp(36px, 5.6vw, 60px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05;
-  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 60%, var(--accent-3) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
-.section-title-sub { font-size: clamp(14px, 1.5vw, 17px); font-weight: 700; letter-spacing: 0; color: var(--muted);
-  -webkit-text-fill-color: var(--muted); }
+  font-size: clamp(36px, 5.6vw, 60px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05; color: var(--text); }
+.section-title-sub { font-size: clamp(14px, 1.5vw, 17px); font-weight: 700; letter-spacing: 0; color: var(--muted); }
 .featured-title { font-size: clamp(26px, 3.6vw, 36px); }
