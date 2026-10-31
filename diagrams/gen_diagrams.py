@@ -291,24 +291,6 @@ emit_seq("visualdata-action", "VisualData 전투 액션 — ActionEvt → 몽타
     {"frm":"Custom ActionNotify","to":"Custom ActionNotify","label":"Notify_Editor — 에디터 프리뷰 전용"},
   ])
 
-# ═══════════════════════════════════════════════════════════════
-# D4. 인게임 연출 파이프라인
-# ═══════════════════════════════════════════════════════════════
-emit_seq("cinema-pipeline", "인게임 연출 — 별자리 룰렛/순례 연출 라이프사이클",
-  ["CinemaConstellationManager", "CineConstellationRoulette", "PocketLevelSubsystem", "ALevelSequenceActor", "SceneCapture2D"],
-  [
-    {"frm":"CinemaConstellationManager","to":"PocketLevelSubsystem","label":"SpawnPocketLevel (연출 공간 구성)"},
-    {"frm":"CinemaConstellationManager","to":"CineConstellationRoulette","label":"Appear(PointRid) 트리거"},
-    {"frm":"CineConstellationRoulette","to":"CinemaConstellationManager","label":"CreateLevelSeqActor(SoftObjectPtr)"},
-    {"frm":"CinemaConstellationManager","to":"ALevelSequenceActor","label":"SetSequence(LoadSynchronous) 비동기"},
-    {"frm":"CineConstellationRoulette","to":"ALevelSequenceActor","label":"Play() (PlaySequence)"},
-    {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(true) → RenderTarget → UI 합성"},
-    {"frm":"ALevelSequenceActor","to":"CineConstellationRoulette","label":"OnFinished","ret":True},
-    {"frm":"CineConstellationRoulette","to":"CinemaConstellationManager","label":"DestroyLevelSeqActors()"},
-    {"frm":"CinemaConstellationManager","to":"ALevelSequenceActor","label":"Stop() + Destroy() (메모리 해제)"},
-    {"frm":"SceneCapture2D","to":"SceneCapture2D","label":"SetVisibility(false) 연출 종료"},
-  ])
-
 # ── 데이터 파이프라인 자동화 흐름: 기획 Excel → Python 파이프라인(Cron · Unit · 커스텀 검증) → JSON → 런타임 ──
 emit_seq("data-pipeline-flow", "데이터 파이프라인 — Excel → Python 변환 · 검증 → JSON → 런타임",
   ["기획 Excel", "Python 파이프라인", "Custom Validation Script", "JSON 메타데이터", "MetaDataSubsystem"],

@@ -8,8 +8,6 @@ summary: "횡적 성장 컨텐츠의 클라이언트 · 서버 통신과, 별자
 tags: ["Gameplay", "Content", "HTTP API", "WebSocket", "PocketLevel", "LevelSequence", "Niagara", "UI Particle", "DeltaTime"]
 imageLayout: slider
 images:
-  - src: "/images/projects/rendering-cinema/constellation-preview.gif"
-    alt: "별자리 전환 연출"
   - src: "/images/projects/sol-content/Screenshot_26.png"
   - src: "/images/projects/sol-content/Screenshot_27.png"
   - src: "/images/projects/sol-content/Screenshot_28.png"
@@ -31,8 +29,8 @@ images:
     <p class="case-title">프레임 드랍 시 획득 연출 폭주</p>
     <dl>
       <dt>문제</dt><dd>Delta Time이 커지면 파티클이 판정 범위를 한 프레임에 지나쳐 목표 주위를 계속 회전</dd>
-      <dt>해결</dt><dd>Tick의 Delta를 <code>MaxDeltaTime</code>(0.03초) 단위로 나눠 여러 스텝으로 진행</dd>
-      <dt>결과</dt><dd>어떤 프레임에서도 한 스텝 이동량이 제한되어 판정 누락 제거</dd>
+      <dt>해결</dt><dd>이동 선분 기준 획득 판정 + Delta를 0.03초 이하 스텝으로 나눠 갱신(스텝 수 상한)</dd>
+      <dt>결과</dt><dd>한 프레임에 판정 반경을 지나쳐도 획득 처리, 긴 히칭에도 갱신 횟수가 무한히 늘지 않음</dd>
     </dl>
     <a class="case-more" href="#case-obtain">자세히 ↓</a>
   </div>
@@ -61,9 +59,6 @@ images:
 
 <img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 컨텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
-- 별자리 · 순례 연출은 인게임과 분리된 공간(PocketLevel)에서 재생하고, 시퀀스 · 액터 자원은 연출 구간에만 사용
-
-<img class="diagram" src="/images/diagrams/cinema-pipeline.svg" alt="인게임 연출 파이프라인: 트리거 → PocketLevel Instance → LevelSequenceActor → SceneCapture2D→RenderTarget → UI 합성, 종료 시 Actor 파괴·캡처 off" />
 
 ## 구현 내용
 
@@ -75,48 +70,43 @@ images:
 
 - <strong>문제 — 프레임 드랍 시 판정 범위 통과</strong>
   - 경험치 파티클이 NPC 피격 위치에서 플레이어를 향해 날아가는 중, 프레임 드랍(히칭)으로 Delta Time이 비정상적으로 커지면 판정 범위를 한 프레임에 뛰어넘어 목표 주위를 계속 회전
-- <strong>해결 — MaxDeltaTime 루프 분할</strong>
-  - `AObtainEffectObject::Tick`에서 프레임 Delta를 `MaxDeltaTime`(0.03초) 단위로 나눠 처리
-  - 어떤 프레임에서도 한 스텝 이동이 최대 30ms 분량을 넘지 않아 판정 범위를 건너뛰지 않음
+- <strong>원인</strong>
+  - 이동 후 위치가 목표 반경(`ObtainRange` 30cm) 안에 있는지만 보는 점 판정이라, 한 스텝 이동 거리가 반경보다 길면 목표를 지나침
+  - 지나친 뒤에는 목표 방향으로 다시 꺾이며 주위를 맴돎
+- <strong>해결 1 — 이동 선분 기준 획득 판정</strong>
+  - 이번 스텝의 이동 선분과 목표 사이 거리(`PointDistToSegment`)가 반경 이내면 목표 위치로 붙여 획득 처리 → 한 프레임에 지나쳐도 놓치지 않음
+  - 가속이 상한에 닿으면 랜덤 속도 성분을 0으로 만들어 목표로 직진, `LifeTime`을 넘기면 강제 종료하는 안전장치
+
+    ```cpp
+    // ObtainEffectObject.cpp — FSingleEffect::UpdateSingle
+    FVector NewLocation = CurrentLocation + DesiredVelocity * DeltaTime;
+
+    // 이동 경로가 획득 반경을 지나가면 목표 위치로 스냅 (이동 후 점 판정만으로는 놓칠 수 있음)
+    float Distance = FMath::PointDistToSegment(TargetLocation, CurrentLocation, NewLocation);
+    if (Distance <= ObtainRange)
+    {
+        NewLocation = TargetLocation;
+    }
+    ```
+
+- <strong>해결 2 — Delta 분할 갱신 + 스텝 수 상한</strong>
+  - 긴 프레임의 Delta를 `MaxDeltaTime`(0.03초) 이하 스텝으로 나눠 여러 번 갱신해, 한 번에 큰 시간 간격으로 적분하지 않음
+  - 스텝 수를 `MaxSubSteps`(8)로 제한하고 남은 시간은 버림 → 긴 히칭에서 갱신 횟수가 늘어 프레임이 더 길어지는 따라잡기 루프 방지
 
     ```cpp
     // ObtainEffectObject.cpp
     void AObtainEffectObject::Tick(float DeltaSeconds)
     {
         Super::Tick(DeltaSeconds);
-        // DeltaSeconds가 MaxDeltaTime을 초과하면 MaxDeltaTime 단위로 쪼개어 스텝마다 판정
-        while (DeltaSeconds > 0)
+
+        int32 SubStep = 0;
+        while (DeltaSeconds > KINDA_SMALL_NUMBER && SubStep < MaxSubSteps && !IsFinished)
         {
-            UpdateEffect(FMath::Min(DeltaSeconds, MaxDeltaTime));
-            DeltaSeconds -= MaxDeltaTime;
+            const float StepTime = FMath::Min(DeltaSeconds, MaxDeltaTime);
+            UpdateEffect(StepTime);
+            DeltaSeconds -= StepTime;
+            ++SubStep;
         }
-    }
-    ```
-
-- <strong>연출 흐름</strong>
-  - 피격자 위치에서 `StartDirection`(피격자 → 공격자 방향의 반대)으로 발사
-  - 초기에는 랜덤 속도(`RandomVelocity`)가 더해져 퍼져 나가고, 가속도를 매 스텝 누적해 획득자 방향으로 점점 빠르게 추격
-  - 타겟까지 거리가 `ObtainRange`(30cm) 이하가 되면 획득 판정 후 종료 이펙트 재생
-
-    ```cpp
-    // ObtainEffectObject.cpp — 매 스텝 위치 갱신
-    void FSingleEffect::UpdateSingle(float DeltaTime)
-    {
-        FVector DirectionToTarget =
-            (TargetLocation - NiagaraComponent->GetComponentLocation()).GetSafeNormal();
-
-        // 가속도 누적 — MaxAcceleration 초과 방지
-        Accel = FMath::Min(Accel + Data.Acceleration * DeltaTime, Data.MaxAcceleration);
-        float DesiredSpeed = Data.InitSpeed + Accel;
-        float RandomSpeed  = Accel >= Data.MaxAcceleration ? 0 :
-                             FMath::Max(0, RandomVelocity.Size() - Accel);
-
-        FVector DesiredVelocity =
-            DesiredSpeed * DirectionToTarget +
-            RandomVelocity.GetSafeNormal() * RandomSpeed;
-
-        NiagaraComponent->SetWorldLocation(
-            NiagaraComponent->GetComponentLocation() + DesiredVelocity * DeltaTime, true);
     }
     ```
 
@@ -145,9 +135,10 @@ images:
     SingleEffect.RandomVelocity = TargetDirection * Data.CurveForce * CurveDistanceInterpolator;
     ```
 
-  - 확산 범위(`MinRandomRange` / `MaxRandomRange`)는 재화 타입별로 데이터에서 조정
 
 ### PocketLevel · 시퀀스 수명 관리
+
+<figure style="text-align:center"><img src="/images/projects/rendering-cinema/constellation-preview.gif" alt="별자리 전환 연출 — PocketLevel 안에서 재생되는 별자리 LevelSequence" /><figcaption style="font-size:11px;color:#888;margin-top:6px">별자리 전환 연출 — PocketLevel에서 재생되는 LevelSequence</figcaption></figure>
 
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
 - <strong>진입 시 Stream In · 종료 시 Stream Out</strong>
