@@ -26,15 +26,21 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 function extractHeadings(markdown: string): Heading[] {
   const lines = markdown.split('\n');
   const headings: Heading[] = [];
+  let inImpl = false; // 현재 '## 구현 내용' 섹션 안인지
+  let inFence = false;
   for (const line of lines) {
+    if (/^\s*```/.test(line)) { inFence = !inFence; continue; }
+    if (inFence) continue;
     const m = line.match(/^(#{2,3})\s+(.+)/);
     if (!m) continue;
     const level = m[1].length as 2 | 3;
-    // ### 세부 제목은 목차에서 제외
-    if (level === 3) continue;
+    if (level === 2) inImpl = /^구현 내용\s*$/.test(m[2].trim());
+    // ### 세부 제목은 '구현 내용' 하위만 목차에 포함
+    if (level === 3 && !inImpl) continue;
     const raw = m[2].replace(/\*\*/g, '').replace(/`[^`]*`/g, (s) => s.slice(1, -1)).trim();
-    // 사이드바용 축약: "— 설명" 부분 제거, 번호 접두사 제거
-    const text = raw.replace(/\s*[—–]\s*.+$/, '').replace(/^\d+\.\s*/, '').trim();
+    // 사이드바용 축약: "— 설명" 부분 제거, 번호 접두사 제거, (### 은) 끝 괄호 설명 제거
+    let text = raw.replace(/\s*[—–]\s*.+$/, '').replace(/^\d+\.\s*/, '').trim();
+    if (level === 3) text = text.replace(/\s*\([^)]*\)\s*$/, '').trim() || text;
     // id는 원본(raw) 기준으로 생성 — 헤더 렌더러와 일치시킴
     const id = raw
       .toLowerCase()
