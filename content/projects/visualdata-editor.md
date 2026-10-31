@@ -6,10 +6,12 @@ role: "Tools / Editor"
 period: "2023 — 현재 (리팩토링)"
 summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터 확장."
 tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
-images:
-  - src: "/images/projects/visualdata/Screenshot_25.png"
-    alt: "VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰"
 ---
+
+<div class="shot-row">
+  <figure><img src="/images/projects/visualdata/editor-bone-transform.gif" alt="VisualData 에디터에서 BoneTransform 값을 바꾸면 프리뷰 캐릭터 체형이 바로 바뀌는 모습" /><figcaption>본 트랜스폼 값 변경이 프리뷰에 즉시 반영</figcaption></figure>
+  <figure><img src="/images/projects/visualdata/Screenshot_25.png" alt="VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰" /><figcaption>VisualData 에디터 — 파츠별 메시 설정</figcaption></figure>
+</div>
 
 ## 문제 해결 요약
 
@@ -64,8 +66,6 @@ images:
 <div id="case-preview-bones" class="case-anchor"></div>
 
 ### 에디터 본 트랜스폼 프리뷰 — AnimPreviewInstance
-
-![VisualData 에디터 — 파츠 · BoneTransform 값을 디테일 패널에서 바꾸면 우측 프리뷰 캐릭터에 바로 반영](/images/projects/visualdata/editor-bone-transform.jpg)
 
 - PC의 체형 값을 인게임에서는 AnimInstance(`ULocomotionAnimInstance`)에 넘겨 적용
 - 에디터 프리뷰 메시(`UDebugSkelMeshComponent`)는 `UAnimPreviewInstance`로 재생돼 이 경로를 타지 않음 → 에디터 전용 `UEditorTransformBonesComponent`에서 프리뷰 인스턴스에 직접 적용
