@@ -88,11 +88,11 @@
 .lead-headline { font-size: clamp(16px, 1.9vw, 20px); font-weight: 600; margin: 0 0 16px; opacity: .85; word-break: keep-all; }
 .lead-intro { font-size: 16px; line-height: 1.75; opacity: .8; margin: 0 0 26px; }
 /* 히어로 키워드 문구 — 스캔 쉬운 pill */
-.lead-keywords { list-style: none; padding: 0; margin: 4px 0 28px; display: flex; flex-wrap: wrap; gap: 9px; }
+.lead-keywords { scroll-margin-top: 90px; list-style: none; padding: 0; margin: 4px 0 28px; max-width: 620px; display: flex; flex-wrap: wrap; gap: 9px; }
 .lead-keywords li { font-size: 13.5px; font-weight: 600; padding: 7px 14px; border-radius: 999px;
   color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
   background: color-mix(in srgb, var(--accent) 10%, transparent); }
-.lead-keywords li:nth-child(2) { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent-2) 45%, transparent);
+.lead-keywords li.kw-alt { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent-2) 45%, transparent);
   background: color-mix(in srgb, var(--accent-2) 12%, transparent); }
 /* 인적사항 · 학력 (작게) */
 .lead-bio { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 6px; }

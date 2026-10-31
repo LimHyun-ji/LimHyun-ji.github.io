@@ -103,18 +103,12 @@ export default function Home() {
             {id.tagline && <p className="lead-tagline">{glue(id.tagline)}</p>}
             <p className="lead-headline">{glue(p.headline)}</p>
             {heroSkills.length > 0 && (
-              <div className="lead-skills" id="skills" aria-label="Skills">
-                {heroSkills.map((g) => (
-                  <div className="ls-row" key={g.category}>
-                    <span className="ls-cat">{g.category}</span>
-                    <span className="ls-vals">
-                      {g.items.map((it, i) => (
-                        <span key={it}>{i > 0 && <i className="ls-sep">·</i>}{it}</span>
-                      ))}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <ul className="lead-keywords" id="skills" aria-label="기술스택">
+                {heroSkills.flatMap((g, gi) =>
+                  g.items.map((it) => (
+                    <li key={g.category + it} className={gi % 2 ? 'kw-alt' : undefined} title={g.category}>{glue(it)}</li>
+                  )))}
+              </ul>
             )}
             <div className="lead-actions">
               {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
