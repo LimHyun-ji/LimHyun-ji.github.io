@@ -169,8 +169,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .detail-body .shot-row figcaption { margin-top: 6px; font-size: 12.5px; text-align: center; color: var(--muted); }
 
 /* FEATURED — Sol */
-.featured { max-width: 1600px; margin: 0 auto; padding: 40px clamp(20px, 5vw, 48px);
-  border-top: 1px solid var(--line); }
+.featured { max-width: 1600px; margin: 0 auto; padding: 56px clamp(20px, 5vw, 48px) 40px; }
 .featured-tag { display: inline-block; color: var(--accent-3); font-weight: 700; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
 .featured-title { font-size: clamp(30px, 5vw, 46px); margin: 0 0 14px; font-weight: 800; letter-spacing: -.5px; }
 .featured-sub { font-size: 16px; line-height: 1.75; opacity: .82; max-width: 720px; margin: 0 0 30px; }
@@ -212,8 +211,7 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 
 /* SIDE PROJECTS (12개 컴팩트 그리드) */
 /* 사이드 프로젝트 — 메인 프로젝트와 구분되는 풀폭 밴드 */
-.side-band { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  padding: 66px 0; margin-top: 28px; }
+.side-band { padding: 56px 0 72px; }
 .side-inner { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
 .section-h { font-size: clamp(24px, 4vw, 34px); font-weight: 800; margin: 0 0 6px; letter-spacing: -.5px; }
 .section-note { margin: 0 0 24px; font-size: 13px; color: var(--muted); }
@@ -527,3 +525,12 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .img-slider-slide video { width: 100%; height: auto; display: block; object-fit: cover; aspect-ratio: 16 / 10; pointer-events: none; }
 .img-gallery-item video { width: 100%; height: auto; display: block; object-fit: contain; }
 @media (max-width: 720px) { .detail-body video { max-width: 100%; } }
+
+/* 큰 섹션 제목 — Main Project / Side Projects (배경 띠 없이 제목으로 구분) */
+.section-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 26px;
+  font-size: clamp(36px, 5.6vw, 60px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05;
+  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 60%, var(--accent-3) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.section-title-sub { font-size: clamp(14px, 1.5vw, 17px); font-weight: 700; letter-spacing: 0; color: var(--muted);
+  -webkit-text-fill-color: var(--muted); }
+.featured-title { font-size: clamp(26px, 3.6vw, 36px); }

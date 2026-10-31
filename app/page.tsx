@@ -158,10 +158,10 @@ export default function Home() {
 
       {/* FEATURED — SOL (메인 프로젝트, 크게) */}
       <section className="featured" id="sol">
-        <div className="featured-tag">◆ Main Project · 메인 프로젝트</div>
+        <h2 className="section-title">Main Project<span className="section-title-sub">메인 프로젝트</span></h2>
         <div className="featured-intro">
           <div className="featured-text">
-            <h2 className="featured-title">Sol — UE5 MMORPG</h2>
+            <h3 className="featured-title">Sol — UE5 MMORPG</h3>
             {p.experience?.[0] && <p className="featured-meta">{glue(`${p.experience[0].org ?? ''} · ${p.experience[0].period ?? ''}`)}</p>}
             <p className="featured-sub">
               {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일 / PC MMORPG. 2023년부터 클라이언트 시스템 · 엔진 툴 · 최적화를 맡고 있습니다.')}
@@ -188,7 +188,7 @@ export default function Home() {
       {/* SIDE PROJECTS — 학부 · 개인 프로젝트 (작은 카드로 비중을 낮춤) */}
       <section className="side-band" id="side">
        <div className="side-inner">
-        <div className="featured-tag">▚ Side Projects · 학부 · 개인 프로젝트</div>
+        <h2 className="section-title">Side Projects<span className="section-title-sub">학부 · 개인 프로젝트</span></h2>
         <p className="section-note">{glue(`개인 · 학습 · 팀 프로젝트 (${sideProjects.length})`)}</p>
         <div className="side-grid-sm">
           {sideProjects.slice(0, 4).map((sp) => (
