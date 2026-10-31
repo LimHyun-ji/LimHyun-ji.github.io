@@ -23,6 +23,24 @@ images:
     </dl>
     <a class="case-more" href="#case-refactor">자세히 ↓</a>
   </div>
+  <div class="case">
+    <p class="case-title">프리뷰에서 본 트랜스폼 미적용</p>
+    <dl>
+      <dt>문제</dt><dd>에디터 프리뷰 메시는 <code>UAnimPreviewInstance</code>로 재생돼, 인게임 AnimInstance를 거치는 본 트랜스폼이 적용되지 않음</dd>
+      <dt>해결</dt><dd>프리뷰 인스턴스의 <code>ModifyBone()</code>으로 본별 Bone Modify 노드를 넣고, 스케일 · 이동의 적용 공간을 분리</dd>
+      <dt>결과</dt><dd>체형 값을 바꾸면 에디터 프리뷰에 바로 반영</dd>
+    </dl>
+    <a class="case-more" href="#case-preview-bones">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">에디터 · 인게임 외형 로직 이중화</p>
+    <dl>
+      <dt>문제</dt><dd>에디터 전용 컴포넌트가 인게임 외형 로직을 따로 구현해, 외형 변경 시 양쪽을 모두 수정해야 함</dd>
+      <dt>해결</dt><dd>인게임 모듈 컴포넌트를 상속해 모듈 생성(<code>CreateModule</code>)만 교체, 에디터 전용 동작은 모듈 override로 분리</dd>
+      <dt>결과</dt><dd>에디터 전용 컴포넌트 삭제, 인게임 모듈 수정이 프리뷰에 그대로 반영</dd>
+    </dl>
+    <a class="case-more" href="#case-module-reuse">자세히 ↓</a>
+  </div>
 </div>
 
 ## 개요
@@ -39,12 +57,78 @@ images:
 
 - 파츠별 메시 · Override Material · Attachment · 본 트랜스폼을 에디터에서 바로 설정하고 프리뷰
 - 몽타주와 Custom ActionNotify를 서버 없이 재생해 전투 연출을 확인 (Notify_Editor 경로)
-- 갓아머 연출용 본 트랜스폼도 에디터 프리뷰 전용 `EditorTransformBonesComponent`로 분리
 - <strong>Editor Slate 구현</strong>
   - VisualData 에디터의 UI를 Slate로 직접 구현
 - <strong>Preview 환경 확장 · 유지보수</strong>
   - 새 Entity 타입이나 기능이 추가될 때마다 Preview 환경을 확장하고 상시 유지보수
   - 데이터 변경 → Preview 화면 즉시 반영: 디테일 패널에서 값을 바꾸면 프로퍼티 변경 이벤트를 받아 프리뷰에 바로 다시 적용 → 저장하거나 다시 실행하지 않아도 결과 확인
+
+<div id="case-preview-bones" class="case-anchor"></div>
+
+### 에디터 본 트랜스폼 프리뷰 — AnimPreviewInstance
+
+- 갓아머 · PC의 체형 값(머리 · 척추 · 팔 · 다리 스케일, 골반 이동)을 인게임에서는 AnimInstance(`ULocomotionAnimInstance`)에 넘겨 적용
+- 에디터 프리뷰 메시(`UDebugSkelMeshComponent`)는 `UAnimPreviewInstance`로 재생돼 이 경로를 타지 않음 → 에디터 전용 `UEditorTransformBonesComponent`에서 프리뷰 인스턴스에 직접 적용
+- <strong>본별 Bone Modify 노드 주입</strong>
+  - `UAnimPreviewInstance::ModifyBone()`이 본 이름으로 `FAnimNode_ModifyBone`을 찾거나 추가 → 체형 값이 바뀔 때마다 같은 노드를 갱신
+  - 스케일은 컴포넌트 공간에서 교체, 이동은 부모 본 공간에서 더하기, 회전은 건드리지 않음
+
+    ```cpp
+    // EditorTransformBonesComponent.cpp
+    if (auto* PrevInst = Cast<UAnimPreviewInstance>(SkelMesh->PreviewInstance))
+    {
+        auto Apply = [PrevInst](FName Bone, FVector Scale, FVector Trans = FVector::ZeroVector)
+        {
+            FAnimNode_ModifyBone& Mod = PrevInst->ModifyBone(Bone);   // find-or-add
+            Mod.ScaleMode        = EBoneModificationMode::BMM_Replace;
+            Mod.Scale            = Scale;
+            Mod.ScaleSpace       = EBoneControlSpace::BCS_ComponentSpace;
+            Mod.TranslationMode  = EBoneModificationMode::BMM_Additive;
+            Mod.Translation      = Trans;
+            Mod.TranslationSpace = EBoneControlSpace::BCS_ParentBoneSpace;
+            Mod.RotationMode     = EBoneModificationMode::BMM_Ignore;
+        };
+        Apply("head", Cur.HeadScale);
+        Apply("pelvis", Cur.PelvisScale, Cur.PelvisTrans);
+        Apply("upperarm_l", Cur.ArmsScale);
+        // spine · clavicle · thigh 등 12개 본
+    }
+    ```
+
+- 게임 쪽 `UTransformBonesComponent`도 AnimInstance 종류로 분기해, 프리뷰 인스턴스면 같은 방식으로 적용 (`#if WITH_EDITOR`)
+
+<div id="case-module-reuse" class="case-anchor"></div>
+
+### 에디터 프리뷰의 인게임 모듈 재사용
+
+- 기존에는 에디터 전용 `VisualDataEditorComponent`가 인게임 외형 로직을 따로 구현 → 외형 기능을 바꿀 때마다 인게임 · 에디터 양쪽 수정
+- <strong>상속 + 모듈 생성 교체 (Factory Method)</strong>
+  - 에디터 컴포넌트를 인게임 `UVisualDataModuleComponent`의 자식으로 바꾸고, 타입별 모듈 생성 함수 `CreateModule()` 하나만 override
+  - 생성되는 에디터 모듈도 인게임 모듈(PC · NPC · Spirit · Item)을 상속 → 로드 · 파츠 적용 · 전이 규칙은 인게임 코드 그대로 실행
+
+    ```cpp
+    // VisualDataEditorModuleComponent.cpp
+    TSharedPtr<FVisualDataModuleBase> UVisualDataEditorModuleComponent::CreateModule(const UVisualGameDataBase* InVisualGameData)
+    {
+        if (InVisualGameData->DataType == EVisualGameDataType::GodArmor
+            || InVisualGameData->DataType == EVisualGameDataType::PC)
+        {
+            // FVisualDataEditorModulePC : FVisualDataModulePC
+            TSharedPtr<FVisualDataModuleBase> Module = MakeShared<FVisualDataEditorModulePC>(this);
+            Module->SetVisualGameData(const_cast<UVisualGameDataBase*>(InVisualGameData));
+            return Module;
+        }
+        // NPC · Spirit · Item도 같은 방식
+        ...
+        return Super::CreateModule(InVisualGameData);   // 그 외 타입은 인게임 모듈 그대로
+    }
+    ```
+
+- <strong>에디터 전용 동작은 override로만</strong>
+  - 전이 규칙: PC는 메인 파츠가 바뀔 때만 전체 재적용, NPC · Spirit는 항상 전체 재적용 (`EvaluateTransitionRule`)
+  - 무기 소켓 프리뷰: 에셋 로드 완료 후 지정한 무기 메시를 소켓에 붙이고, 모듈 정리 시 함께 제거 (`ApplySocket` · `ClearModule`)
+  - Spirit 프리뷰는 Dissolve 연출 값을 0으로 고정
+- 이후 기존 `VisualDataEditorComponent`를 삭제하고, 캐릭터 뷰어 · FX 에디터의 프리뷰도 같은 모듈 컴포넌트로 전환
 
 <div id="case-refactor" class="case-anchor"></div>
 
