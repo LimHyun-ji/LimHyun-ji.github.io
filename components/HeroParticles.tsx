@@ -18,7 +18,16 @@ export default function HeroParticles() {
     let disposed = false;
     let cleanup = () => {};
 
+    // 첫 화면 표시(LCP)와 경쟁하지 않도록, 페이지 로드가 끝나고 브라우저가 한가할 때 Three.js를 불러온다
+    const whenIdle = () => new Promise<void>((resolve) => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      const idle = () => (w.requestIdleCallback ? w.requestIdleCallback(() => resolve(), { timeout: 2500 }) : w.setTimeout(resolve, 600));
+      if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
+    });
+
     (async () => {
+      await whenIdle();
+      if (disposed) return;
       const THREE = await import('three');
       if (disposed || !canvas.parentElement) return;
       const host = canvas.parentElement;
@@ -52,7 +61,7 @@ export default function HeroParticles() {
       // 테마
       const applyTheme = () => {
         const light = document.documentElement.getAttribute('data-theme') === 'light';
-        pMat.color.set(light ? 0x138a4c : 0x22a862); // 사이트 강조색 (초록)
+        pMat.color.set(light ? 0x0f7a42 : 0x22a862); // 사이트 강조색 (초록)
         pMat.opacity = light ? 0.5 : 0.75;
       };
       applyTheme();

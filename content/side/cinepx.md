@@ -5,7 +5,7 @@ engine: "Unity / C#"
 period: "2022.10 – 2022.11"
 team: "XR 2 · AI 2 · CR 1"
 status: "Highlights"
-image: "/images/cinepx-1.png"
+image: "/images/cinepx-1.webp"
 video: "https://youtu.be/aKcv3BfkqDQ"
 tags: ["Unity", "Cinemachine", "RenderTexture", "Optimization"]
 links: { git: "https://github.com/LimHyun-ji/AppleBox", doc: "https://www.miricanvas.com/ko/v/11mrvoy", video: "https://youtu.be/aKcv3BfkqDQ" }

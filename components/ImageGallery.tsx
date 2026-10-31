@@ -1,5 +1,6 @@
 'use client';
-import LoopVideo, { gifToVideo } from './LoopVideo';
+import LoopVideo from './LoopVideo';
+import { gifToVideo } from '@/lib/media';
 
 import { useState, useCallback, useEffect } from 'react';
 

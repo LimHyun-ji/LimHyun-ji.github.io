@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import LoopVideo, { gifToVideo } from './LoopVideo';
+import LoopVideo from './LoopVideo';
+import { gifToVideo } from '@/lib/media';
 
 interface ImageSliderProps {
   images: { src: string; alt?: string; caption?: string }[];

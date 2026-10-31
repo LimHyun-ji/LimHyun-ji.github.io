@@ -48,7 +48,7 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - Unreal Insights 측정 결과 `Slate::Tick (Time and Widgets)` · `Slate::DrawWindows` · `Slate_PaintSlowPath`가 매 프레임 실행 → 바뀌지 않은 위젯까지 매 프레임 다시 계산하고 그리고 있었음
   - 이 측정 결과를 근거로 Invalidation을 적용할 화면 / 레이어를 결정
 
-  ![Slate 사이클 카운터 — Total Slate Tick Time·Draw Window·Game UI Paint·Tick Widgets](/images/projects/optimization/image-20250709-123214.png)
+  ![Slate 사이클 카운터 — Total Slate Tick Time·Draw Window·Game UI Paint·Tick Widgets](/images/projects/optimization/image-20250709-123214.webp)
   ![Unreal Insights 타이밍 뷰 — Slate::Tick·Slate::DrawWindows·Slate::Prepass·Slate_PaintSlowPath](/images/projects/optimization/image-20250709-123225.png)
 
 - <strong>적용 — Global Invalidation 화면 단위 동적 토글</strong>
@@ -92,7 +92,7 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
 
 - 원거리 Entity는 분리된 파츠 중 LOD에 따라 파츠를 통합, 원거리에서 그리는 파츠 수를 줄임
 - <strong>판정 기준</strong>
-  - Torso 메시의 `GetPredictedLODLevel()`이 `OptimizeLOD`(2) 이상이면 대상 파츠를 숨김
+  - Torso 메시의 `GetPredictedLODLevel()` 값이 `OptimizeLOD`(2) 이상이면 대상 파츠를 숨김
   - 컴포넌트 Tick(1초 간격)에서 LOD 값이 바뀐 경우에만 Visibility를 갱신하고, 에셋 로드 완료 시점에 한 번 다시 적용
 
     ```cpp

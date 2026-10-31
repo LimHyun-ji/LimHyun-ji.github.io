@@ -8,9 +8,9 @@ summary: "횡적 성장 콘텐츠의 클라이언트 · 서버 통신 및 연출
 tags: ["네트워크 동기화", "게임 수학", "렌더링"]
 imageLayout: slider
 images:
-  - src: "/images/projects/sol-content/Screenshot_26.png"
-  - src: "/images/projects/sol-content/Screenshot_27.png"
-  - src: "/images/projects/sol-content/Screenshot_28.png"
+  - src: "/images/projects/sol-content/Screenshot_26.webp"
+  - src: "/images/projects/sol-content/Screenshot_27.webp"
+  - src: "/images/projects/sol-content/Screenshot_28.webp"
 ---
 
 ## 문제 해결 요약
@@ -67,7 +67,7 @@ images:
 
 ### 경험치 획득 연출 — 궤적 · 시간 보정
 
-<figure style="text-align:center"><img src="/images/projects/sol-content/exp-obtain-effect.gif" alt="경험치 획득 연출" /><figcaption style="font-size:11px;color:#888;margin-top:6px">경험치 획득 시 파티클이 플레이어 방향으로 가속 추격하는 연출</figcaption></figure>
+<figure style="text-align:center"><img src="/images/projects/sol-content/exp-obtain-effect.gif" alt="경험치 획득 연출" /><figcaption style="font-size:11px;color:var(--muted);margin-top:6px">경험치 획득 시 파티클이 플레이어 방향으로 가속 추격하는 연출</figcaption></figure>
 
 - <strong>문제 — 프레임 드랍 시 판정 범위 통과</strong>
   - 경험치 파티클이 NPC 피격 위치에서 플레이어를 향해 날아가는 중, 프레임 드랍(히칭)으로 Delta Time이 비정상적으로 커지면 판정 범위를 한 프레임에 뛰어넘어 목표 주위를 계속 회전
@@ -139,7 +139,7 @@ images:
 
 ### PocketLevel · 시퀀스 수명 관리
 
-<figure style="text-align:center"><img src="/images/projects/rendering-cinema/constellation-preview.gif" alt="별자리 전환 연출 — PocketLevel 안에서 재생되는 별자리 LevelSequence" /><figcaption style="font-size:11px;color:#888;margin-top:6px">별자리 전환 연출 — PocketLevel에서 재생되는 LevelSequence</figcaption></figure>
+<figure style="text-align:center"><img src="/images/projects/rendering-cinema/constellation-preview.gif" alt="별자리 전환 연출 — PocketLevel 안에서 재생되는 별자리 LevelSequence" /><figcaption style="font-size:11px;color:var(--muted);margin-top:6px">별자리 전환 연출 — PocketLevel에서 재생되는 LevelSequence</figcaption></figure>
 
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
 - <strong>진입 시 Stream In · 종료 시 Stream Out</strong>

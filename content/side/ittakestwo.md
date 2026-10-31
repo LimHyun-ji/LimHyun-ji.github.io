@@ -5,7 +5,7 @@ engine: "Unity / C#"
 period: "2022.08"
 team: "개발자 2인"
 status: "Highlights"
-image: "/images/ittakestwo-1.png"
+image: "/images/ittakestwo-1.webp"
 video: "https://youtu.be/23g39-UNHLQ"
 tags: ["Unity", "FSM", "Shader", "Bezier", "IK"]
 links: { git: "https://github.com/LimHyun-ji/ItTakesTwo_GG", doc: "https://www.miricanvas.com/v/11j6dmn", video: "https://youtu.be/23g39-UNHLQ" }

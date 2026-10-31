@@ -78,7 +78,7 @@ tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
 ### 전이 규칙으로 부분 갱신 최적화
 
 - 헬멧 하나만 바꿔도 전신 파츠와 Attachment를 전부 다시 로드하고 있었음 → 외형 데이터가 바뀔 때마다 모듈 전체를 다시 적용하는 구조였기 때문
-- 다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 <strong>전이 규칙</strong>(`EvaluateTransitionRule`) 도입
+- 다음 데이터와 현재 상태를 비교해 갱신 범위를 정하는 <strong>전이 규칙</strong> (`EvaluateTransitionRule`) 도입
   - <strong>NoUpdate</strong>: 동일 → 아무것도 안 함
   - <strong>PartialUpdate</strong>: 바뀐 파츠만 교체 (예: 헬멧만)
   - <strong>FullReset</strong>: 전면 재구성

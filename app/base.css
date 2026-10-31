@@ -26,16 +26,16 @@
   --card: #ffffff;
   --border: #d3e2da;
   --text: #14201A;
-  --muted: #5a6b62;
-  --accent: #138A4C;
-  --accent-2: #A67C00;
-  --accent-3: #C9572E;
-  --accent-soft: rgba(19, 138, 76, 0.10);
-  --accent-2-soft: rgba(166, 124, 0, 0.12);
+  --muted: #4d5c54;
+  --accent: #0F7A42;
+  --accent-2: #8A6700;
+  --accent-3: #B24A22;
+  --accent-soft: rgba(15, 122, 66, 0.10);
+  --accent-2-soft: rgba(138, 103, 0, 0.12);
   --shadow: 0 8px 24px rgba(90, 107, 98, 0.2);
   /* Darcula 팔레트 — 라이트 배경 대비 보정 (같은 색상 계열을 어둡게) */
-  --rd-orange: #C9572E; --rd-yellow: #A67C00; --rd-green: #138A4C; --rd-blue: #2F6A9E;
-  --rd-purple: #7A5A93; --rd-olive: #7E7A12; --rd-gold: #9A6B12; --rd-slate: #4E5B66;
+  --rd-orange: #B24A22; --rd-yellow: #8A6700; --rd-green: #0F7A42; --rd-blue: #2F6A9E;
+  --rd-purple: #7A5A93; --rd-olive: #66630E; --rd-gold: #80590F; --rd-slate: #4E5B66;
   --code-bg: #2B2B2B;
 }
 
@@ -43,7 +43,7 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.65;
@@ -75,7 +75,7 @@ a:hover { text-decoration: underline; }
 /* ───────────── Hero ───────────── */
 .hero { padding: 110px 0 60px; }
 .hero .eyebrow {
-  font-family: 'JetBrains Mono', monospace; color: var(--accent);
+  font-family: var(--font-mono), 'JetBrains Mono', monospace; color: var(--accent);
   font-size: 0.9rem; letter-spacing: 0.05em; margin: 0 0 8px;
 }
 .hero h1 {
@@ -114,7 +114,7 @@ a:hover { text-decoration: underline; }
   white-space: nowrap; /* 태그는 한 덩어리 — 줄바꿈은 태그 단위로만 */
   background: var(--accent-soft); color: var(--accent);
   padding: 5px 12px; border-radius: 999px; font-size: 0.88rem;
-  font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace; font-weight: 600;
 }
 .chips.small li { font-size: 0.78rem; padding: 3px 10px; }
 
@@ -128,7 +128,7 @@ a:hover { text-decoration: underline; }
 .card:hover { transform: translateY(-3px); border-color: var(--accent); }
 .card header { margin-bottom: 12px; }
 .card h3 { margin: 0 0 4px; font-size: 1.2rem; }
-.card .meta { color: var(--muted); font-size: 0.88rem; font-family: 'JetBrains Mono', monospace; }
+.card .meta { color: var(--muted); font-size: 0.88rem; font-family: var(--font-mono), 'JetBrains Mono', monospace; }
 .card .summary { margin: 0 0 14px; color: var(--text); }
 .highlights { margin: 0 0 16px; padding-left: 20px; color: var(--muted); }
 .highlights li { margin-bottom: 6px; }
@@ -136,7 +136,7 @@ a:hover { text-decoration: underline; }
 /* ───────────── Timeline ───────────── */
 .timeline { display: grid; gap: 24px; }
 .tl-item { display: grid; grid-template-columns: 160px 1fr; gap: 16px; }
-.tl-period { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding-top: 2px; }
+.tl-period { color: var(--muted); font-family: var(--font-mono), 'JetBrains Mono', monospace; font-size: 0.9rem; padding-top: 2px; }
 .tl-body h3 { margin: 0 0 6px; font-size: 1.1rem; }
 .tl-body .org { color: var(--muted); font-weight: 400; font-size: 0.95rem; }
 .tl-body p { margin: 0; color: var(--muted); }
@@ -154,20 +154,20 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .card-link:hover h3 .arrow { transform: translateX(4px); opacity: 1; }
 .card .more {
   display: inline-block; margin-top: 4px; color: var(--accent);
-  font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 600; font-family: var(--font-mono), 'JetBrains Mono', monospace;
 }
 
 /* ───────────── Project detail page ───────────── */
 .project-detail { padding: 100px 0 40px; }
 .back {
-  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  display: inline-block; font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.9rem; color: var(--muted); margin-bottom: 24px;
 }
 .back:hover { color: var(--accent); text-decoration: none; }
 .back.bottom { margin-top: 40px; margin-bottom: 0; }
 .detail-head { margin-bottom: 32px; }
 .detail-head .eyebrow {
-  font-family: 'JetBrains Mono', monospace; color: var(--accent-2);
+  font-family: var(--font-mono), 'JetBrains Mono', monospace; color: var(--accent-2);
   font-size: 0.9rem; margin: 0 0 8px;
 }
 .detail-head h1 { font-size: clamp(2.3rem, 6vw, 3.5rem); font-weight: 800; margin: 0 0 14px; letter-spacing: -0.03em; line-height: 1.1; }
@@ -219,7 +219,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 .detail-body :not(pre) > code {
   background: var(--accent-soft); color: var(--accent);
   padding: 2px 6px; border-radius: 5px;
-  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 0.9em;
+  font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 0.9em;
 }
 
 /* 코드 블록 — Rider 기본 폰트(JetBrains Mono), 다크 에디터 스타일 */
@@ -229,7 +229,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 }
 .detail-body pre code {
   display: block; background: none; color: #A9B7C6; padding: 0; border-radius: 0;
-  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   font-size: 0.82rem; line-height: 1.75; white-space: pre; tab-size: 4;
 }
 
@@ -270,7 +270,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   z-index: 40;
 }
 .toc-title {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;

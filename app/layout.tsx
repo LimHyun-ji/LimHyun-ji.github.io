@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import ScrollReveal from '@/components/ScrollReveal';
 import Analytics from '@/components/Analytics';
+
+// 글꼴을 빌드 시 내려받아 같은 도메인에서 제공 (외부 CSS 요청 · 렌더링 차단 제거)
+const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700', '800'], display: 'swap', variable: '--font-inter' });
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '600', '700'], display: 'swap', variable: '--font-mono' });
 
 export const metadata: Metadata = {
   title: '임현지 · Game Client Developer',
@@ -22,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const themeInit = `(function(){try{var t=localStorage.getItem('theme');var l=(t!=='dark');var d=document.documentElement;if(l)d.setAttribute('data-theme','light');else d.removeAttribute('data-theme');d.style.colorScheme=l?'only light':'dark';var m=document.querySelector('meta[name=\\"theme-color\\"]');if(!m){m=document.createElement('meta');m.setAttribute('name','theme-color');d.querySelector('head').appendChild(m);}m.setAttribute('content',l?'#ffffff':'#0C1210');}catch(e){}})();`;
 
   return (
-    <html lang="ko" data-theme="light" suppressHydrationWarning>
+    <html lang="ko" data-theme="light" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>

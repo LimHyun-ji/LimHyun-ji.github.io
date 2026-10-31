@@ -18,7 +18,7 @@ export const sideProjects: SideProject[] = [
     engine: 'Unity / C#',
     desc: 'SnowGlobe 챕터를 모작하며 오브젝트 특수 상호작용과 협동 시각 요소를 구현하고, 클래스 FSM·벡터 내적 슬라이딩·Bezier·Stencil 셰이더·IK를 재사용성 있게 설계.',
     tags: ['Unity', 'FSM', 'Shader', 'Bezier', 'IK'],
-    image: '/images/ittakestwo-1.png',
+    image: '/images/ittakestwo-1.webp',
     links: { git: 'https://github.com/LimHyun-ji/ItTakesTwo_GG', video: 'https://youtu.be/23g39-UNHLQ', doc: 'https://www.miricanvas.com/v/11j6dmn' },
   },
   {
@@ -38,7 +38,7 @@ export const sideProjects: SideProject[] = [
     engine: 'Unity / C#',
     desc: '다중 카메라 구조화, RenderTexture 미리보기, Camera Timeline(Queue) 블렌딩을 구현하고, 그래픽 최적화(Static·Light Baking·Occlusion Culling)를 담당.',
     tags: ['Unity', 'Cinemachine', 'RenderTexture', 'Optimization'],
-    image: '/images/cinepx-1.png',
+    image: '/images/cinepx-1.webp',
     links: { git: 'https://github.com/LimHyun-ji/AppleBox', video: 'https://youtu.be/aKcv3BfkqDQ', doc: 'https://www.miricanvas.com/v/11mr28x' },
   },
   {

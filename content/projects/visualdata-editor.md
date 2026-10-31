@@ -17,7 +17,7 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
     <p class="case-title">프리뷰에서 본 트랜스폼 미적용</p>
     <dl>
       <dt>문제</dt><dd>에디터 프리뷰 메시는 <code>UAnimPreviewInstance</code>로 재생돼, 인게임 AnimInstance를 거치는 본 트랜스폼이 적용되지 않음</dd>
-      <dt>해결</dt><dd>프리뷰 인스턴스의 <code>ModifyBone()</code>으로 본별 Bone Modify 노드를 넣고, 스케일 · 이동의 적용 공간을 분리</dd>
+      <dt>해결</dt><dd>프리뷰 인스턴스에 <code>ModifyBone()</code> 호출로 본별 Bone Modify 노드를 넣고, 스케일 · 이동의 적용 공간을 분리</dd>
       <dt>결과</dt><dd>체형 값을 바꾸면 에디터 프리뷰에 바로 반영</dd>
     </dl>
     <a class="case-more" href="#case-preview-bones">자세히 ↓</a>
@@ -64,10 +64,10 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
 
 ### 에디터 본 트랜스폼 프리뷰 — AnimPreviewInstance
 
-- PC의 체형 값을 인게임에서는 AnimInstance(`ULocomotionAnimInstance`)에 넘겨 적용
+- PC의 체형 값을 인게임에서는 AnimInstance로 넘겨 적용 (`ULocomotionAnimInstance`)
 - 에디터 프리뷰 메시(`UDebugSkelMeshComponent`)는 `UAnimPreviewInstance`로 재생돼 이 경로를 타지 않음 → 에디터 전용 `UEditorTransformBonesComponent`에서 프리뷰 인스턴스에 직접 적용
 - <strong>본별 Bone Modify 노드 주입</strong>
-  - `UAnimPreviewInstance::ModifyBone()`이 본 이름으로 `FAnimNode_ModifyBone`을 찾거나 추가 → 체형 값이 바뀔 때마다 같은 노드를 갱신
+  - `UAnimPreviewInstance::ModifyBone()` 호출 시 본 이름으로 `FAnimNode_ModifyBone`을 찾거나 추가 → 체형 값이 바뀔 때마다 같은 노드를 갱신
   - 스케일은 컴포넌트 공간에서 교체, 이동은 부모 본 공간에서 더하기, 회전은 건드리지 않음
 
     ```cpp
