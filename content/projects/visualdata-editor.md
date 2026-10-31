@@ -4,7 +4,7 @@ order: 6
 title: "VisualData 에디터 & Commandlet (유지보수 및 개선)"
 role: "Tools / Editor"
 period: "2023 — 현재 (리팩토링)"
-summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터와, 데이터를 빌드 단계에서 export하는 Commandlet 담당."
+summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터와, 빌드 단계 Commandlet export를 타입별 구조에 맞게 개선."
 tags: ["Editor Tooling", "VisualData", "Slate", "EditorModule", "AssetMigration", "Commandlet"]
 images:
   - src: "/images/projects/visualdata/Screenshot_25.png"
