@@ -8,10 +8,7 @@ summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보�
 tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
 ---
 
-<div class="shot-row">
-  <figure><img src="/images/projects/visualdata/editor-bone-transform.gif" alt="VisualData 에디터에서 BoneTransform 값을 바꾸면 프리뷰 캐릭터 체형이 바로 바뀌는 모습" /><figcaption>본 트랜스폼 값 변경이 프리뷰에 즉시 반영</figcaption></figure>
-  <figure><img src="/images/projects/visualdata/Screenshot_25.png" alt="VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰" /><figcaption>VisualData 에디터 — 파츠별 메시 설정</figcaption></figure>
-</div>
+![VisualData 에디터에서 BoneTransform 값을 바꾸면 프리뷰 캐릭터 체형이 바로 바뀌는 모습](/images/projects/visualdata/editor-bone-transform.gif)
 
 ## 문제 해결 요약
 
