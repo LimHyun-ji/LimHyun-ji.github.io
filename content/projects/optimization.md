@@ -53,11 +53,9 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 
 - <strong>적용 — Global Invalidation 화면 단위 동적 토글</strong>
   - CommonUI / Slate 최대 비용은 매 프레임 위젯 재계산 → 무거운 화면과 가벼운 HUD를 구분해 레이어 단위로 토글
-  - 화면(`USolActivatableWidget`)마다 `bUseGlobalInvalidation` 값을 데이터로 지정하고, 풀스크린 화면이 모두 닫히면 다시 활성화
   - 게임 진입 / 종료 시점에도 전역 토글 → 로딩 중 UI 재계산 절감
 
     ```cpp
-    // GeoFullScreenUILayerWidget.cpp — 활성 풀스크린 화면이 바뀔 때마다 호출
     bool IsGlobalInvalidationEnabled = true;   // 풀스크린 화면이 없으면(HUD만) 활성
     if (const auto* SolActivatableWidget = Cast<USolActivatableWidget>(SolWidgetContainer->GetActiveWidget()))
     {
@@ -69,10 +67,9 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 
 <div id="case-forcevolatile" class="case-anchor"></div>
 
-- <strong>부작용 대응 — 계속 바뀌는 위젯의 Volatile 지정</strong>
-  - Invalidation을 켜자 스크롤 리스트 · 파티클처럼 계속 바뀌는 UI가 갱신되지 않는 문제 발생
+- <strong>부작용 대응 1 — 계속 바뀌는 위젯의 Volatile 지정</strong>
+  - 스크롤 리스트 · 파티클처럼 계속 바뀌는 UI가 갱신되지 않는 문제 대응
   - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 컨텐츠까지 캐시 대상에 들어감
-  - 해당 위젯만 Volatile로 캐시에서 빼고 나머지 UI는 Invalidation 유지 — HUD에서 항상 Paint하는 위젯 · 선택상자 팝업 · 특성 강화 UI · UI Particle
 
     ```cpp
     // UIParticle.cpp — 재생 중 매 프레임 바뀌므로 위젯이 다시 만들어질 때마다 Volatile 지정
@@ -83,20 +80,17 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
     }
     ```
 
-- <strong>부작용 대응 — 갱신 누락 시 지연 갱신 · 전체 재무효화</strong>
+- <strong>부작용 대응 2 — 갱신 누락 시 지연 갱신 · 전체 재무효화</strong>
   - 무효화가 걸리지 않는 경로로 값이 바뀌면 화면이 갱신되지 않아, 해당 화면은 2틱 뒤 갱신하도록 보정
   - 재접속 · 게임 접속 시점처럼 UI 상태가 한꺼번에 바뀌는 지점에서는 `InvalidateAllWidget`으로 전체 재무효화
 - <strong>한계와 적용 기준</strong>
   - 갱신 경로가 어긋나면 전체 재갱신이 필요해, 데이터 갱신이 잦거나 타이밍이 맞지 않는 화면은 화면 단위로 끄고 적용 범위를 제한
 - <strong>풀스크린 UI 아래 3D 렌더링 중지</strong>
-  - 풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않는 기존 구조 (`USolDisableGameRenderingSubsystem`) 와 같은 화면 전환 지점에서 Invalidation 토글이 함께 동작
+  - 풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않는 기존 구조 화면 전환 지점에서 동작
 
 ### LOD별 파츠 통합
 
-- 원거리 Entity는 분리된 파츠(Master / Face / Torso / Helmet) 중 Helmet / Face 메시를 LOD에 따라 숨겨, 원거리에서 그리는 파츠 수를 줄임
-- <strong>적용 대상</strong>
-  - VisualData 에셋의 `bUseLODOptimize`를 켠 에셋만 적용 → 에셋별로 데이터에서 선택
-  - 타입별 대상 파츠: PC → Face, 갓아머 / NPC → Helmet · Face
+- 원거리 Entity는 분리된 파츠 중 LOD에 따라 파츠를 통합, 원거리에서 그리는 파츠 수를 줄임
 - <strong>판정 기준</strong>
   - Torso 메시의 `GetPredictedLODLevel()`이 `OptimizeLOD`(2) 이상이면 대상 파츠를 숨김
   - 컴포넌트 Tick(1초 간격)에서 LOD 값이 바뀐 경우에만 Visibility를 갱신하고, 에셋 로드 완료 시점에 한 번 다시 적용
@@ -125,14 +119,10 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
     ```
 
 ### Tick / 기타 비용 절감
-
-- <strong>월드맵 위젯 Tick 분리</strong>
-  - 월드맵 지역 화면의 `NativeTick`을 제거하고, 화면이 열려 있는 동안에만 `FTSTicker`에 틱을 등록 · 닫힐 때 해제
 - <strong>아이템 수집 정렬 키 사전 계산</strong>
   - 정렬 비교마다 슬롯 × 인벤토리를 Lookup하던 구조(비교 O(N log N)회)를, 정렬 전 컬렉션별 1회 계산(O(N))한 키를 비교하도록 변경
 - <strong>함께 적용된 프로젝트 공통 구조</strong>
   - Sector 기반으로 카메라 거리에 따른 NPC 틱 빈도 조절
-  - 조작 불가 / 원격 상태 플레이어의 상태 기반 Tick 비활성화
   - FX 그림자 제거: 파티클 Notify에서 `SetCastShadow(false)`
 
 <div id="case-pooling-crash" class="case-anchor"></div>
@@ -141,7 +131,6 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 
 - 모바일 메모리 예산 · GC 스파이크 절감
 - <strong>UObject → 일반 C++ 클래스 전환</strong>
-  - 아이템 수집 UI의 레시피 슬롯 · 수집 조건 데이터를 `UObject`에서 일반 클래스(`TSharedPtr<FItemCollectionRecipeSlot>`, `FItemCollectionCondition`)로 변경 → 리스트 데이터가 UObject 개수 · GC 추적 대상에서 빠짐
 - <strong>VisualData 무기 FX 정리</strong>
   - FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기 교체 시 나이아가라 잔상이 남던 문제 → Detach에서 직접 `DeactivateImmediate()` 호출로 정리 (`ReleaseToPool()`만으로는 꺼지지 않음)
 - <strong>함께 적용된 프로젝트 공통 구조</strong>
