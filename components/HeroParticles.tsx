@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
  * - 텍스트 가독성을 위해 떠다니는 도형 오브젝트는 제거하고 입자만 유지
  * - 다크/라이트 테마 대응
  * - three는 useEffect 안에서 동적 import → 첫 로드 번들 분리
- * - 마우스 시차, 모바일 축소, prefers-reduced-motion 정지, 뷰포트 밖 렌더 정지, 언마운트 dispose
+ * - 마우스 시차 + 커서 주변 입자 밀어내기, 모바일 축소, prefers-reduced-motion 정지, 뷰포트 밖 렌더 정지, 언마운트 dispose
  */
 export default function HeroParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,9 +40,12 @@ export default function HeroParticles() {
         pos[i * 3 + 1] = (Math.random() - 0.5) * 55;
         pos[i * 3 + 2] = (Math.random() - 0.5) * 40 - 8;
       }
+      const base = pos.slice(); // 원래 위치 — 마우스가 지나간 뒤 이 자리로 돌아온다
       const pGeo = new THREE.BufferGeometry();
-      pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      const pMat = new THREE.PointsMaterial({ size: 0.12, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+      const posAttr = new THREE.BufferAttribute(pos, 3);
+      posAttr.setUsage(THREE.DynamicDrawUsage);
+      pGeo.setAttribute('position', posAttr);
+      const pMat = new THREE.PointsMaterial({ size: 0.15, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
       const points = new THREE.Points(pGeo, pMat);
       scene.add(points);
 
@@ -50,7 +53,7 @@ export default function HeroParticles() {
       const applyTheme = () => {
         const light = document.documentElement.getAttribute('data-theme') === 'light';
         pMat.color.set(light ? 0x138a4c : 0x22a862); // 사이트 강조색 (초록)
-        pMat.opacity = light ? 0.4 : 0.6;
+        pMat.opacity = light ? 0.5 : 0.75;
       };
       applyTheme();
       window.addEventListener('themechange', applyTheme);
@@ -64,9 +67,47 @@ export default function HeroParticles() {
       window.addEventListener('resize', resize);
 
       const target = { x: 0, y: 0 };
+      // 마우스 반응 — 커서를 z=0 평면에 투영해, 반경 안의 입자를 바깥으로 밀어낸다 (터치 기기는 시차만)
+      const ndc = new THREE.Vector2(9, 9);
+      let pointerActive = false;
+      const raycaster = new THREE.Raycaster();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const hit = new THREE.Vector3();
+      const local = new THREE.Vector3();
+      const RADIUS = 7.5, PUSH = 4.5;
       const onMove = (e: MouseEvent) => {
         target.x = (e.clientX / window.innerWidth - 0.5) * 2;
         target.y = (e.clientY / window.innerHeight - 0.5) * 2;
+        const r = host.getBoundingClientRect();
+        ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        pointerActive = e.clientY >= r.top && e.clientY <= r.bottom;
+        // 커서를 따라다니는 빛 번짐 (CSS 변수로 전달)
+        host.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        host.style.setProperty('--my', `${e.clientY - r.top}px`);
+        host.classList.toggle('glow-on', pointerActive);
+      };
+      const onLeave = () => { pointerActive = false; host.classList.remove('glow-on'); };
+      document.addEventListener('mouseleave', onLeave);
+      const repel = () => {
+        let mx = 1e9, my = 1e9;
+        if (pointerActive) {
+          raycaster.setFromCamera(ndc, camera);
+          if (raycaster.ray.intersectPlane(plane, hit)) { local.copy(hit); points.worldToLocal(local); mx = local.x; my = local.y; }
+        }
+        for (let i = 0; i < COUNT; i++) {
+          const ix = i * 3, iy = ix + 1;
+          const bx = base[ix], by = base[iy];
+          const dx = bx - mx, dy = by - my;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          let tx = bx, ty = by;
+          if (d < RADIUS && d > 0.0001) {
+            const f = (1 - d / RADIUS) * PUSH;
+            tx += (dx / d) * f; ty += (dy / d) * f;
+          }
+          pos[ix] += (tx - pos[ix]) * 0.08;
+          pos[iy] += (ty - pos[iy]) * 0.08;
+        }
+        posAttr.needsUpdate = true;
       };
       window.addEventListener('mousemove', onMove, { passive: true });
 
@@ -86,6 +127,7 @@ export default function HeroParticles() {
         if (disposed || !visible) return;
         const t = clock.getElapsedTime();
         points.rotation.y = t * 0.015;
+        repel();
         render();
         raf = requestAnimationFrame(loop);
       };
@@ -96,6 +138,7 @@ export default function HeroParticles() {
         io.disconnect();
         window.removeEventListener('resize', resize);
         window.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseleave', onLeave);
         window.removeEventListener('themechange', applyTheme);
         pGeo.dispose(); pMat.dispose();
         renderer.dispose();

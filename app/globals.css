@@ -509,3 +509,10 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 @media (max-width: 760px) { .nav-brand-sub { display: none; } .nav-links a:nth-child(3) { display: none; } }
 @media (max-width: 520px) { .nav { height: 52px; padding: 0 6px 0 16px; gap: 8px; } .nav-links a { padding: 6px 10px; font-size: 12.5px; }
   .nav-links a:nth-child(2) { display: none; } }
+
+/* 히어로 — 커서를 따라다니는 빛 번짐 (HeroParticles가 --mx/--my 갱신) */
+.hero-wrap::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .5s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 40%),
+    color-mix(in srgb, var(--accent) 26%, transparent), color-mix(in srgb, var(--accent-2) 8%, transparent) 45%, transparent 70%); }
+.hero-wrap.glow-on::after { opacity: 1; }
+@media (hover: none), (prefers-reduced-motion: reduce) { .hero-wrap::after { display: none; } }
