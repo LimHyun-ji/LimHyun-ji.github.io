@@ -39,7 +39,7 @@ images:
 
 - 파츠별 메시 · Override Material · Attachment · 본 트랜스폼을 에디터에서 바로 설정하고 프리뷰
 - 몽타주와 Custom ActionNotify를 서버 없이 재생해 전투 연출을 확인 (Notify_Editor 경로)
-- 갓아머 연출용 본 트랜스폼도 에디터 프리뷰 전용 `EditorTransformBonesComponent`로 분리 → [인게임 연출 페이지](/projects/rendering-cinema/)
+- 갓아머 연출용 본 트랜스폼도 에디터 프리뷰 전용 `EditorTransformBonesComponent`로 분리
 - <strong>Editor Slate 구현</strong>
   - VisualData 에디터의 UI를 Slate로 직접 구현
 - <strong>Preview 환경 확장 · 유지보수</strong>

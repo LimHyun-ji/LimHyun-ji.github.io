@@ -11,7 +11,7 @@ import { glue } from '@/lib/keepWords';
 // 담당 시스템 그룹 — 직무 대조용(클라이언트 / 엔진 툴). 그룹 안 순서는 slugs 순서를 따름. 목록에 없는 slug는 마지막 그룹으로.
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
 const PROJECT_GROUPS = [
-  { title: '인게임 클라이언트 — 시스템 · 전투 · 연출', tone: 'a', slugs: ['visualdata', 'combat', 'sol-content', 'mapdesign', 'rendering-cinema'] },
+  { title: '인게임 클라이언트 — 시스템 · 전투 · 연출', tone: 'a', slugs: ['visualdata', 'combat', 'sol-content', 'mapdesign'] },
   { title: '엔진 툴 · 기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'areatool', 'visualdata-editor', 'metadata-pipeline'] },
 ];
 
