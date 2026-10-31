@@ -168,7 +168,7 @@ export default function Home() {
           <h3 className="systems-h">담당 시스템<span>{glue(' — 사례의 배경이 되는 시스템')}</span></h3>
           <div className="sys-groups">
             {grouped.filter((g) => g.items.length > 0).map((g) => (
-              <div className="sys-group" key={g.title}>
+              <div className={`sys-group tone-${g.tone}`} key={g.title}>
                 <h4 className="sys-group-h"><KeepWords text={g.title} /></h4>
                 <ul className="sys-list">{g.items.map((a) => <SystemRow a={a} key={a.slug} />)}</ul>
               </div>

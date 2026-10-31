@@ -412,14 +412,19 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 .systems-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
 .systems-h span { font-size: 14px; font-weight: 600; color: var(--muted); }
 .sys-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; }
-.sys-group-h { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
-.sys-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.sys-list li { border-bottom: 1px solid var(--line); }
-.sys-row { display: block; padding: 12px 4px; color: inherit; text-decoration: none; transition: background .2s; }
-.sys-row:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+/* 그룹 색: 인게임 클라이언트(tone-a) = 민트, 기술 기반(tone-b) = 골드 — 각 시스템을 그룹 색 박스로 */
+.sys-group { --tone: var(--accent); }
+.sys-group.tone-b { --tone: var(--accent-2); }
+.sys-group-h { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--tone); letter-spacing: .02em; }
+.sys-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sys-row { display: block; padding: 14px 18px 14px 16px; border-radius: 12px; color: inherit; text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--line)); border-left: 4px solid var(--tone);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 13%, transparent), color-mix(in srgb, var(--tone) 3%, transparent) 70%);
+  transition: transform .15s, border-color .15s, background .15s; }
+.sys-row:hover { transform: translateX(4px); border-color: var(--tone);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 20%, transparent), color-mix(in srgb, var(--tone) 5%, transparent) 70%); }
 .sys-row h4 { margin: 0 0 2px; font-size: 15px; font-weight: 750; word-break: keep-all; }
-.sys-row .arrow { color: var(--muted); }
-.sys-row:hover .arrow { color: var(--accent); }
+.sys-row .arrow { color: var(--tone); }
 .sys-row p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--muted); word-break: keep-all; }
 @media (max-width: 820px) { .sys-groups { grid-template-columns: 1fr; } }
 /* 모바일 상단 네비: 브랜드와 링크가 두 줄로 깨지지 않게 */
