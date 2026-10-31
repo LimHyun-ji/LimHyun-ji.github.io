@@ -8,15 +8,16 @@
   --border: #263a32;
   --text: #E6ECE8;
   --muted: #869089;
-  --accent: #39CC9B;
-  --accent-2: #C9A26D;
-  --accent-soft: rgba(57, 204, 155, 0.13);
-  --accent-2-soft: rgba(201, 162, 109, 0.15);
+  --accent: #6A8759;
+  --accent-2: #FFC66D;
+  --accent-3: #CC7832;
+  --accent-soft: rgba(106, 135, 89, 0.16);
+  --accent-2-soft: rgba(255, 198, 109, 0.14);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  /* Rider Dark 구문 강조 팔레트 — 사이트 전반의 보조 색 (역량 태그 · 기술스택 · 코드 블록) */
-  --rd-keyword: #6C95EB; --rd-type: #C191FF; --rd-method: #39CC9B; --rd-field: #66C3CC;
-  --rd-number: #ED94C0; --rd-comment: #85C46C; --rd-string: #C9A26D; --rd-struct: #E1BFFF;
-  --rd-text: #BDBDBD; --rd-macro: #BC8CFF; --code-bg: #262626;
+  /* Rider Darcula 구문 강조 팔레트 — 주요 색: 초록(string) · 노랑(method) · 주황(keyword) */
+  --rd-orange: #CC7832; --rd-yellow: #FFC66D; --rd-green: #6A8759; --rd-blue: #6897BB;
+  --rd-purple: #9876AA; --rd-olive: #BBB529; --rd-gold: #E8BF6A; --rd-slate: #A9B7C6;
+  --code-bg: #2B2B2B;
 }
 [data-theme="light"] {
   color-scheme: only light;   /* 'only' 필수 — 모바일 강제 다크(auto/force dark) 옵트아웃 */
@@ -26,15 +27,16 @@
   --border: #d3e2da;
   --text: #14201A;
   --muted: #5a6b62;
-  --accent: #0E8A64;
-  --accent-2: #8C6C41;
-  --accent-soft: rgba(14, 138, 100, 0.10);
-  --accent-2-soft: rgba(140, 108, 65, 0.12);
+  --accent: #4E7A3A;
+  --accent-2: #A87400;
+  --accent-3: #B5561B;
+  --accent-soft: rgba(78, 122, 58, 0.10);
+  --accent-2-soft: rgba(168, 116, 0, 0.12);
   --shadow: 0 8px 24px rgba(90, 107, 98, 0.2);
-  /* Rider 팔레트 — 라이트 배경 대비 보정 (같은 색상 계열을 어둡게) */
-  --rd-keyword: #2F5FD0; --rd-type: #7A3FD8; --rd-method: #0E8A64; --rd-field: #11808C;
-  --rd-number: #B4357E; --rd-comment: #4E8A3A; --rd-string: #8C6C41; --rd-struct: #8A4FC4;
-  --rd-text: #2B2B2B; --rd-macro: #7A3FD8; --code-bg: #262626;
+  /* Darcula 팔레트 — 라이트 배경 대비 보정 (같은 색상 계열을 어둡게) */
+  --rd-orange: #B5561B; --rd-yellow: #A87400; --rd-green: #4E7A3A; --rd-blue: #2F6A9E;
+  --rd-purple: #7A5A93; --rd-olive: #7E7A12; --rd-gold: #9A6B12; --rd-slate: #4E5B66;
+  --code-bg: #2B2B2B;
 }
 
 * { box-sizing: border-box; }
@@ -84,7 +86,7 @@ a:hover { text-decoration: underline; }
 
 .actions { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
 .btn {
-  display: inline-block; padding: 11px 22px; border-radius: 8px;
+  display: inline-block; padding: 11px 22px; border-radius: 999px;
   background: var(--accent); color: #0C1210; font-weight: 700;
   border: 1px solid var(--accent); transition: transform 0.15s, opacity 0.15s;
 }
@@ -225,7 +227,7 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
 }
 .detail-body pre code {
-  display: block; background: none; color: #BDBDBD; padding: 0; border-radius: 0;
+  display: block; background: none; color: #A9B7C6; padding: 0; border-radius: 0;
   font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   font-size: 0.82rem; line-height: 1.75; white-space: pre; tab-size: 4;
 }
@@ -359,25 +361,24 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   .mermaid { padding: 10px; }
 }
 
-/* ───────────── 코드 구문 강조 — Rider Dark (highlight.js 클래스) ───────────── */
+/* ───────────── 코드 구문 강조 — Rider Darcula (highlight.js 클래스) ───────────── */
 /* 코드 블록 배경은 라이트 테마에서도 어둡게 유지하므로 다크 팔레트 값을 고정으로 사용 */
-.detail-body pre .hljs-keyword, .detail-body pre .hljs-built_in, .detail-body pre .hljs-literal { color: #6C95EB; }
-.detail-body pre .hljs-type, .detail-body pre .hljs-title.class_ { color: #C191FF; }
-.detail-body pre .hljs-title.function_, .detail-body pre .hljs-title { color: #39CC9B; }
-.detail-body pre .hljs-string { color: #C9A26D; }
-.detail-body pre .hljs-number { color: #ED94C0; }
-.detail-body pre .hljs-comment { color: #85C46C; font-style: italic; }
-.detail-body pre .hljs-meta, .detail-body pre .hljs-meta .hljs-keyword { color: #BC8CFF; }
-.detail-body pre .hljs-meta .hljs-string { color: #C9A26D; }
-.detail-body pre .hljs-attr, .detail-body pre .hljs-property, .detail-body pre .hljs-variable { color: #66C3CC; }
-.detail-body pre .hljs-params { color: #BDBDBD; }
-.detail-body pre .hljs-operator, .detail-body pre .hljs-punctuation { color: #BDBDBD; }
+.detail-body pre .hljs-keyword, .detail-body pre .hljs-built_in, .detail-body pre .hljs-literal { color: #CC7832; }
+.detail-body pre .hljs-type, .detail-body pre .hljs-title.class_ { color: #A9B7C6; }
+.detail-body pre .hljs-title.function_, .detail-body pre .hljs-title { color: #FFC66D; }
+.detail-body pre .hljs-string { color: #6A8759; }
+.detail-body pre .hljs-number { color: #6897BB; }
+.detail-body pre .hljs-comment { color: #808080; font-style: italic; }
+.detail-body pre .hljs-meta, .detail-body pre .hljs-meta .hljs-keyword { color: #BBB529; }
+.detail-body pre .hljs-meta .hljs-string { color: #6A8759; }
+.detail-body pre .hljs-attr, .detail-body pre .hljs-property, .detail-body pre .hljs-variable { color: #9876AA; }
+.detail-body pre .hljs-params, .detail-body pre .hljs-operator, .detail-body pre .hljs-punctuation { color: #A9B7C6; }
 
-/* ───────────── 역량 태그 tone (Rider 팔레트) ───────────── */
-.tone-keyword { --tone: var(--rd-keyword); } .tone-type { --tone: var(--rd-type); }
-.tone-method { --tone: var(--rd-method); } .tone-field { --tone: var(--rd-field); }
-.tone-number { --tone: var(--rd-number); } .tone-comment { --tone: var(--rd-comment); }
-.tone-string { --tone: var(--rd-string); } .tone-struct { --tone: var(--rd-struct); }
+/* ───────────── 역량 태그 tone (Rider Darcula 팔레트) ───────────── */
+.tone-orange { --tone: var(--rd-orange); } .tone-yellow { --tone: var(--rd-yellow); }
+.tone-green { --tone: var(--rd-green); } .tone-blue { --tone: var(--rd-blue); }
+.tone-purple { --tone: var(--rd-purple); } .tone-olive { --tone: var(--rd-olive); }
+.tone-gold { --tone: var(--rd-gold); } .tone-slate { --tone: var(--rd-slate); }
 .tone-accent { --tone: var(--accent); }
 .chips li[class*="tone-"], .ci-item-tags li[class*="tone-"] { color: var(--tone);
   border: 1px solid color-mix(in srgb, var(--tone) 42%, transparent);
