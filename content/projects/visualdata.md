@@ -96,4 +96,4 @@ tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
 
 - <strong>가시성 게이팅</strong>: VisualData <strong>로드가 끝난 Entity만 표시</strong> (`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임 · 미완성 노출 방지
 - <strong>렌더 비용 제어</strong>: `OptimizeLOD`(2) 이상에서 Helmet / Face 파츠를 숨기는 LOD별 파츠 통합 — 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고
-- OverrideMaterial : Material만 변경하여 에셋을 재사용할 수 있는 구조 지원
+- OverrideMaterial: Material만 변경하여 에셋을 재사용할 수 있는 구조 지원

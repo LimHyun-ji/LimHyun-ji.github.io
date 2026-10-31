@@ -11,7 +11,7 @@ tags: ["Unity", "C#", "2D", "Collision"]
 links: { git: "", doc: "", video: "https://youtu.be/wzn5y_Gpyq8" }
 ---
 ## 프로젝트 소개
-랜덤으로 생성되는 과일들을 잘 맞추어 떨어뜨리고  같은 과일끼리 합쳐지도록 조작합니다.<br><strong>과일 충돌 종류를  판별</strong>하고 생성하는 과정에 집중해 구현하였습니다.
+랜덤으로 생성되는 과일들을 잘 맞추어 떨어뜨리고 같은 과일끼리 합쳐지도록 조작합니다.<br><strong>과일 충돌 종류를 판별</strong>하고 생성하는 과정에 집중해 구현하였습니다.
 ## 💻담당 업무 및 사용 기술
 <strong>Unity Engine C#<br></strong>
 - <strong>충돌 이벤트 감지 </strong>

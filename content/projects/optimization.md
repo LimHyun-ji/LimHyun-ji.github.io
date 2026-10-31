@@ -15,7 +15,7 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
     <p class="case-title">Slate Hitching</p>
     <dl>
       <dt>문제</dt><dd>UI 화면에서 Slate Hitching(프레임 튐) 발생</dd>
-      <dt>해결</dt><dd>Unreal Insights/Slate stat로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
+      <dt>해결</dt><dd>Unreal Insights/Slate stat으로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
       <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감, 갱신 타이밍이 맞지 않는 화면은 화면 단위로 제외</dd>
     </dl>
     <a class="case-more" href="#case-slate-hitching">자세히 ↓</a>
@@ -24,8 +24,8 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
     <p class="case-title">UObject Max Exceed Crash</p>
     <dl>
       <dt>문제</dt><dd>List View 아이템이 많은 경우 인게임 액터 등 UObject의 한계 수량에 도달해 크래시(모바일 빈번)</dd>
-      <dt>해결</dt><dd>Actor Pooling으로 재사용성 향상, 및 풀스크린 진입시 명시적 GC</dd>
-      <dt>결과</dt><dd>UObject생성 재사용을 통해 구조적 차단</dd>
+      <dt>해결</dt><dd>Actor Pooling으로 재사용성 향상 및 풀스크린 진입 시 명시적 GC</dd>
+      <dt>결과</dt><dd>UObject 생성 재사용을 통해 구조적 차단</dd>
     </dl>
     <a class="case-more" href="#case-pooling-crash">자세히 ↓</a>
   </div>
@@ -69,7 +69,7 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
 
 - <strong>부작용 대응 1 — 계속 바뀌는 위젯의 Volatile 지정</strong>
   - 스크롤 리스트 · 파티클처럼 계속 바뀌는 UI가 갱신되지 않는 문제 대응
-  - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 컨텐츠까지 캐시 대상에 들어감
+  - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 콘텐츠까지 캐시 대상에 들어감
 
     ```cpp
     // UIParticle.cpp — 재생 중 매 프레임 바뀌므로 위젯이 다시 만들어질 때마다 Volatile 지정
@@ -86,7 +86,7 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
 - <strong>한계와 적용 기준</strong>
   - 갱신 경로가 어긋나면 전체 재갱신이 필요해, 데이터 갱신이 잦거나 타이밍이 맞지 않는 화면은 화면 단위로 끄고 적용 범위를 제한
 - <strong>풀스크린 UI 아래 3D 렌더링 중지</strong>
-  - 풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않는 기존 구조 화면 전환 지점에서 동작
+  - 풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않는 기존 구조가 화면 전환 지점에서 함께 동작
 
 ### LOD별 파츠 통합
 

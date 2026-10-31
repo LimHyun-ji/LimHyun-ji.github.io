@@ -11,14 +11,14 @@ tags: ["Unreal", "C++", "AI Behavior", "Destructible", "FPS RPG"]
 links: { git: "https://github.com/LimHyun-ji/Space-To-Journey", doc: "", video: "https://youtu.be/xfQBWUyWXu8" }
 ---
 ## 프로젝트 소개
-<br><strong>우주와 행성을 탐험하며 전투와 퀘스트 진행을 통해 성장하는 FPS RPG게임</strong>입니다.  Ureal  엔진  내  블루프린트  사용을  최소화하고 C++을 중점적으로 사용하여 제작했으며 AI 행동패턴 및 캐릭터 기능 구현에 집중했습니다. 
+<br><strong>우주와 행성을 탐험하며 전투와 퀘스트 진행을 통해 성장하는 FPS RPG 게임</strong>입니다.  Ureal  엔진 내  블루프린트 사용을 최소화하고 C++을 중점적으로 사용하여 제작했으며 AI 행동패턴 및 캐릭터 기능 구현에 집중했습니다. 
 ## 📚프로젝트 자료
 ↘️클릭 시 원본 링크로 이동합니다
 [Git Repositiry](https://github.com/LimHyun-ji/Space-To-Journey)
 ## 💻담당 업무 및 해당 업무에서 사용된 기술
 <strong>Unreal Engine C++ 80/ Blueprint 20</strong>
 행성 파트 담당
-- <strong>컨텐츠 개발(기믹)</strong>
+- <strong>콘텐츠 개발(기믹)</strong>
   맵 내에서 얻은 단서를 통해 순서대로 횃불에 불을 붙이면 보스와의 전투 진입
   Destructible Mesh 를 이용한 파괴
 - <strong>적 보스 AI :: 행동 패턴 구현</strong>

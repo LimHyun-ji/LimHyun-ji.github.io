@@ -45,7 +45,7 @@ META = {
                    period="2022.08 – 2022.09", team="XR 4 · AI 2 · 모델러 2 · 사운드 1", status="GameJam",
                    tags=["Unity","AI Hand Tracking","Compute Shader","Interactive Art"], image="/images/yt/midnight.jpg",
                    video="https://youtu.be/IDryaiFv-Mw", git="", doc=""),
- "healthmr":  dict(title="헬스 트레이닝 MR", subtitle="MR 헬스 컨텐츠 · 게임잼", engine="Unity / Oculus Quest",
+ "healthmr":  dict(title="헬스 트레이닝 MR", subtitle="MR 헬스 콘텐츠 · 게임잼", engine="Unity / Oculus Quest",
                    period="2022.07", team="개발자 3 · 모델러 2", status="GameJam",
                    tags=["MR","Passthrough API","Oculus Quest","GameManager"], image="/images/yt/healthmr.jpg",
                    video="https://youtu.be/WjROo7WEGCY", git="", doc=""),

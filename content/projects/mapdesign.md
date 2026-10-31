@@ -15,7 +15,7 @@ images:
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">Model-View구조로 UI와 데이터 분리</p>
+    <p class="case-title">Model-View 구조로 UI와 데이터 분리</p>
     <dl>
       <dt>문제</dt><dd>던전 전용 맵을 추가하려면 같은 맵 View를 복제해야 하는 구조</dd>
       <dt>해결</dt><dd>View(<code>URegionMapWidget</code>)는 하나로 공유하고, 맵 종류별로 달라지는 데이터 소스 선택 · 목록 구성 · 상호작용 규칙만 Strategy(<code>UMapViewerStrategy</code>)로 분리</dd>
@@ -35,7 +35,7 @@ images:
   <div class="case">
     <p class="case-title">CustomShader로 미니맵 QuestData 표시</p>
     <dl>
-      <dt>문제</dt><dd>퀘스트영역에 따라 아이콘 위젯을 쓰면 대상이 늘수록 UI 비용 증가 및 재사용성 하락</dd>
+      <dt>문제</dt><dd>퀘스트 영역에 따라 아이콘 위젯을 쓰면 대상이 늘수록 UI 비용 증가 및 재사용성 하락</dd>
       <dt>해결</dt><dd>Quest Data는 머티리얼에서 직접 표시</dd>
       <dt>결과</dt><dd>대상이 늘어도 위젯 비용이 늘지 않음</dd>
     </dl>
@@ -54,7 +54,7 @@ images:
 
 ### 미니맵 위치 동기화 — MPC 기반
 
-- PC 위치를 <strong>MPC</strong> (Material Parameter Collection) 를 통해 미니맵 머티리얼에 <strong>실시간 위치 parameter</strong>로 전송해 동기화
+- PC 위치를 <strong>MPC</strong>(Material Parameter Collection)를 통해 미니맵 머티리얼에 <strong>실시간 위치 parameter</strong>로 전송해 동기화
 - 매 프레임 위젯 갱신 대신 머티리얼 파라미터로 위치를 반영 → 위치 표시를 GPU 측에서 처리
 - <strong>월드 좌표 → 0~1 정규화 후 MPC 전송</strong>
   - 맵 원점을 빼고 월드 크기로 나눠 텍스처 UV 기준 좌표로 변환
@@ -189,7 +189,7 @@ images:
 
 - <strong>월드맵 전체를 고해상도 한 장으로 상시 메모리에 올리면 모바일 메모리 예산을 넘는 문제</strong>
 - 그리려는 영역만 <strong>고해상도 이미지로 동적 로딩</strong>
-- 이를 타일 단위로 세분화해 확대 수준에 맞는 해상도의 타일만 불러오도록 고도화 (라이브 컨텐츠 고도화 참고)
+- 이를 타일 단위로 세분화해 확대 수준에 맞는 해상도의 타일만 불러오도록 고도화 (라이브 콘텐츠 고도화 참고)
 - <strong>Region별 이미지를 Soft 참조로 보유</strong>
   - Region 에셋은 월드맵 · 미니맵 이미지를 `TSoftObjectPtr`로만 들고, 해당 Region을 열 때 로드
 

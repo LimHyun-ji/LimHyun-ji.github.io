@@ -15,10 +15,10 @@ growthIntro: >
 # 경력 카드별 "부딪힌 문제 → 넓어진 영역" (period 값이 profile.yml experience의 period와 같아야 표시됨)
 growth:
   - period: "2023"
-    area: "데이터 파이프라인 · 신규 시스템 컨텐츠"
+    area: "데이터 파이프라인 · 신규 시스템 콘텐츠"
   - period: "2024"
     area: "렌더링 · 에셋 수명 관리"
   - period: "2025"
     area: "성능 · 메모리 최적화 · 에디터 툴링"
   - period: "2026"
-    area: "라이브 고도화·전투 컨텐츠"
+    area: "라이브 고도화·전투 콘텐츠"

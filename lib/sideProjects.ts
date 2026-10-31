@@ -94,9 +94,9 @@ export const sideProjects: SideProject[] = [
   {
     slug: 'healthmr',
     title: '헬스 트레이닝 MR',
-    subtitle: 'MR 헬스 컨텐츠 · 게임잼',
+    subtitle: 'MR 헬스 콘텐츠 · 게임잼',
     engine: 'Unity / Oculus Quest',
-    desc: 'Passthrough API로 현실 위에 가상 오브젝트를 투영하는 MR 헬스 컨텐츠. 체스트 프레스 유효 판정(UI/Collider)과 GameManager 플로우를 담당.',
+    desc: 'Passthrough API로 현실 위에 가상 오브젝트를 투영하는 MR 헬스 콘텐츠. 체스트 프레스 유효 판정(UI/Collider)과 GameManager 플로우를 담당.',
     tags: ['MR', 'Passthrough API', 'Oculus Quest', 'GameManager'],
     image: '/images/yt/healthmr.jpg',
     links: { video: 'https://youtu.be/WjROo7WEGCY' },

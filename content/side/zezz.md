@@ -11,7 +11,7 @@ tags: ["Unity", "Firebase", "Realtime DB", "Building System"]
 links: { git: "", doc: "https://www.miricanvas.com/ko/v/11mt76t", video: "https://youtu.be/dXVODz3MJaY" }
 ---
 ## 프로젝트 소개
- Zezz는 Sims와 Zepeto를 레퍼런스로 삼은 프로젝트로 아바타 커스터마이징, 마이홈 꾸미기 등, 메타버스 컨텐츠의 기본적인 기능 구현을 학습하기 위해 진행한 프로젝트입니다. FireBase를 통해 로그인을 하여 회원정보 및 커스텀 데이터를 데이터 베이스에 저장하였고 접속 시 다시 로드하여 플레이를 이어갈 수 있습니다.
+ Zezz는 Sims와 Zepeto를 레퍼런스로 삼은 프로젝트로 아바타 커스터마이징, 마이홈 꾸미기 등, 메타버스 콘텐츠의 기본적인 기능 구현을 학습하기 위해 진행한 프로젝트입니다. Firebase를 통해 로그인을 하여 회원정보 및 커스텀 데이터를 데이터베이스에 저장하였고 접속 시 다시 로드하여 플레이를 이어갈 수 있습니다.
 ## 📚프로젝트 자료
 ↘️클릭 시 원본 링크로 이동합니다
 ### [코드 분석 및 기술소개서](https://www.miricanvas.com/ko/v/11mt76t)
@@ -24,7 +24,7 @@ links: { git: "", doc: "https://www.miricanvas.com/ko/v/11mt76t", video: "https:
 - <strong>Save Load System</strong>
   - 저장해야 하는 객체 정보들을 Class로 생성
   - Generic을 이용해 다양한 Class를 Save할 수 있는 함수 생성 → 함수의 재사용성 향상
-  - FireBase의 실시간 데이터 베이스로 전송하여 저장
+  - FireBase의 실시간 데이터베이스로 전송하여 저장
   - 이후 playerID와 비교하여 데이터를 다시 로드 가능
 - <strong>HashTable을 이용하여 Room Custom정보 저장</strong>
   - Room을 생성할 당시 필요한 정보들을 Hash Table로 Key-Value 형태로 저장

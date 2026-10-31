@@ -1,10 +1,10 @@
 ---
 layout: project
 order: 3
-title: "인게임 컨텐츠 · 연출"
-role: "Client Developer · Schema 설계·컨텐츠 구현 담당"
+title: "인게임 콘텐츠 · 연출"
+role: "Client Developer · Schema 설계·콘텐츠 구현 담당"
 period: "2023 — 현재"
-summary: "횡적 성장 컨텐츠의 클라이언트 · 서버 통신 및 연출 자원의 수명 관리."
+summary: "횡적 성장 콘텐츠의 클라이언트 · 서버 통신 및 연출 자원의 수명 관리."
 tags: ["네트워크 동기화", "게임 수학", "렌더링"]
 imageLayout: slider
 images:
@@ -20,7 +20,7 @@ images:
     <p class="case-title">로그인 패킷 과부하</p>
     <dl>
       <dt>문제</dt><dd>로그인 시점에 받을 데이터가 많아 패킷 과부하</dd>
-      <dt>해결</dt><dd>성장 컨텐츠는 진입 시점에 HTTP API로 지연 조회</dd>
+      <dt>해결</dt><dd>성장 콘텐츠는 진입 시점에 HTTP API로 지연 조회</dd>
       <dt>결과</dt><dd>로그인 패킷 부담 완화</dd>
     </dl>
     <a class="case-more" href="#case-login-packet">자세히 ↓</a>
@@ -47,18 +47,18 @@ images:
 
 ## 개요
 
-- **길드 · 수집 · 순례 · 경제 · 채팅** 등 횡적 성장 컨텐츠를 기획 연동부터 UI · 서버 동기화까지 구현
-- 컨텐츠 특성에 맞춰 **세 가지 네트워크 방식**을 구분 적용
+- **길드 · 수집 · 순례 · 경제 · 채팅** 등 횡적 성장 콘텐츠를 기획 연동부터 UI · 서버 동기화까지 구현
+- 콘텐츠 특성에 맞춰 **세 가지 네트워크 방식**을 구분 적용
   - **TCP** — 상시 동기화가 필요한 리텐션 리워드 · 데미지미터 · 세금 등
   - **WebSocket** — 채팅 실시간 송수신
-  - **HTTP API** — 횡적 성장 컨텐츠를 진입 시점에 **지연 조회**해 로그인 패킷 과부하 방지
+  - **HTTP API** — 횡적 성장 콘텐츠를 진입 시점에 **지연 조회**해 로그인 패킷 과부하 방지
 - **채팅 아이템 링크** — 시스템 메시지에 함께 온 아이템 데이터로 렌더 시점에 링크 마크업을 만들고, RichText Decorator로 파싱해 클릭 시 아이템 정보 표시
 
 <div id="case-login-packet" class="case-anchor"></div>
 
-**HTTP API를 따로 둔 이유는 로그인 패킷 과부하였습니다.** 횡적 성장 컨텐츠 데이터까지 로그인 시점에 함께 받으면 로그인 패킷이 무거워지기 때문에, 해당 컨텐츠에 진입하는 시점에 HTTP API로 지연 조회하도록 나눴습니다.
+**HTTP API를 따로 둔 이유는 로그인 패킷 과부하였습니다.** 횡적 성장 콘텐츠 데이터까지 로그인 시점에 함께 받으면 로그인 패킷이 무거워지기 때문에, 해당 콘텐츠에 진입하는 시점에 HTTP API로 지연 조회하도록 나눴습니다.
 
-<img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 컨텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
+<img class="diagram" src="/images/diagrams/outgame-noti.svg" alt="게임 콘텐츠 Manager 패턴 시퀀스: 서버 NotifyEvt→UNetworkNotiClient→UGuildManager 상태 갱신→델리게이트 브로드캐스트→UI, UI 입력→Manager→서버 요청" />
 
 
 ## 구현 내용

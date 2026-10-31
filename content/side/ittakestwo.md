@@ -11,7 +11,7 @@ tags: ["Unity", "FSM", "Shader", "Bezier", "IK"]
 links: { git: "https://github.com/LimHyun-ji/ItTakesTwo_GG", doc: "https://www.miricanvas.com/v/11j6dmn", video: "https://youtu.be/23g39-UNHLQ" }
 ---
 ## 프로젝트 소개
- Steam 게임 It takes two의 SnowGlobe 챕터의 일부를 모작한 프로젝트입니다. 일반적인 RPG게임에는 드문 <strong>오브젝트와의 특수 상호작용</strong>을 최대한 비슷하게 구현하도록 노력하였으며 2인 협동 플레이 컨텐츠라는 점을 고려한 <strong>시각적 요소</strong> 또한 구현하였습니다. 또한, <strong>코드의 재사용성 및 확장성</strong>을 고려하여 구조적으로 설계하였습니다.
+ Steam 게임 It Takes Two의 SnowGlobe 챕터의 일부를 모작한 프로젝트입니다. 일반적인 RPG 게임에는 드문 <strong>오브젝트와의 특수 상호작용</strong>을 최대한 비슷하게 구현하도록 노력하였으며 2인 협동 플레이 콘텐츠라는 점을 고려한 <strong>시각적 요소</strong> 또한 구현하였습니다. 또한, <strong>코드의 재사용성 및 확장성</strong>을 고려하여 구조적으로 설계하였습니다.
 ## 📚프로젝트 자료
 ↘️클릭 시 원본 링크로 이동합니다
 ### [코드 분석 및 기술소개서 ](https://www.miricanvas.com/v/11j6dmn) 
