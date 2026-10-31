@@ -10,8 +10,9 @@ import { useEffect, useRef } from 'react';
  * - 화면 밖이면 정지, 동작 줄이기 설정이면 실행 안 함, WebGL2/half-float 미지원 기기는 그리지 않음
  */
 
-const PALETTE_DARK = [[0.13, 0.66, 0.38], [0.96, 0.75, 0.0], [0.97, 0.52, 0.35]]; // 초록 · 노랑 · 주황
-const PALETTE_LIGHT = [[0.06, 0.48, 0.26], [0.70, 0.52, 0.0], [0.80, 0.36, 0.18]];
+// 단색 — 사이트 강조색(초록) 한 가지만 사용
+const COLOR_DARK = [0.13, 0.66, 0.38];
+const COLOR_LIGHT = [0.06, 0.48, 0.26];
 
 const VERT = `#version 300 es
 precision highp float;
@@ -212,8 +213,7 @@ export default function HeroFluid() {
     const bindTex = (unit: number, tex: WebGLTexture) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); return unit; };
 
     // ── 색 · 속도 주입 ──
-    let colorIdx = 0;
-    const splat = (x: number, y: number, dx: number, dy: number, strength = 1) => {
+        const splat = (x: number, y: number, dx: number, dy: number, strength = 1) => {
       const aspect = canvas.width / canvas.height;
       gl.useProgram(P.splat.p);
       gl.uniform1i(P.splat.u.uTarget, bindTex(0, velocity.read.tex));
@@ -222,9 +222,8 @@ export default function HeroFluid() {
       gl.uniform3f(P.splat.u.color, dx, dy, 0);
       gl.uniform1f(P.splat.u.radius, (isMobile ? 0.9 : 0.6) / 100 * (aspect > 1 ? aspect : 1));
       blit(velocity.write); velocity.swap();
-      const pal = light ? PALETTE_LIGHT : PALETTE_DARK;
-      const c = pal[Math.floor(colorIdx) % pal.length];
-      const k = (light ? 0.09 : 0.08) * strength;
+      const c = light ? COLOR_LIGHT : COLOR_DARK;
+      const k = (light ? 0.05 : 0.045) * strength;
       gl.uniform1i(P.splat.u.uTarget, bindTex(0, dye.read.tex));
       gl.uniform3f(P.splat.u.color, c[0] * k, c[1] * k, c[2] * k);
       blit(dye.write); dye.swap();
@@ -242,7 +241,7 @@ export default function HeroFluid() {
       gl.uniform2fv(P.vort.u.texelSize, velocity.ts);
       gl.uniform1i(P.vort.u.uVelocity, bindTex(0, velocity.read.tex));
       gl.uniform1i(P.vort.u.uCurl, bindTex(1, curl.tex));
-      gl.uniform1f(P.vort.u.curl, 14); gl.uniform1f(P.vort.u.dt, dt);
+      gl.uniform1f(P.vort.u.curl, 6); gl.uniform1f(P.vort.u.dt, dt);
       blit(velocity.write); velocity.swap();
 
       gl.useProgram(P.div.p);
@@ -279,7 +278,7 @@ export default function HeroFluid() {
 
       gl.uniform1i(P.advect.u.uVelocity, bindTex(0, velocity.read.tex));
       gl.uniform1i(P.advect.u.uSource, bindTex(1, dye.read.tex));
-      gl.uniform1f(P.advect.u.dissipation, 1.4); // 색이 빨리 옅어져 화면에 쌓이지 않음
+      gl.uniform1f(P.advect.u.dissipation, 1.8); // 색이 빨리 옅어져 화면에 쌓이지 않음
       blit(dye.write); dye.swap();
     };
 
@@ -291,7 +290,7 @@ export default function HeroFluid() {
       gl.uniform2f(P.display.u.texelSize, 1 / canvas.width, 1 / canvas.height);
       gl.uniform1i(P.display.u.uTexture, bindTex(0, dye.read.tex));
       gl.uniform1f(P.display.u.intensity, light ? 0.8 : 0.9);
-      gl.uniform1f(P.display.u.maxAlpha, light ? 0.4 : 0.42); // 글자를 가리지 않도록 최대 농도 제한
+      gl.uniform1f(P.display.u.maxAlpha, light ? 0.22 : 0.25); // 글자를 가리지 않도록 최대 농도 제한
       blit(null);
     };
 
@@ -320,8 +319,8 @@ export default function HeroFluid() {
       resize();
 
       if (pointer.moved) {
-        const dx = (pointer.x - pointer.px) * 6000, dy = (pointer.y - pointer.py) * 6000;
-        if (dx !== 0 || dy !== 0) { splat(pointer.x, pointer.y, dx, dy); colorIdx += 0.02; }
+        const dx = (pointer.x - pointer.px) * 3500, dy = (pointer.y - pointer.py) * 3500;
+        if (dx !== 0 || dy !== 0) { splat(pointer.x, pointer.y, dx, dy); }
         pointer.px = pointer.x; pointer.py = pointer.y;
       }
       // 마우스가 2초 이상 멈추면 자동 데모 — 리사주 곡선을 따라 천천히 저을 때처럼
@@ -329,8 +328,7 @@ export default function HeroFluid() {
         demoT += dt * 0.35;
         const x = 0.5 + 0.32 * Math.sin(demoT * 1.3), y = 0.5 + 0.28 * Math.sin(demoT * 1.9 + 1.1);
         const x2 = 0.5 + 0.32 * Math.sin((demoT + dt * 0.35) * 1.3), y2 = 0.5 + 0.28 * Math.sin((demoT + dt * 0.35) * 1.9 + 1.1);
-        splat(x, y, (x2 - x) * 3000, (y2 - y) * 3000, 0.4);
-        colorIdx += 0.004;
+        splat(x, y, (x2 - x) * 2000, (y2 - y) * 2000, 0.3);
       }
       step(dt);
       render();
