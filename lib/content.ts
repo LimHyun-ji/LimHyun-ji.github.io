@@ -34,7 +34,7 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
-export interface TechCase { id: string; title: string; summary: string; metric?: string; tags: string[]; link: string; }
+export interface TechCase { id: string; title: string; summary: string; tags: string[]; link: string; }
 export interface TechCases { tagOrder: string[]; cases: TechCase[]; }
 
 // 메인 "기술 사례" (content/cases.yml)

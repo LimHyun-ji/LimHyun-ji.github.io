@@ -37,7 +37,6 @@ export default function CaseIndex({ cases, tagOrder }: { cases: TechCase[]; tagO
                   {c.tags.map((t) => <li key={t} className={t === tag ? 'on' : ''}>{glue(t)}</li>)}
                 </ul>
               </div>
-              {c.metric && <strong className="ci-metric">{glue(c.metric)}</strong>}
             </Link>
           </li>
         ))}

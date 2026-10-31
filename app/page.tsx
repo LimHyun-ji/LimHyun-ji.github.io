@@ -47,7 +47,6 @@ export default function Home() {
     { id: 'cases', label: '기술 사례' },
     { id: 'sol', label: 'Sol' },
     { id: 'systems', label: '담당 시스템', indent: true },
-    { id: 'career', label: '이력' },
     { id: 'side', label: 'Side' },
     { id: 'skills', label: 'Skills' },
   ];
@@ -155,6 +154,7 @@ export default function Home() {
         <div className="featured-intro">
           <div className="featured-text">
             <h2 className="featured-title">Sol — UE5 MMORPG</h2>
+            {p.experience?.[0] && <p className="featured-meta">{glue(`${p.experience[0].org ?? ''} · ${p.experience[0].period ?? ''}`)}</p>}
             <p className="featured-sub">
               {glue('커스텀 Unreal Engine 5 브랜치 기반 모바일 / PC MMORPG. 2023년부터 클라이언트 시스템 · 엔진 툴 · 최적화를 맡고 있습니다.')}
             </p>
@@ -178,38 +178,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* CAREER — 이력 (연도별 영역 확장) */}
-      {p.experience && (
-        <section className="career" id="career">
-          <div className="featured-tag">◈ Career · 이력 한눈에</div>
-          {p.experience[0] && (
-            <h2 className="career-head">
-              {glue(p.experience[0].org ?? '')}
-              <span className="career-period"> · {glue(p.experience[0].period ?? '')}</span>
-            </h2>
-          )}
-          {id.growthIntro && <p className="career-intro">{glue(id.growthIntro)}</p>}
-          <div className="career-grid">
-            {p.experience.slice(1).map((e, i) => {
-              const g = id.growth?.find((x) => x.period === e.period);
-              return (
-                <div className="career-card" key={i}>
-                  <div className="career-year">{e.period}</div>
-                  {g && (
-                    <div className="career-growth">
-                      <span className="cg-problem">{glue(g.problem)}</span>
-                      <span className="cg-area">→ {glue(g.area)}</span>
-                    </div>
-                  )}
-                  <h3><KeepWords text={(e.org ?? '').replace(/^\d{4}\s*—\s*/, '')} /></h3>
-                  <p>{(e.desc ?? '').split(/\\n/).map((line, i) => <span key={i}>{i > 0 && <br />}{glue(line.trim())}</span>)}</p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* SIDE PROJECTS — 학부 · 개인 프로젝트 (작은 카드로 비중을 낮춤) */}
       <section className="side-band" id="side">
