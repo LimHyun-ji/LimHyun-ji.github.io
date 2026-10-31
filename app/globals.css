@@ -35,9 +35,6 @@
 
 /* HERO */
 .hero-wrap { position: relative; overflow: hidden; }
-.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%); }
 .hero-wrap .lead { position: relative; z-index: 1; }
 /* 3D 오브젝트 위에서도 히어로 텍스트 가독성 확보 — 텍스트 뒤 은은한 스크림 */
 .hero-wrap .lead::before { content: ""; position: absolute; inset: -8% -6%; z-index: -1; pointer-events: none;
