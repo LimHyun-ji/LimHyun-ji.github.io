@@ -8,6 +8,12 @@ summary: "레벨 영역 저작툴, Commandlet 기반 검증 CI."
 tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI", "Perforce"]
 ---
 
+<div class="shot-row">
+  <figure><img src="/images/projects/areatool/areatool-patrol-spawn.jpg" alt="레벨 위에 배치된 순찰 경로와 스폰 지점" /><figcaption>레벨 위 순찰 경로 · 스폰 지점 배치</figcaption></figure>
+  <figure><img src="/images/projects/areatool/areatool-spawn-area.jpg" alt="스폰 영역과 영역 안의 NPC 스폰 지점" /><figcaption>스폰 영역과 영역 안의 NPC 스폰 지점</figcaption></figure>
+  <figure><img src="/images/projects/areatool/areatool-outliner.png" alt="AreaTool Outliner에서 rid = 1 조건으로 배치 액터 검색" /><figcaption>AreaTool Outliner — 조건 검색(rid = 1)</figcaption></figure>
+</div>
+
 ## 문제 해결 요약
 
 <div class="cases">
@@ -44,12 +50,6 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 
 - 레벨별 구역(District)을 기획자가 직접 지정하는 2D Polygon 영역 지정 Mode 제공
 - <strong>AreaTool Outliner</strong>에서 `rid = 1`처럼 조건으로 배치 액터 검색 → 넓은 맵에서도 대상 액터를 바로 찾아 수정
-
-<div class="shot-row">
-  <figure><img src="/images/projects/areatool/areatool-patrol-spawn.jpg" alt="레벨 위에 배치된 순찰 경로와 스폰 지점" /><figcaption>레벨 위 순찰 경로 · 스폰 지점 배치</figcaption></figure>
-  <figure><img src="/images/projects/areatool/areatool-spawn-area.jpg" alt="스폰 영역과 영역 안의 NPC 스폰 지점" /><figcaption>스폰 영역과 영역 안의 NPC 스폰 지점</figcaption></figure>
-  <figure><img src="/images/projects/areatool/areatool-outliner.png" alt="AreaTool Outliner에서 rid = 1 조건으로 배치 액터 검색" /><figcaption>AreaTool Outliner — 조건 검색(rid = 1)</figcaption></figure>
-</div>
 
 - <strong>에디터 3D 시각화 — CylinderComponent · DrawMesh</strong>
   - 스폰 반경 · 순찰 영역을 뷰포트에서 확인하도록 `FPrimitiveSceneProxy` 기반 커스텀 실린더 컴포넌트와 `FComponentVisualizer` 구현
@@ -172,7 +172,6 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     // 교차점 → InverseTransformPosition → Point3D.Insert(LocalPos, CurrentIdx + 1)
     ```
 
-
 - <strong>스폰 프리뷰 기준점 — 다각형 무게중심</strong>
   - 스폰 그룹 프리뷰 메시를 Territory 중앙에 두기 위해 면적 기준 무게중심 계산
   - 꼭짓점 평균과 달리 오목 다각형에서도 면적 분포를 반영한 중심을 얻음
@@ -203,76 +202,16 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 
 - export 직전 액터마다 검증자 체인을 통과시키고, 실패한 액터는 제외 후 경고 → Commandlet CI도 같은 경로로 검사
 - <strong>인터페이스 하나 + Generator별 조합</strong>
-  - 모든 검증자가 `IAreaToolValidator`를 구현하고, Generator마다 필요한 검증자만 등록 (이름 중복 검사는 기본 포함)
-- <strong>검증 규칙</strong>
-  - 이름 중복 · 지정 폴더(`Design/Level/` · `Design/Quest/`) 하위 여부 · 리전 메타데이터 존재 · 텔레포트 확률 혼용 · NavMesh 투영(경고만)
-- <strong>폴더 구조로 리전 판별</strong>
-  - Outliner 폴더 경로 `Design/Level/<리전>` 에서 정규식으로 리전 이름을 잘라 메타데이터와 대조, 리전별 export 파일 분리 기준으로도 사용
-
-    ```cpp
-    // AreaToolActor.cpp — "Root/Depth/Design/Level/INSRegion/District_A/MonsterA" → "INSRegion"
-    FString AAreaToolActor::GetInsRegionName(FString FolderPath)
-    {
-        // 접두사 정규식: "Design/Level/|Design/Quest/"
-        FRegexPattern PrefixRegexPattern(TEXT("^.*?" + PrefixsRegex));
-        FRegexMatcher PrefixMatcher(PrefixRegexPattern, FolderPath);
-
-        FString TrimmedPath = FolderPath;
-        if (PrefixMatcher.FindNext())                     // 처음부터 접두사 끝까지 제거
-            TrimmedPath = FolderPath.RightChop(PrefixMatcher.GetMatchEnding());
-
-        FRegexMatcher SlashMatcher(FRegexPattern(TEXT("/.*$")), TrimmedPath);
-        if (SlashMatcher.FindNext())                      // 첫 '/'부터 끝까지 제거
-            TrimmedPath = TrimmedPath.Left(SlashMatcher.GetMatchBeginning());
-
-        return TrimmedPath;
-    }
-    ```
-
-- <strong>경고에서 바로 액터로 이동</strong>
-  - 실패 내용을 메시지 로그에 액터 링크(`FUObjectToken`)로 남겨 클릭 시 해당 액터 선택, 일괄 export에서는 팝업 없이 로그만 기록
 
 ### Export + 소스 컨트롤 연동
 
 <img class="diagram" src="/images/diagrams/areatool-reconcile.svg" alt="AreaTool Export의 SaveAndReconcile 흐름: Export 결과(파일 경로별 JSON 배열)를 파일마다 기존 파일 문자열과 비교해, 동일하면 건너뛰고(체크아웃 · 저장 없음), 내용이 바뀌었으면 FCheckOut 후 저장, 새 파일이면 저장 후 FMarkForAdd. 기존 Level/ · Region/ 하위 json 중 이번 Export에 없는 파일은 FDelete로 삭제" />
 
-- export 결과를 통째로 저장하면 바뀌지 않은 파일까지 체크아웃되고, 레벨에서 지운 액터의 파일은 그대로 남음
 - export 결과와 디스크의 기존 파일을 직접 비교해, 달라진 파일에만 소스 컨트롤 작업 수행 (`FAreaToolJsonGenerator::SaveAndReconcile`)
 - <strong>파일 단위 reconcile</strong>
-  - export 결과는 액터마다 정해진 파일 경로로 묶인 JSON 배열
-  - 기존 파일과 문자열로 비교해 동일 · 변경 · 신규로 분류, 비교에 쓰이지 않고 남은 기존 파일은 삭제 대상
-
-    ```cpp
-    // AreaToolGenerator.cpp — FAreaToolJsonGenerator::SaveAndReconcile
-    for (const auto& [RelPath, JsonArray] : ExportedFileDatas)
-    {
-        const FString FilePath = FPaths::ConvertRelativePathToFull(DIR_METADATA_FOR_SERVER, RelPath);
-        FString ExportedJsonString;
-        FJsonSerializer::Serialize(JsonArray, TJsonWriterFactory<>::Create(&ExportedJsonString));
-
-        CurrExistDataFiles.Remove(FilePath);           // 남는 파일 = 이번 Export에 없는 파일
-        if (FileManager.FileExists(*FilePath))
-        {
-            FString Existing;
-            if (FFileHelper::LoadFileToString(Existing, *FilePath) && Existing == ExportedJsonString)
-                continue;                              // 동일 → 체크아웃하지 않음
-            EditFiles.Add(FilePath);
-        }
-        else AddedFiles.Add(FilePath);
-        DatasToSave.Add(FilePath, ExportedJsonString);
-    }
-    // FDelete(CurrExistDataFiles) → FCheckOut(EditFiles) → 저장 → FMarkForAdd(AddedFiles)
-    ```
-
-- <strong>GUID 정렬 기반 직렬화 순서 고정</strong>
-  - 문자열 비교가 의미 있으려면 직렬화 순서가 매번 같아야 함
-  - export 전에 액터를 GUID 순으로 정렬, DataAsset도 GUID 키 순으로 정렬해 저장
 - <strong>JSON · DataAsset 두 경로</strong>
   - JSON은 서버용 생성 데이터 폴더(`GeneratedData_Server`)에 저장
   - 클라이언트용 데이터는 `FAreaToolAssetGenerator<TargetActor, TargetAssetSet>` 템플릿으로 `/Game/GameAsset/Area/<레벨>/` 아래 DataAsset으로 저장
-  - DataAsset도 기존 에셋을 JSON 문자열로 바꿔 비교한 뒤 변경분만 체크아웃 · 추가, 사라진 에셋은 삭제
-- <strong>메타데이터에 없는 리전 파일 정리</strong>
-  - 전체 레벨 export 후 `CleanUp()`이 Region 메타데이터에 없는 리전 이름의 파일을 소스 컨트롤에서 삭제
 - export 결과는 런타임 메타데이터로 사용 → [메타데이터 파이프라인 페이지](/projects/metadata-pipeline/)
 
 ### Commandlet 기반 CI
@@ -280,12 +219,7 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 - export를 사람이 에디터에서 레벨마다 실행하면 빠지는 레벨이 생길 수 있음
 - 에디터 UI 없이 Commandlet으로 전체 레벨의 검증 · export를 실행하고 Jenkins CI에 연동
 - 사람 실수와 무관하게 빌드 단계에서 데이터 검증 · 생성 보장
-- <strong>`UAreaToolExportCommandlet` → `ExportAllLevels()`</strong>
-  - Commandlet은 `UAreaToolSubsystem::ExportAllLevels()`만 호출
-  - Region 메타데이터에 등록된 레벨 목록을 돌며 레벨 로드 → 검증 · export 반복, 마지막에 `CleanUp()`
-  - 에디터 메뉴의 전체 export도 같은 함수 사용
 - <strong>헤드리스에서도 에디터와 같은 상태로 레벨 로드</strong>
-  - 맵만 열면 World Partition 셀 · 데이터 레이어 · NavMesh가 로드되지 않아 배치 액터 수집과 NavMesh 검증이 동작하지 않음
   - 레벨마다 내비게이션 시스템 추가 → 기획 배치용 데이터 레이어(`DL_Design`) 로드 → 월드 전체 범위 로드
 
     ```cpp
@@ -305,10 +239,3 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     }
     ```
 
-- <strong>Slate 없는 환경 대응</strong>
-  - 디버그 입력 처리기는 `!IsRunningCommandlet() && FSlateApplication::IsInitialized()`일 때만 등록
-  - Commandlet 경로에서는 경고 팝업을 띄우지 않음
-- <strong>레벨 데이터 빌더 Commandlet에 통합</strong>
-  - NavMesh · Landscape 등을 굽는 팀 공용 `SolLevelDataBuilderCommandlet`에 빌더 팩토리(`USolLevelDataBuilderFactory`)를 추가해, 명령줄 스위치 이름으로 실행할 빌더 선택
-  - AreaTool은 `-AreaToolData` 스위치로 레벨마다 export, 모든 맵 처리 후 팩토리 `CleanUp()` 한 번 호출
-  - Jenkins 파이프라인이 이 Commandlet을 `-AreaToolData`와 함께 호출
