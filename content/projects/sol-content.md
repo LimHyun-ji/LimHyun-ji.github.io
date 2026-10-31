@@ -180,7 +180,7 @@ protected:
 
 ---
 
-## 경험치 획득 연출 — 시간 보정
+## 경험치 획득 연출 — 궤적 · 시간 보정
 
 <figure style="text-align:center"><img src="/images/projects/sol-content/exp-obtain-effect.gif" alt="경험치 획득 연출" /><figcaption style="font-size:11px;color:#888;margin-top:6px">경험치 획득 시 파티클이 플레이어 방향으로 가속 추격하는 연출</figcaption></figure>
 
@@ -242,17 +242,36 @@ void FSingleEffect::UpdateSingle(float DeltaTime)
 }
 ```
 
+### 궤적 설계 — 로컬 기저에서 확산 방향 생성
+
+파티클이 일직선으로 날아오지 않고 **발사 방향을 축으로 사방에 퍼졌다가 휘어 들어오도록**, 초기 랜덤 속도(`RandomVelocity`)의 방향을 발사 방향 기준 로컬 좌표계에서 만듭니다.
+
+1. 발사 방향(`StartDirection`)을 회전으로 바꾸고, 그 회전으로 Right · Up 축을 돌려 **발사 방향에 수직인 기저**를 구성
+2. 두 축에 랜덤 가중치를 곱해 합성 → 발사 방향과 수직인 평면 위의 무작위 방향
+3. 매 스텝 속도 = 목표 방향 속도 + 랜덤 속도. 가속이 누적될수록 랜덤 성분이 줄어들어 **처음엔 퍼지고, 점점 목표로 수렴**하는 곡선 궤적
+
 피격자와 공격자(획득자)의 거리에 반비례하는 `CurveDistanceInterpolator`를 곱해 **거리가 멀수록 초기 확산 반경을 크게** 설정하므로, 먼 거리에서도 연출이 자연스럽습니다.
 
 ```cpp
-// ObtainEffectObject.cpp — 거리 기반 곡선 보정
+// ObtainEffectObject.cpp — 발사 방향 기준 로컬 기저 + 거리 기반 곡선 보정
+const FRotator Rotation = Data.StartDirection.Rotation();
+const FVector RightVector = Rotation.RotateVector(FVector::RightVector);
+const FVector UpVector    = Rotation.RotateVector(FVector::UpVector);
+
 float X = 1 - FMath::Clamp(
     (Distance - Data.DistanceInterpolation.X) /
     (Data.DistanceInterpolation.Y - Data.DistanceInterpolation.X), 0.f, 1.f);
 float CurveDistanceInterpolator =
     FMath::Clamp(X * Data.DistanceInterpolation.Z, 1.f, Data.DistanceInterpolation.Z);
+
+const float RandY = FMath::RandRange(Data.MinRandomRange.Y, Data.MaxRandomRange.Y);
+const float RandZ = FMath::RandRange(Data.MinRandomRange.Z, Data.MaxRandomRange.Z);
+const FVector TargetDirection = (RightVector * RandY + UpVector * RandZ).GetSafeNormal();
+
 SingleEffect.RandomVelocity = TargetDirection * Data.CurveForce * CurveDistanceInterpolator;
 ```
+
+- 확산 범위(`MinRandomRange` / `MaxRandomRange`)는 재화 타입별로 데이터에서 조정
 
 ---
 

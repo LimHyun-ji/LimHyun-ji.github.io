@@ -11,6 +11,7 @@ highlights:
   - "LevelSequence가 내려갈 때 안의 Actor도 모두 메모리에서 내려가도록 동적 제어 — 연출 액터를 진입 시 생성·종료 시 파괴하고 시퀀스는 SoftObjectPtr로 비동기 로드"
   - "3D 오브젝트를 SceneCapture2D로 RenderTarget에 캡처해 UI에 합성, 연출 구간에만 캡처를 Visible 토글해 모바일 GPU 비용 절감"
   - "갓아머 연출: TransformBonesComponent로 런타임 본 트랜스폼을 AnimBP와 연동하고 Niagara 잔상을 Deactivate로 정리"
+  - "UI 파티클: 부모 위젯의 누적 RenderTransform 행렬에서 Atan2로 회전각을 구하고 회전 행렬로 크기 · 위치를 변환해, 회전 · 스케일된 UI 안에서도 파티클 배치를 맞춤"
 images:
   - src: "/images/projects/rendering-cinema/constellation-preview.gif"
     alt: "별자리 전환 연출"
@@ -34,6 +35,15 @@ images:
       <dt>결과</dt><dd>연출 외 구간의 캡처 비용 제거</dd>
     </dl>
     <a class="case-more" href="#case-scenecapture">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">회전된 UI에서 파티클 배치 어긋남</p>
+    <dl>
+      <dt>문제</dt><dd>부모 위젯에 회전 · 스케일이 걸리면 UI 파티클의 위치 · 각도가 어긋남</dd>
+      <dt>해결</dt><dd>누적 변환 행렬에서 <code>Atan2</code>로 회전각을 구하고, 스케일 → 회전 순서로 크기 · 위치를 재계산</dd>
+      <dt>결과</dt><dd>회전 · 스케일된 UI 안에서도 파티클이 의도한 위치 · 방향으로 표시</dd>
+    </dl>
+    <a class="case-more" href="#case-uiparticle">자세히 ↓</a>
   </div>
 </div>
 
@@ -108,6 +118,46 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 - 별도 아이콘 위젯 없이 GPU 표시 처리 → 대상 증가에도 일정 비용
 - MPC·머티리얼 기반 미니맵 및 월드맵 설계 상세 → [실시간 위치 기반 맵 설계 페이지](/projects/mapdesign/)
 
+<div id="case-uiparticle" class="case-anchor"></div>
+
+## 5. UI 파티클 — 부모 변환을 반영한 2D 회전 계산
+
+프로젝트에 도입된 UI 파티클 플러그인(Slate 기반)의 렌더 위치 계산부를 수정했습니다. **부모 위젯에 회전 · 스케일이 걸린 화면에서 파티클의 위치와 각도가 어긋나는 문제가 있었습니다.** 기존 코드에는 세 가지 원인이 있었습니다.
+
+- 회전각의 cos를 `A / √(B² + D²)`로 구해, X · Y 스케일이 다르면 값이 틀리고 1을 넘으면 sin 계산(`√(1 − cos²)`)이 NaN이 됨
+- 크기를 먼저 회전한 뒤 스케일을 곱해, 비균일 스케일에서 변환 순서가 어긋남
+- 파티클 위치(`CurPos`)에는 부모 회전이 적용되지 않아, 부모가 회전해도 방출 위치가 따라 돌지 않음
+
+1. 부모까지 누적된 `RenderTransform`의 2×2 행렬 성분(A, B)에서 `Atan2(B, A)`로 **회전각을 직접 계산**
+2. 파티클 크기 · 위치에 **스케일을 먼저 곱한 뒤 2D 회전 행렬** `(x·cos − y·sin, y·cos + x·sin)` 적용
+3. 회전된 위치에서 회전된 크기의 절반을 빼 **중심 기준 위치**로 보정
+4. 자식 Geometry의 렌더 변환은 `FScale2D` · `FQuat2D(부모 회전 − 파티클 회전)`을 합성
+
+```cpp
+// EasyParticleState.cpp — 렌더 위치 계산
+float A, B, C, D;
+RenderTransform.GetMatrix().GetMatrix(A, B, C, D);
+const float TotalAngle = FMath::Atan2(B, A);                 // 부모 누적 회전각
+const float Cosvalue = FMath::Cos(TotalAngle);
+const float Sinvalue = FMath::Sin(TotalAngle);
+
+FSlateRenderTransform Transform(::Concatenate(
+    FScale2D(DirectionScale, VerticalDirectionScale),
+    FQuat2D(TotalAngle - FMath::DegreesToRadians(CurRotation))));
+
+const FVector2D ScaledSize = FVector2D(CurSizeX, CurSizeY) * Scale2D;
+const FVector2D RotatedSize(ScaledSize.X * Cosvalue - ScaledSize.Y * Sinvalue,
+                            ScaledSize.Y * Cosvalue + ScaledSize.X * Sinvalue);
+const FVector2D ScaledCurPos = CurPos * Scale2D;
+const FVector2D RotatedCurPos(ScaledCurPos.X * Cosvalue - ScaledCurPos.Y * Sinvalue,
+                              ScaledCurPos.Y * Cosvalue + ScaledCurPos.X * Sinvalue);
+
+const FVector2D AbsolutePosition = RotatedCurPos - RotatedSize / 2;   // 중심 기준
+const FVector2D FixPosition = AllottedGeometry.AbsoluteToLocal(AbsolutePosition + BasePos - WindowOffset);
+```
+
+- 레이아웃 대응 — DesiredSize를 (100, 100)으로 고정하고 실제 배치 크기와의 비율(`LocalScale`)을 스케일에 반영, 앵커를 중앙 정렬로 변경해 레이아웃 안에 배치된 파티클도 크기 · 위치 유지
+
 
 ## 기술 요약
 
@@ -118,4 +168,5 @@ if (RenderTargetCam && RenderTargetCam->GetComponentByClass<USceneCaptureCompone
 | 로딩 | `TSoftObjectPtr<ULevelSequence>` 비동기 로드 (진입 전 미로드) |
 | 스켈레탈 | `TransformBonesComponent` 런타임 본 트랜스폼 ↔ AnimBP |
 | FX | Niagara `Deactivate`(잔상 정리) · 모바일 PostProcess off |
+| UI 파티클 | 누적 `RenderTransform` → `Atan2` 회전각 · 2D 회전 행렬 · `FQuat2D` 합성 |
 | 비용 | 모바일에서 SceneCapture/시퀀스 액터 수명을 연출 구간에 한정 |
