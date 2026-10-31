@@ -132,10 +132,10 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 <div id="case-polygon-edit" class="case-anchor"></div>
 
 - <strong>폴리곤 편집 — 클릭한 변 위에 꼭짓점 삽입 (광선 · 선분 교차)</strong>
-  - 기존에는 선택한 점을 Alt + 드래그로 복제해 추가 → 선택한 점 옆에만 생겨 원하는 변 위치를 지정하기 어려움
   - Alt + 클릭한 화면 좌표를 월드 광선으로 바꾸고, 폴리곤의 각 변과 3D 교차 판정을 직접 구현
   - 외적 · 내적으로 평행 · 동일 평면 여부를 거른 뒤, 교차 매개변수 t, s 가 모두 [0, 1] 안이면 그 변 위의 점으로 판정
   - 교차점을 로컬 좌표로 바꿔 해당 변 다음 인덱스에 삽입 (Undo 지원)
+  - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역으로 돌려 로컬 공간 기준으로 반영 (`Quat.GetInverse().RotateVector`)
 
     ```cpp
     // Polygon2dComponentVisualizer.cpp
@@ -172,14 +172,12 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     // 교차점 → InverseTransformPosition → Point3D.Insert(LocalPos, CurrentIdx + 1)
     ```
 
-  - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역으로 돌려 로컬 공간 기준으로 반영 (`Quat.GetInverse().RotateVector`)
+
 - <strong>스폰 프리뷰 기준점 — 다각형 무게중심</strong>
-  - 스폰 그룹 프리뷰 메시를 Territory 중앙에 두기 위해 Shoelace 공식으로 면적 기준 무게중심 계산
+  - 스폰 그룹 프리뷰 메시를 Territory 중앙에 두기 위해 면적 기준 무게중심 계산
   - 꼭짓점 평균과 달리 오목 다각형에서도 면적 분포를 반영한 중심을 얻음
-  - NPC · FieldObject 스폰 그룹 프리뷰 위치와 Territory 디버그 표시 위치에 사용
 
     ```cpp
-    // TerritoryPolygonComponent.cpp
     FVector2D UTerritoryPolygonComponent::GetCenter()
     {
         float SignedArea = 0.0f;
@@ -203,23 +201,13 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 
 ### 검증자 체인 (데이터 무결성)
 
-- 잘못 배치된 액터가 그대로 export되면 문제가 런타임에서야 드러남
-- export 직전에 액터마다 검증자 체인(`IAreaToolValidator`)을 통과시키고, 실패한 액터는 결과에서 빼고 경고로 알림
-- Commandlet CI도 같은 Export 경로를 타므로 빌드 단계에서도 같은 검사 적용
+- export 직전 액터마다 검증자 체인을 통과시키고, 실패한 액터는 제외 후 경고 → Commandlet CI도 같은 경로로 검사
 - <strong>인터페이스 하나 + Generator별 조합</strong>
-  - 검증자는 모두 `IAreaToolValidator`를 구현하고, Generator마다 필요한 것만 등록
-  - 이름 중복 검사는 모든 JSON Generator에 기본 포함
-  - District는 폴더 · 레벨, TeleportGroup은 확률 · 폴더 · 리전, SpawnNpc는 NavMesh · 폴더 · 리전 검증
-  - 하나라도 실패하면 그 액터는 export 대상에서 제외
+  - 모든 검증자가 `IAreaToolValidator`를 구현하고, Generator마다 필요한 검증자만 등록 (이름 중복 검사는 기본 포함)
 - <strong>검증 규칙</strong>
-  - `FNameValidator` — 액터 라벨 중복 검사(`TSet`), 상태를 가지므로 Export 시작 때 `ClearCachedData()` 호출로 초기화
-  - `FFolderValidator` — Outliner의 `Design/Level/` · `Design/Quest/` 하위 액터만 export
-  - `FRegionValidator` / `RegionValidator` — 폴더에서 뽑은 리전 이름 / 현재 레벨 이름이 Region 메타데이터에 있는지 확인
-  - `FTeleportProbValidator` — 한 텔레포트 그룹 안에서 확률이 있는 항목과 0인 항목이 섞이면 실패
-  - `FNavMeshValidator` — 액터 위치를 NavMesh에 투영해 실패하면 경고 (차단하지 않고 경고만 남김)
+  - 이름 중복 · 지정 폴더(`Design/Level/` · `Design/Quest/`) 하위 여부 · 리전 메타데이터 존재 · 텔레포트 확률 혼용 · NavMesh 투영(경고만)
 - <strong>폴더 구조로 리전 판별</strong>
-  - 기획자가 Outliner 폴더를 `…/Design/Level/<리전>/<District>/…` 규칙으로 정리
-  - 폴더 경로에서 리전 이름을 정규식으로 잘라 Region 메타데이터와 대조, export 파일을 리전별로 나누는 기준으로도 사용
+  - Outliner 폴더 경로 `Design/Level/<리전>` 에서 정규식으로 리전 이름을 잘라 메타데이터와 대조, 리전별 export 파일 분리 기준으로도 사용
 
     ```cpp
     // AreaToolActor.cpp — "Root/Depth/Design/Level/INSRegion/District_A/MonsterA" → "INSRegion"
@@ -242,8 +230,7 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     ```
 
 - <strong>경고에서 바로 액터로 이동</strong>
-  - 실패 내용은 AreaTool 메시지 로그에 `FUObjectToken` 링크와 함께 기록, 클릭하면 해당 액터 선택
-  - 전체 레벨 일괄 export처럼 무인으로 도는 경로에서는 경고 팝업 없이 로그만 남김
+  - 실패 내용을 메시지 로그에 액터 링크(`FUObjectToken`)로 남겨 클릭 시 해당 액터 선택, 일괄 export에서는 팝업 없이 로그만 기록
 
 ### Export + 소스 컨트롤 연동
 
