@@ -49,7 +49,7 @@ export default function HeroParticles() {
       // 테마
       const applyTheme = () => {
         const light = document.documentElement.getAttribute('data-theme') === 'light';
-        pMat.color.set(light ? 0x1f9d6b : 0x3fd69a);
+        pMat.color.set(light ? 0x0e8a64 : 0x39cc9b); // Rider method 색 (사이트 강조색)
         pMat.opacity = light ? 0.4 : 0.6;
       };
       applyTheme();

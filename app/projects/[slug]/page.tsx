@@ -2,6 +2,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
 import { getProject, getSlugs } from '@/lib/content';
 import Mermaid from '@/components/Mermaid';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -11,6 +12,7 @@ import CodeToggle from '@/components/CodeToggle';
 import KeepWords from '@/components/KeepWords';
 import TableOfContents, { type Heading } from '@/components/TableOfContents';
 import { glue, rehypeKeepWords } from '@/lib/keepWords';
+import { sortCompetencies, toneClass } from '@/lib/competency';
 import type { Components } from 'react-markdown';
 
 export function generateStaticParams() {
@@ -98,7 +100,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         <p className="eyebrow">{glue(`${proj.role ?? ''}${proj.period ? ` · ${proj.period}` : ''}`)}</p>
         <h1><KeepWords text={proj.title} /></h1>
         {proj.summary && <p className="headline">{glue(proj.summary)}</p>}
-        {proj.tags && <ul className="chips small">{proj.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
+        {proj.tags && <ul className="chips small">{sortCompetencies(proj.tags).map((t) => <li key={t} className={toneClass(t)}>{glue(t)}</li>)}</ul>}
       </header>
 
       {/* 이미지: slider 또는 gallery */}
@@ -113,7 +115,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         <div className="detail-body toc-layout-main">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw, rehypeKeepWords]}
+            rehypePlugins={[rehypeRaw, [rehypeHighlight, { detect: false, plainText: ['mermaid', 'text'] }], rehypeKeepWords]}
             components={headingComponents}
           >
             {proj.body}

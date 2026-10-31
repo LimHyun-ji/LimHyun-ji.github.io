@@ -5,7 +5,7 @@ title: "실시간 위치 기반 맵 설계 — 미니맵 · 월드맵"
 role: "Client Developer"
 period: "2024 — 현재"
 summary: "Material 기반 미니맵 동기화, InputProcessor 월드맵 확대·드래그, 영역 이미지 동적 로딩으로 텍스처 비용 절감."
-tags: ["Minimap", "World Map", "MPC", "Material", "InputProcessor", "Mobile"]
+tags: ["렌더링", "메모리 최적화", "런타임 아키텍처"]
 images:
   - src: "/images/projects/mapdesign/mapdesign-preview.gif"
     alt: "맵 설계 동작 미리보기"

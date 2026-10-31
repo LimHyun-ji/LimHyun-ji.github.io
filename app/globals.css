@@ -8,8 +8,8 @@
 .mermaid { overflow-x: auto; }
 
 /* ───────────── 홈 재구성 (zachjordan 스타일) ───────────── */
-:root { --accent: #3FD69A; --accent-2: #F2B23E; --line: color-mix(in srgb, currentColor 14%, transparent); --surf: color-mix(in srgb, currentColor 4%, transparent); }
-:root[data-theme="light"] { --accent: #128a5c; --accent-2: #b7830f; }
+:root { --accent: #39CC9B; --accent-2: #C9A26D; --line: color-mix(in srgb, currentColor 14%, transparent); --surf: color-mix(in srgb, currentColor 4%, transparent); }
+:root[data-theme="light"] { --accent: #0E8A64; --accent-2: #8C6C41; }
 
 /* NAV (sticky) */
 /* 에메랄드 메뉴바 — 밝은 에메랄드 배경 + 어두운 글자 */
@@ -101,10 +101,8 @@
 .lead-stack .lead-keywords { gap: 7px; padding: 5px 0 5px 14px;
   border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); } /* 카테고리 라벨과 태그 사이 세로선 */
 .lead-stack .lead-keywords li { font-size: 13px; padding: 5px 12px; }
-/* 카테고리별 색 — IDE 구문 강조 팔레트 (VS Code Dark+ / Light+) : keyword · type · variable · string */
-.lst-c0 { --kw: #C586C0; } .lst-c1 { --kw: #4EC9B0; } .lst-c2 { --kw: #569CD6; } .lst-c3 { --kw: #CE9178; }
-:root[data-theme="light"] .lst-c0 { --kw: #AF00DB; } :root[data-theme="light"] .lst-c1 { --kw: #267F99; }
-:root[data-theme="light"] .lst-c2 { --kw: #0451A5; } :root[data-theme="light"] .lst-c3 { --kw: #C0560A; }
+/* 카테고리별 색 — Rider 팔레트 토큰 (keyword · type · field · string) */
+.lst-c0 { --kw: var(--rd-keyword); } .lst-c1 { --kw: var(--rd-type); } .lst-c2 { --kw: var(--rd-field); } .lst-c3 { --kw: var(--rd-string); }
 .lead-stack .lst-cat { color: var(--kw); }
 .lead-stack .lead-keywords li { color: var(--kw); border-color: color-mix(in srgb, var(--kw) 45%, transparent);
   background: color-mix(in srgb, var(--kw) 11%, transparent); }

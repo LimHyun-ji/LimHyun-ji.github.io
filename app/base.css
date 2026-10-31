@@ -8,11 +8,15 @@
   --border: #263a32;
   --text: #E6ECE8;
   --muted: #869089;
-  --accent: #3FD69A;
-  --accent-2: #F2B23E;
-  --accent-soft: rgba(63, 214, 154, 0.13);
-  --accent-2-soft: rgba(242, 178, 62, 0.15);
+  --accent: #39CC9B;
+  --accent-2: #C9A26D;
+  --accent-soft: rgba(57, 204, 155, 0.13);
+  --accent-2-soft: rgba(201, 162, 109, 0.15);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  /* Rider Dark 구문 강조 팔레트 — 사이트 전반의 보조 색 (역량 태그 · 기술스택 · 코드 블록) */
+  --rd-keyword: #6C95EB; --rd-type: #C191FF; --rd-method: #39CC9B; --rd-field: #66C3CC;
+  --rd-number: #ED94C0; --rd-comment: #85C46C; --rd-string: #C9A26D; --rd-struct: #E1BFFF;
+  --rd-text: #BDBDBD; --rd-macro: #BC8CFF; --code-bg: #262626;
 }
 [data-theme="light"] {
   color-scheme: only light;   /* 'only' 필수 — 모바일 강제 다크(auto/force dark) 옵트아웃 */
@@ -22,11 +26,15 @@
   --border: #d3e2da;
   --text: #14201A;
   --muted: #5a6b62;
-  --accent: #128a5c;
-  --accent-2: #b7830f;
-  --accent-soft: rgba(18, 138, 92, 0.10);
-  --accent-2-soft: rgba(183, 131, 15, 0.12);
+  --accent: #0E8A64;
+  --accent-2: #8C6C41;
+  --accent-soft: rgba(14, 138, 100, 0.10);
+  --accent-2-soft: rgba(140, 108, 65, 0.12);
   --shadow: 0 8px 24px rgba(90, 107, 98, 0.2);
+  /* Rider 팔레트 — 라이트 배경 대비 보정 (같은 색상 계열을 어둡게) */
+  --rd-keyword: #2F5FD0; --rd-type: #7A3FD8; --rd-method: #0E8A64; --rd-field: #11808C;
+  --rd-number: #B4357E; --rd-comment: #4E8A3A; --rd-string: #8C6C41; --rd-struct: #8A4FC4;
+  --rd-text: #2B2B2B; --rd-macro: #7A3FD8; --code-bg: #262626;
 }
 
 * { box-sizing: border-box; }
@@ -214,11 +222,10 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
 /* 코드 블록 — Rider 기본 폰트(JetBrains Mono), 다크 에디터 스타일 */
 .detail-body pre {
   margin: 16px 0 26px; padding: 16px 18px; overflow-x: auto;
-  background: #0B1512; border: 1px solid var(--border); border-radius: 10px;
-  box-shadow: inset 0 0 0 1px rgba(63,214,154,.04);
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
 }
 .detail-body pre code {
-  display: block; background: none; color: #d7e2db; padding: 0; border-radius: 0;
+  display: block; background: none; color: #BDBDBD; padding: 0; border-radius: 0;
   font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   font-size: 0.82rem; line-height: 1.75; white-space: pre; tab-size: 4;
 }
@@ -351,3 +358,31 @@ footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size:
   .tl-item { grid-template-columns: 1fr; gap: 4px; }
   .mermaid { padding: 10px; }
 }
+
+/* ───────────── 코드 구문 강조 — Rider Dark (highlight.js 클래스) ───────────── */
+/* 코드 블록 배경은 라이트 테마에서도 어둡게 유지하므로 다크 팔레트 값을 고정으로 사용 */
+.detail-body pre .hljs-keyword, .detail-body pre .hljs-built_in, .detail-body pre .hljs-literal { color: #6C95EB; }
+.detail-body pre .hljs-type, .detail-body pre .hljs-title.class_ { color: #C191FF; }
+.detail-body pre .hljs-title.function_, .detail-body pre .hljs-title { color: #39CC9B; }
+.detail-body pre .hljs-string { color: #C9A26D; }
+.detail-body pre .hljs-number { color: #ED94C0; }
+.detail-body pre .hljs-comment { color: #85C46C; font-style: italic; }
+.detail-body pre .hljs-meta, .detail-body pre .hljs-meta .hljs-keyword { color: #BC8CFF; }
+.detail-body pre .hljs-meta .hljs-string { color: #C9A26D; }
+.detail-body pre .hljs-attr, .detail-body pre .hljs-property, .detail-body pre .hljs-variable { color: #66C3CC; }
+.detail-body pre .hljs-params { color: #BDBDBD; }
+.detail-body pre .hljs-operator, .detail-body pre .hljs-punctuation { color: #BDBDBD; }
+
+/* ───────────── 역량 태그 tone (Rider 팔레트) ───────────── */
+.tone-keyword { --tone: var(--rd-keyword); } .tone-type { --tone: var(--rd-type); }
+.tone-method { --tone: var(--rd-method); } .tone-field { --tone: var(--rd-field); }
+.tone-number { --tone: var(--rd-number); } .tone-comment { --tone: var(--rd-comment); }
+.tone-string { --tone: var(--rd-string); } .tone-struct { --tone: var(--rd-struct); }
+.tone-accent { --tone: var(--accent); }
+.chips li[class*="tone-"], .ci-item-tags li[class*="tone-"] { color: var(--tone);
+  border: 1px solid color-mix(in srgb, var(--tone) 42%, transparent);
+  background: color-mix(in srgb, var(--tone) 11%, transparent); }
+/* 역량 태그는 한글이라 본문 글꼴로 (모노 글꼴 자간이 한글에서 벌어져 보임) */
+.chips li[class*="tone-"] { font-family: inherit; letter-spacing: 0; font-weight: 700; }
+/* 역량 태그 — 둥근 알약 모양 */
+.chips li[class*="tone-"], .ci-item-tags li[class*="tone-"] { border-radius: 999px; padding: 4px 12px; font-size: 12px; line-height: 1.5; }

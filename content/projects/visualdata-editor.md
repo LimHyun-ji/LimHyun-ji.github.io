@@ -5,7 +5,7 @@ title: "VisualData 에디터(유지보수 및 개선)"
 role: "Tools / Editor"
 period: "2023 — 현재 (리팩토링)"
 summary: "서버 없이 인게임과 같은 외형·전투 연출을 미리 보는 VisualData 에디터 확장."
-tags: ["Editor Tooling", "VisualData", "Slate", "EditorModule", "AssetMigration", "Commandlet"]
+tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
 images:
   - src: "/images/projects/visualdata/Screenshot_25.png"
     alt: "VisualData 에디터 — 파츠별 메시 설정과 캐릭터 프리뷰"

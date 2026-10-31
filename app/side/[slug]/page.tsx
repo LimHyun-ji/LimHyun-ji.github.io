@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
 import { getSideDetail, getSideSlugs } from '@/lib/sideContent';
 import ThemeToggle from '@/components/ThemeToggle';
 import DocPreview from '@/components/DocPreview';
@@ -63,7 +64,7 @@ export default function SideProjectPage({ params }: { params: { slug: string } }
       {docUrl && <DocPreview url={docUrl} title={`${d.title} 기술소개서`} />}
 
       <div className="detail-body">
-        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw, rehypeKeepWords]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw, [rehypeHighlight, { detect: false, plainText: ['mermaid', 'text'] }], rehypeKeepWords]}>
           {d.body}
         </ReactMarkdown>
       </div>

@@ -5,7 +5,7 @@ title: "인게임 컨텐츠 · 연출"
 role: "Client Developer · Schema 설계·컨텐츠 구현 담당"
 period: "2023 — 현재"
 summary: "횡적 성장 컨텐츠의 클라이언트 · 서버 통신 및 연출 자원의 수명 관리."
-tags: ["Gameplay", "Content", "HTTP API", "WebSocket", "PocketLevel", "LevelSequence", "Niagara", "UI Particle", "DeltaTime"]
+tags: ["네트워크 동기화", "게임 수학", "렌더링"]
 imageLayout: slider
 images:
   - src: "/images/projects/sol-content/Screenshot_26.png"

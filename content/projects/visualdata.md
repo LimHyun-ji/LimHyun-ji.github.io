@@ -5,7 +5,7 @@ title: "외형 시스템"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
 summary: "모든 Entity에 외형을 세팅 · 로드하는 인게임 모듈과 데이터 소유 · 수명 구조."
-tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"]
+tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
 ---
 
 <div class="shot-row">

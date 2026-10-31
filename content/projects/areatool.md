@@ -5,7 +5,7 @@ title: "AreaTool — 레벨 · 스폰 데이터 저작 & 검증 자동화"
 role: "Tools / Pipeline"
 period: "2023 — 현재 (상시)"
 summary: "레벨 영역 저작툴, Commandlet 기반 검증 CI."
-tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI", "Perforce"]
+tags: ["엔진 툴 확장", "게임 수학"]
 ---
 
 <div class="shot-row">

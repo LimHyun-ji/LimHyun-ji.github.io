@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { glue } from '@/lib/keepWords';
 import type { TechCase } from '@/lib/content';
+import { sortCompetencies, toneClass } from '@/lib/competency';
 
-// 대표 기술 사례 목록 — 상세 페이지의 문제 해결 카드로 가는 목차 (tagOrder는 태그 표시 순서에만 사용)
-export default function CaseIndex({ cases, tagOrder }: { cases: TechCase[]; tagOrder: string[] }) {
-  const rank = (t: string) => { const i = tagOrder.indexOf(t); return i < 0 ? 99 : i; };
+// 대표 기술 사례 목록 — 상세 페이지의 문제 해결 카드로 가는 목차 (태그 순서 · 색은 lib/competency.ts)
+export default function CaseIndex({ cases }: { cases: TechCase[]; tagOrder?: string[] }) {
   return (
     <div className="ci">
       <ol className="ci-list">
@@ -15,7 +15,7 @@ export default function CaseIndex({ cases, tagOrder }: { cases: TechCase[]; tagO
                 <h3>{glue(c.title)}<span className="arrow">{' '}→</span></h3>
                 <p>{glue(c.summary)}</p>
                 <ul className="ci-item-tags">
-                  {[...c.tags].sort((a, b) => rank(a) - rank(b)).map((t) => <li key={t}>{glue(t)}</li>)}
+                  {sortCompetencies(c.tags).map((t) => <li key={t} className={toneClass(t)}>{glue(t)}</li>)}
                 </ul>
               </div>
             </Link>

@@ -5,7 +5,7 @@ title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
 summary: "Unreal Insights 측정 기반 Slate Invalidation, LOD, Tick · UObject 절감으로 모바일 비용 최적화."
-tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass", "LOD"]
+tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
 ---
 
 ## 문제 해결 요약
@@ -15,7 +15,7 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
     <p class="case-title">Slate Hitching</p>
     <dl>
       <dt>문제</dt><dd>UI 화면에서 Slate Hitching(프레임 튐) 발생</dd>
-      <dt>해결</dt><dd>Unreal Insights로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
+      <dt>해결</dt><dd>Unreal Insights/Slate stat로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
       <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감, 갱신 타이밍이 맞지 않는 화면은 화면 단위로 제외</dd>
     </dl>
     <a class="case-more" href="#case-slate-hitching">자세히 ↓</a>

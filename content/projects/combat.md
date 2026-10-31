@@ -5,7 +5,7 @@ title: "전투 시스템 — Action · Notify · 서버 동기화"
 role: "Client Developer"
 period: "2023 — 현재"
 summary: "서버 ActionEvt를 Action Table · 몽타주 Notify기반으로 연결 및 동기화"
-tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/Lazy Hit", "StatusEffect"]
+tags: ["네트워크 동기화", "애니메이션", "게임 수학"]
 ---
 
 <div class="shot-row">
