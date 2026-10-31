@@ -7,7 +7,7 @@ const CONTENT = path.join(process.cwd(), 'content');
 
 export interface SkillGroup { category: string; items: string[]; }
 export interface Experience { org?: string; title?: string; period?: string; desc?: string; }
-export interface HistoryItem { period: string; title: string; sub?: string; kind?: 'work' | 'edu' | 'activity'; }
+export interface HistoryItem { period: string; title: string; sub?: string; note?: string; kind?: 'work' | 'edu' | 'activity'; }
 export interface About { born?: string; school?: string; schoolPeriod?: string; highschool?: string; }
 export interface Growth { period: string; problem: string; area: string; }
 export interface Identity { tagline?: string; growthIntro?: string; growth?: Growth[]; }

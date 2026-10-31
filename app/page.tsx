@@ -128,6 +128,7 @@ export default function Home() {
                     <span className="lh-body">
                       <span className="lh-title">{glue(h.title)}</span>
                       {h.sub && <span className="lh-sub">{glue(h.sub)}</span>}
+                      {h.note && <span className="lh-note">🏆 {glue(h.note)}</span>}
                     </span>
                   </li>
                 ))}

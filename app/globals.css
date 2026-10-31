@@ -58,6 +58,7 @@
 .lh-title { font-size: 14.5px; font-weight: 700; }
 .lh-sub { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 .lh-work .lh-title { color: var(--accent); }
+.lh-note { margin-top: 2px; font-size: 12.5px; font-weight: 600; color: var(--accent-2); line-height: 1.5; }
 @media (max-width: 520px) { .lh-item { grid-template-columns: 1fr; gap: 2px; } }
 @media (max-width: 520px) { .ls-row { grid-template-columns: 1fr; gap: 2px; } }
 /* 항목 단위로만 줄바꿈 — 항목 하나(예: Unreal Engine 5)가 중간에서 끊기지 않도록 */
