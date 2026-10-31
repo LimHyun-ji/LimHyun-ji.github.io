@@ -20,3 +20,6 @@ Gemfile.lock
 .omc/
 .p4*
 site-*.bat
+
+# 포트폴리오 PDF 산출물 (node pdf/build.mjs 로 재생성)
+pdf/out/
