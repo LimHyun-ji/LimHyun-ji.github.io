@@ -15,15 +15,6 @@ images:
 
 <div class="cases">
   <div class="case">
-    <p class="case-title">슈퍼클래스에 엉킨 타입별 규칙</p>
-    <dl>
-      <dt>문제</dt><dd>모든 타입의 에디터 데이터가 하나의 슈퍼클래스에 모여 유지보수가 어려움</dd>
-      <dt>해결</dt><dd>타입별 클래스 분리 + AssetMigration으로 구 에셋 자동 변환</dd>
-      <dt>결과</dt><dd>기존 에셋 일괄 이전, 에디터 구조 부채 해소</dd>
-    </dl>
-    <a class="case-more" href="#case-refactor">자세히 ↓</a>
-  </div>
-  <div class="case">
     <p class="case-title">프리뷰에서 본 트랜스폼 미적용</p>
     <dl>
       <dt>문제</dt><dd>에디터 프리뷰 메시는 <code>UAnimPreviewInstance</code>로 재생돼, 인게임 AnimInstance를 거치는 본 트랜스폼이 적용되지 않음</dd>
@@ -31,6 +22,15 @@ images:
       <dt>결과</dt><dd>체형 값을 바꾸면 에디터 프리뷰에 바로 반영</dd>
     </dl>
     <a class="case-more" href="#case-preview-bones">자세히 ↓</a>
+  </div>
+  <div class="case">
+    <p class="case-title">슈퍼클래스에 엉킨 타입별 규칙</p>
+    <dl>
+      <dt>문제</dt><dd>모든 타입의 에디터 데이터가 하나의 슈퍼클래스에 모여 유지보수가 어려움</dd>
+      <dt>해결</dt><dd>타입별 클래스 분리 + AssetMigration으로 구 에셋 자동 변환</dd>
+      <dt>결과</dt><dd>기존 에셋 일괄 이전, 에디터 구조 부채 해소</dd>
+    </dl>
+    <a class="case-more" href="#case-refactor">자세히 ↓</a>
   </div>
   <div class="case">
     <p class="case-title">에디터 · 인게임 외형 로직 이중화</p>
