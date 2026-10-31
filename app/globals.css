@@ -101,6 +101,13 @@
 .lead-stack .lead-keywords { gap: 7px; padding: 5px 0 5px 14px;
   border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); } /* 카테고리 라벨과 태그 사이 세로선 */
 .lead-stack .lead-keywords li { font-size: 13px; padding: 5px 12px; }
+/* 카테고리별 색 — IDE 구문 강조 팔레트 (VS Code Dark+ / Light+) : keyword · type · variable · string */
+.lst-c0 { --kw: #C586C0; } .lst-c1 { --kw: #4EC9B0; } .lst-c2 { --kw: #569CD6; } .lst-c3 { --kw: #CE9178; }
+:root[data-theme="light"] .lst-c0 { --kw: #AF00DB; } :root[data-theme="light"] .lst-c1 { --kw: #267F99; }
+:root[data-theme="light"] .lst-c2 { --kw: #0451A5; } :root[data-theme="light"] .lst-c3 { --kw: #C0560A; }
+.lead-stack .lst-cat { color: var(--kw); }
+.lead-stack .lead-keywords li { color: var(--kw); border-color: color-mix(in srgb, var(--kw) 45%, transparent);
+  background: color-mix(in srgb, var(--kw) 11%, transparent); }
 .lead-keywords li.kw-alt { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent-2) 45%, transparent);
   background: color-mix(in srgb, var(--accent-2) 12%, transparent); }
 /* 인적사항 · 학력 (작게) */

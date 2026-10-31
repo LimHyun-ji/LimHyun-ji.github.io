@@ -105,10 +105,10 @@ export default function Home() {
             {heroSkills.length > 0 && (
               <div className="lead-stack" id="skills" aria-label="기술스택">
                 {heroSkills.map((g, gi) => (
-                  <div className="lst-row" key={g.category}>
+                  <div className={`lst-row lst-c${gi % 4}`} key={g.category}>
                     <span className="lst-cat">{g.category}</span>
                     <ul className="lead-keywords">
-                      {g.items.map((it) => <li key={it} className={gi % 2 ? 'kw-alt' : undefined}>{glue(it)}</li>)}
+                      {g.items.map((it) => <li key={it}>{glue(it)}</li>)}
                     </ul>
                   </div>
                 ))}
