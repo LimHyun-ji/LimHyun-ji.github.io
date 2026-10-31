@@ -12,7 +12,7 @@ import { glue } from '@/lib/keepWords';
 // tone: 그룹 색 (a = 민트 accent, b = 골드 accent-2)
 const PROJECT_GROUPS = [
   { title: '인게임 클라이언트 — 시스템 · 전투 · 연출', tone: 'a', slugs: ['visualdata', 'combat', 'sol-content', 'mapdesign'] },
-  { title: '엔진 툴 · 기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'areatool', 'visualdata-editor', 'metadata-pipeline'] },
+  { title: '엔진 툴 · 기술 기반 — 성능 · 툴 · 파이프라인', tone: 'b', slugs: ['optimization', 'areatool', 'visualdata-editor'] },
 ];
 
 // 담당 시스템 한 줄 — 사례 글의 근거 색인 역할(제목 · 요약 한 줄)

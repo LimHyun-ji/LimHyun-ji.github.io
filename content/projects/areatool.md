@@ -212,7 +212,7 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
 - <strong>JSON · DataAsset 두 경로</strong>
   - JSON은 서버용 생성 데이터 폴더(`GeneratedData_Server`)에 저장
   - 클라이언트용 데이터는 `FAreaToolAssetGenerator<TargetActor, TargetAssetSet>` 템플릿으로 `/Game/GameAsset/Area/<레벨>/` 아래 DataAsset으로 저장
-- export 결과는 런타임 메타데이터로 사용 → [메타데이터 파이프라인 페이지](/projects/metadata-pipeline/)
+- export 결과는 런타임 메타데이터로 사용
 
 ### Commandlet 기반 CI
 
