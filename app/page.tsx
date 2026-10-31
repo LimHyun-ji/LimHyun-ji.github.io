@@ -138,7 +138,7 @@ export default function Home() {
         <section className="cases-sec" id="cases">
           <div className="featured-tag">◈ Case Studies · 기술 사례</div>
           <h2 className="cases-h">{glue('문제 하나를 끝까지 판 기록')}</h2>
-          <p className="cases-sub">{glue('분야 태그로 거를 수 있습니다. 각 사례는 상황 → 원인 → 선택한 방법과 이유 → 결과 순서로 정리합니다.')}</p>
+          <p className="cases-sub">{glue('대표 사례만 모았습니다. 자세한 원인 · 해결 과정은 각 시스템 페이지에 있습니다.')}</p>
           <CaseIndex cases={tc.cases} tagOrder={tc.tagOrder} />
         </section>
       )}

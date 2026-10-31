@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────
 # 메인 "기술 사례" — 사이트의 중심. 사례 하나 = 문제 하나를 끝까지 판 기록.
-# tags: 채용 공고 키워드. 사례 하나에 여러 개 가능(태그 필터로 찾음).
+# tags: 채용 공고 키워드. 사례 하나에 여러 개 가능 (카드 아래 칩으로 표시).
 #   게임플레이 · UI · 렌더링 · 게임 수학 · 최적화 · 엔진 툴 · 네트워크 연동
 # link: 지금은 시스템 상세 페이지의 해당 섹션. 사례 글이 생기면 그 주소로 바꾼다.
 # ─────────────────────────────────────────────────────────────
@@ -8,32 +8,26 @@
 tagOrder: ["게임플레이", "UI", "렌더링", "게임 수학", "최적화", "엔진 툴", "네트워크 연동"]
 
 cases:
-  - id: hit-timing
-    title: "피격 연출 타이밍"
-    summary: "판정은 서버가 확정하고, 클라이언트는 표시 시점만 맞춘다 — 등속 투영에서 이펙트와 같은 속도 커브 기준으로"
-    tags: ["게임플레이", "게임 수학"]
-    link: "/projects/combat/#case-hit-delay"
-
-  - id: visualdata-redesign
-    title: "VisualData 구조 재설계"
-    summary: "하나의 슈퍼클래스에 엉킨 타입별 데이터를 분리하고, 두 번의 롤백 끝에 기존 에셋을 손실 없이 이전"
-    tags: ["게임플레이", "엔진 툴"]
-    link: "/projects/visualdata-editor/#case-refactor"
-
-  - id: minimap-gpu
-    title: "미니맵 퀘스트를 GPU로"
-    summary: "퀘스트 데이터를 Material Parameter로 넘겨 위젯 대신 GPU에서 그리고, 미지원 모바일 기기는 포맷을 낮춰 대응"
-    tags: ["렌더링", "최적화"]
-    link: "/projects/mapdesign/#case-minimap-cost"
-
-  - id: areatool
-    title: "AreaTool — 수동 툴에서 검증 · CI까지"
-    summary: "레벨 데이터 저작 툴을 3년간 키움 — 검증자 체인, 변경분만 P4 반영, Commandlet CI, 선분 교차 판정"
-    tags: ["엔진 툴", "게임 수학"]
-    link: "/projects/areatool/"
+  - id: editor-preview
+    title: "에디터 프리뷰 — 인게임 코드 재사용 · 본 트랜스폼"
+    summary: "에디터 전용 컴포넌트를 인게임 모듈 상속 구조로 바꿔 외형 로직을 하나로 합치고, UAnimPreviewInstance에 Bone Modify 노드를 넣어 체형 값을 프리뷰에 반영"
+    tags: ["엔진 툴", "게임플레이"]
+    link: "/projects/visualdata-editor/#case-preview-bones"
 
   - id: global-invalidation
     title: "Slate Global Invalidation"
-    summary: "Unreal Insights로 측정해 화면 단위로 적용하고, 그 뒤 생긴 위젯 미갱신까지 원인에서 해결"
+    summary: "Unreal Insights 측정으로 화면 단위 적용, 갱신 누락은 지연 갱신 · 전체 재무효화로 보정하고 타이밍이 맞지 않는 화면은 제외"
     tags: ["UI", "최적화"]
     link: "/projects/optimization/#case-slate-hitching"
+
+  - id: hit-timing
+    title: "피격 연출 타이밍"
+    summary: "판정은 서버가 확정하고, 피격 연출 지연은 이펙트와 같은 속도 커브를 참조해 이펙트가 닿는 순간에 표시"
+    tags: ["게임플레이", "게임 수학"]
+    link: "/projects/combat/#case-hit-delay"
+
+  - id: areatool
+    title: "AreaTool — 검증 · CI"
+    summary: "export 직전 검증자 체인, 변경분만 P4 반영, Commandlet CI로 잘못된 레벨 데이터를 export 시점에 차단"
+    tags: ["엔진 툴"]
+    link: "/projects/areatool/#case-validation"
