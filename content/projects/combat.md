@@ -4,9 +4,13 @@ order: 1.5
 title: "전투 시스템 — Action · Notify · 서버 동기화"
 role: "Client Developer"
 period: "2023 — 현재"
-summary: "서버 ActionEvt를 Action Table · 몽타주 · Custom ActionNotify로 연결하고, 서버가 확정한 판정 위에서 클라이언트 연출 시점을 맞추는 전투 액션."
+summary: "서버 ActionEvt를 Action Table · 몽타주 Notify기반으로 연결 및 동기화"
 tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/Lazy Hit", "StatusEffect"]
 ---
+
+<div class="shot-row">
+  <figure><img src="/images/projects/combat/combat-preview.gif" alt="필드 전투 중 스킬 사용 시 몬스터 피격 · 데미지 숫자 · Miss가 표시되는 모습" /><figcaption>전투 — 스킬 피격 · 데미지 표시</figcaption></figure>
+</div>
 
 ## 문제 해결 요약
 
@@ -25,7 +29,7 @@ tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/
     <dl>
       <dt>문제</dt><dd>피격 지연을 진행 방향 투영 · 등속으로 계산해, 속도 커브로 가감속하는 이펙트와 시점이 어긋남</dd>
       <dt>해결</dt><dd>지연 계산이 이펙트와 같은 속성(속도 커브)을 참조하도록 변경</dd>
-      <dt>결과</dt><dd>이펙트가 닿는 순간에 피격 연출 표시, 게임과 툴이 같은 계산 사용</dd>
+      <dt>결과</dt><dd>이펙트가 닿는 순간에 피격 연출 표시(연출 시점 동기화)</dd>
     </dl>
     <a class="case-more" href="#case-hit-delay">자세히 ↓</a>
   </div>
@@ -35,7 +39,6 @@ tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/
 
 - 전투 판정은 서버가 확정해 보내고, 클라이언트는 **판정을 바꾸지 않고 연출 시점 · 위치 · 상태를 맞추는** 역할
 - 흐름: 서버 **ActionEvt** → **Action Table**(타입별 몽타주) → **몽타주 재생** → **Custom ActionNotify** 실행
-- 외형(메시 · Attachment) 세팅은 [외형 시스템 페이지](/projects/visualdata/), 에디터 툴은 [VisualData 에디터 페이지](/projects/visualdata-editor/)에서 다룹니다
 
 <img class="diagram" src="/images/diagrams/visualdata-action.svg" alt="전투 액션 흐름: 서버 ActionEvt 수신 → Entity가 ActionTable에서 타입별 액션 조회 → 재생할 몽타주 반환 → AnimInstance 몽타주 Play → Notify 시점 도달 시 Custom ActionNotify 실행 → Notify_Game(인게임 처리) / Notify_Editor(에디터 프리뷰)" />
 
@@ -59,51 +62,20 @@ tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/
 
 <img class="diagram" src="/images/diagrams/combat-sync.svg" alt="전투 서버 동기화 시퀀스: CastCmd → SkillCastResultEvt → ActionEvt(NotifyInfoList) → Montage 재생 → Immediate/Lazy Hit 분기 → StatusEffect → AttackEndEvt" />
 
-- 서버 ActionEvt 수신 시점에 연출을 처리하면 클라이언트 몽타주 타이밍과 어긋남 → 처리 시점을 ActionNotify Begin으로 이동
+- 서버 ActionEvt 수신 시점에 연출을 처리하면 클라이언트 몽타주 타이밍과 어긋남 <br>
+ -> 처리 시점을 ActionNotify Begin으로 이동
 - 서버와 클라이언트가 같은 Export ActionData(몽타주 Notify 데이터)로 시점을 계산
 - 게임 시간 동기화는 서버 시각보다 약 200ms 늦게 재생해 패킷 도착 여유를 두는 구조이고, Notify 처리는 그 위에서 순서를 맞춤
 
-### Immediate / Lazy Hit 구분
-
-- Immediate: `NotifyInfoList` 큐 앞에서 즉시 소비해 데미지 적용
-- Lazy: 서버 확인 패킷이 `LazyNotifyHitList`에 도착한 뒤 적용, `ExecutedLazyHitNotifyIds`로 중복 실행 방지
-
-  ```cpp
-  // GameplayAction_Combat.cpp
-  bool UGameplayAction_Combat::ConsumeNotifyInfo(
-      int32 NotifyId, bool bIsImmediate, geo::sync::NotifyInfo& Out)
-  {
-      if (!bIsImmediate)
-      {
-          ExecutedLazyHitNotifyIds.Add(NotifyId);
-          for (const geo::sync::NotifyInfo& NotifyInfo : LazyNotifyHitList)
-          {
-              if (NotifyInfo.notify_id() == NotifyId) { Out = NotifyInfo; return true; }
-          }
-          return false;
-      }
-      if (NotifyInfoList.IsEmpty()) return false;
-      Out = NotifyInfoList[0];
-      NotifyInfoList.RemoveAt(0);
-      return true;
-  }
-  ```
-
-### Montage Notify Export · StatusEffect
-
-- 에디터 전용 `IActionNotifyExportInterface`를 구현한 Notify가 `ExportParameter` 메타가 붙은 프로퍼티만 JSON으로 직렬화
-- 서버는 이 데이터로 `NotifyInfo`를 생성해 보내므로 양측 판정 기준이 일치
-- `UActionNotify_StatusEffect`(버프 · 디버프 · CC)도 `Status_Effect_Index`를 Export해 서버 판정과 클라 연출을 동기화
-
 <div id="case-hit-delay" class="case-anchor"></div>
 
-### 피격 연출 지연 — 이펙트와 같은 기준으로
+### 피격 연출 지연 — 이펙트 속도 커브 기준 표시 시점
 
-- 관통 · 확산 스킬도 Hit Notify 한 번에 대상 전원이 같은 프레임에 맞아, 투사체가 지나가는 느낌이 없었음
-- 판정은 서버가 확정했으므로 맞은 시각은 그대로 두고, 대상별로 <strong>표시 시각만</strong> 지연
-- 처음엔 진행 방향 투영 · 등속으로 계산: `delay = max(0, dot(P − O, d̂)) / v`
-- 이펙트(Moving 파티클)는 속도 커브로 가감속해 시점이 어긋남 → 지연 계산이 이펙트와 같은 속도 커브를 참조하도록 변경
-- 커브가 단조롭지 않을 수 있어 이분 탐색 대신 1/60초 간격 선형 탐색으로 "처음 도달" 시각을 찾음 (정밀도 1프레임)
+- 관통 · 확산 스킬도 Hit Notify 한 번에 대상 전원이 같은 프레임에 맞아, 투사체가 지나가는 느낌이 없었음<br>
+-> 판정은 서버가 확정했으므로 맞은 시각은 그대로 두고, 대상별로 <strong>표시 시각만</strong> 지연하도록 개선
+- 이펙트(Moving 파티클)는 속도 커브로 가감속해 시점이 어긋남 <br>
+ -> 지연 계산이 이펙트와 같은 속도 커브를 참조하도록 변경
+- 커브가 단조롭지 않을 수 있어 이분 탐색 대신 1/60초 간격 선형 탐색으로 "처음 도달" 시각을 찾음 (정밀도)
 
   ```cpp
   // ActionNotify_Hit.cpp — GetHitEffectDelay
@@ -121,4 +93,3 @@ tags: ["Action/전투", "AnimMontage", "ActionNotify", "ServerSync", "Immediate/
 
 - 계산을 `UActionNotify_Hit`에 두어 게임과 툴이 같은 함수 사용 → 툴에서 본 타이밍이 게임과 동일
 - 배속 재생 시 파티클이 끊기던 문제: 지연 계산과 파티클 이동에 같은 재생 배율을 적용해 두 시간축을 맞춤
-- 지연 실행 중 대상이 사라질 수 있어 대상 · 월드는 `TWeakObjectPtr`로 캡처

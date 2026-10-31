@@ -4,7 +4,7 @@ order: 3
 title: "인게임 컨텐츠 · 연출"
 role: "Client Developer · Schema 설계·컨텐츠 구현 담당"
 period: "2023 — 현재"
-summary: "횡적 성장 컨텐츠의 클라이언트 · 서버 통신과, 별자리 · 순례 · 획득 연출을 PocketLevel · LevelSequence · Niagara로 구현하고 연출 자원의 수명을 관리."
+summary: "횡적 성장 컨텐츠의 클라이언트 · 서버 통신 및 연출 자원의 수명 관리."
 tags: ["Gameplay", "Content", "HTTP API", "WebSocket", "PocketLevel", "LevelSequence", "Niagara", "UI Particle", "DeltaTime"]
 imageLayout: slider
 images:
@@ -52,6 +52,7 @@ images:
   - **TCP** — 상시 동기화가 필요한 리텐션 리워드 · 데미지미터 · 세금 등
   - **WebSocket** — 채팅 실시간 송수신
   - **HTTP API** — 횡적 성장 컨텐츠를 진입 시점에 **지연 조회**해 로그인 패킷 과부하 방지
+- **채팅 아이템 링크** — 시스템 메시지에 함께 온 아이템 데이터로 렌더 시점에 링크 마크업을 만들고, RichText Decorator로 파싱해 클릭 시 아이템 정보 표시
 
 <div id="case-login-packet" class="case-anchor"></div>
 
@@ -143,9 +144,8 @@ images:
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
 - <strong>진입 시 Stream In · 종료 시 Stream Out</strong>
   - 별자리 연출 진입 시 PocketLevel을 생성 · 스트리밍 인하고, 종료 시 스트리밍 아웃
-  - 진입 후 PocketLevel 안의 카메라 · 룰렛 · 별자리 액터를 태그로 찾아 연결하고, 별자리는 `Order` 값으로 정렬
   - 카메라는 연출 카메라로 ViewTarget을 전환, 종료 시 이전 대상이 아닌 Pawn으로 되돌려 다른 연출과 겹칠 때의 카메라 꼬임 방지
-- <strong>시퀀스 좌표를 PocketLevel 원점에 맞춤</strong>
+- <strong>PocketLevel 원점 기준 시퀀스 좌표 보정</strong>
   - PocketLevel은 월드 어딘가에 생성되므로, 시퀀스 액터 위치와 `TransformOrigin`을 PocketLevel 경계 원점으로 덮어써 연출을 그 공간 안에서 재생
   - 별자리(`PocketLevel.Constellation`) · 순례(`PocketLevel.Pilgrimage`) 모두 GameplayTag로 인스턴스를 찾아 같은 방식 적용
 
@@ -170,8 +170,6 @@ images:
   - 같은 그룹(예: 룰렛 열기 / 닫기)의 다른 시퀀스가 재생 중이면 먼저 멈추고 재생
 - <strong>종료 시 파괴 · 상태 원복</strong>
   - 연출 종료 시 캐시된 시퀀스 액터를 일괄 파괴해, 연출 후 자원이 남지 않도록 관리
-  - 시퀀스는 끝난 상태를 유지(`ForceKeepState`)하도록 재생하므로, 파괴 전에 시작 프레임으로 되돌려 상태 잔존을 방지
-  - 순례 주사위 시퀀스 액터는 재생이 끝나는 시점에, 룰렛 슬롯 액터는 닫기 · 포커스 연출이 끝나면 파괴
 
     ```cpp
     // ConstellationUtil.cpp — DestroyLevelSeqActors()
@@ -186,46 +184,6 @@ images:
     OutActor = nullptr;
     ```
 
-### 별자리 룰렛 — 결과 각도 역산 · 커브 이징
-
-- 별 · 결과별 시퀀스 런타임 생성 · 바인딩 → 종료 시 파괴 구조 (사전 일괄 로드 배제)
-- <strong>연출 단계별 시퀀스 분리</strong>
-  - `ACineConstellationRoulette`가 활성 / 닫기 / 슬롯세팅 / 스핀 시퀀스와 별자리별 포커스 시퀀스를 `TSoftObjectPtr`로 보유
-  - 단계가 끝나면 다음 단계를 이어서 재생 (닫기 → 해당 별자리 포커스 → 별자리 갱신)
-  - 공통 생성 · 재생 · 파괴는 `FConstellationUtil`로 묶어 별자리 매니저와 룰렛이 함께 사용
-- <strong>결과 각도 역산 + 커브 이징 회전</strong>
-  - 서버 결과 슬롯에서 목표 회전량(바퀴 수 × 360 + 슬롯 각도 + 현재 각도)을 먼저 계산
-  - 여러 이징 커브 중 하나를 골라 0 → 1 진행도에 회전량을 곱해 회전
-  - 커브가 1에 도달하면 목표 각도로 맞추고, `Fmod`로 각도를 0~360으로 정규화해 다음 회전의 시작 각도로 사용
-
-    ```cpp
-    // CineConstellationRoulette.cpp
-    // 결과 수신 시: 목표 회전량 계산 + 커브 선택
-    SpinRadius = RouletteSpinCount * RouletteRadius
-               + (RouletteRadius / SlotNum) * (Result.SelectedSlotIndex + 1) + InitSpinnerAngle;
-    CurveIndex = FMath::RandRange(0, RouletteSpinCurves.Num() - 1);
-
-    // Tick: 커브 진행도만큼 회전
-    float NewPitch = -RouletteSpinCurves[CurveIndex]->GetFloatValue(CurrentTime) * SpinRadius + InitSpinnerAngle;
-    Spinner->SetActorRelativeRotation(FRotator(NewPitch, 0.f, 0.f));
-
-    // 정지: 정확한 목표 각도로 맞추고 시작 각도를 정규화
-    if (FMath::IsNearlyZero(RouletteSpinCurves[CurveIndex]->GetFloatValue(CurrentTime) - 1.f, 0.00001f))
-    {
-        double Pitch = -1.f * SpinRadius + InitSpinnerAngle;
-        Spinner->SetActorRelativeRotation(FRotator(Pitch, 0.f, 0.f));
-        InitSpinnerAngle = FMath::Fmod(Pitch, RouletteRadius);
-    }
-    ```
-
-- <strong>회전 중 점수 실시간 표시</strong>
-  - 현재 각도에서 바늘 아래 슬롯 인덱스를 계산해, 슬롯이 바뀔 때마다 점수 텍스트와 High / Low 연출 갱신
-- <strong>시퀀스와 회전 동기화</strong>
-  - 스핀 시퀀스의 이벤트에서 룰렛 Tick을 켜 회전 시작 시점을 연출에 맞춤
-  - 스킵 시 스핀 시퀀스 재생 위치와 회전 시간을 같은 지점으로 이동
-- <strong>슬롯 동적 구성</strong>
-  - 보유한 High 슬롯 수에 따라 각 슬롯의 `ChildActorComponent` 클래스 · 스케일을 바꿔 생성
-
 <div id="case-uiparticle" class="case-anchor"></div>
 
 ### UI 파티클 — 부모 변환을 반영한 2D 회전 계산
@@ -237,9 +195,7 @@ images:
   - 크기를 먼저 회전한 뒤 스케일을 곱해, 비균일 스케일에서 변환 순서가 어긋남
   - 파티클 위치(`CurPos`)에는 부모 회전이 적용되지 않아, 부모가 회전해도 방출 위치가 따라 돌지 않음
 - <strong>수정 내용</strong>
-  - 부모까지 누적된 `RenderTransform`의 2×2 행렬 성분(A, B)에서 `Atan2(B, A)`로 회전각을 직접 계산
   - 파티클 크기 · 위치에 스케일을 먼저 곱한 뒤 2D 회전 행렬 `(x·cos − y·sin, y·cos + x·sin)` 적용
-  - 회전된 위치에서 회전된 크기의 절반을 빼 중심 기준 위치로 보정
   - 자식 Geometry의 렌더 변환은 `FScale2D` · `FQuat2D(부모 회전 − 파티클 회전)`을 합성
 
     ```cpp
@@ -264,36 +220,3 @@ images:
     const FVector2D AbsolutePosition = RotatedCurPos - RotatedSize / 2;   // 중심 기준
     const FVector2D FixPosition = AllottedGeometry.AbsoluteToLocal(AbsolutePosition + BasePos - WindowOffset);
     ```
-
-- <strong>레이아웃 대응</strong>
-  - DesiredSize를 (100, 100)으로 고정하고 실제 배치 크기와의 비율(`LocalScale`)을 스케일에 반영
-  - 앵커를 중앙 정렬로 변경해 레이아웃 안에 배치된 파티클도 크기 · 위치 유지
-
-### 채팅 아이템 하이퍼링크 — RichText Decorator
-
-<figure style="text-align:center"><img src="/images/projects/sol-content/chat-hyperlink.png" alt="채팅 아이템 하이퍼링크" /><figcaption style="font-size:11px;color:#888;margin-top:6px">채팅 내 아이템 하이퍼링크 클릭 시 상세 정보 표시</figcaption></figure>
-
-- `URichTextBlockDecorator`를 확장한 `UItemHyperLinkRichTextBlockDecorator`로 채팅 속 아이템 링크 구현
-- <strong>마크업 → 아이템 데이터</strong>
-  - `<a id="item" rid="…" ench="…" grade="…">` 마크업의 속성을 파싱해, 강화 · 축복 · 속성 수치까지 담은 아이템 데이터(`FDynamicItem`)로 복원
-  - 등급(`grade`) 값으로 RichText 스타일 테이블의 행을 찾아 링크 글자 색 · 스타일을 등급별로 적용
-
-    ```cpp
-    // ItemHyperLinkRichTextBlockDecorator.cpp — FItemHyperLinkDecorator::Supports
-    if (RunParseResult.Name != TEXT("a")) return false;
-
-    FString Id;
-    if (!GetAttr(RunParseResult, Text, ItemHyperLinkMarkup::KeyId, Id) || Id != ItemHyperLinkMarkup::IdValue)
-        return false;
-
-    const RidType Rid    = GetAttrAsInt(RunParseResult, Text, ItemHyperLinkMarkup::KeyRid, INVALID_RESOURCE_ID);
-    const int32 Enchant  = GetAttrAsInt(RunParseResult, Text, ItemHyperLinkMarkup::KeyEnchant, 0);
-    // ... BlessEnchant · ElementalEnchant · ElementalKind 동일
-    PendingItem = FDynamicItem(Rid, /*Amount*/ 0, Enchant, BlessEnchant, ElementalEnchant, ElementalKind);
-
-    GetAttr(RunParseResult, Text, ItemHyperLinkMarkup::KeyGrade, StyleText);   // 등급별 스타일 행 이름
-    return true;
-    ```
-
-- <strong>클릭 → 아이템 정보</strong>
-  - 밑줄 없는 `SHyperlink`로 렌더링하고, 클릭 시 Decorator를 약참조로 캡처한 콜백에서 아이템 정보 팝업을 열어줌

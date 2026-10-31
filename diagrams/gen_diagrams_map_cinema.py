@@ -43,4 +43,4 @@ ms_edges = [
     dict(src="base", dst="world", dashed=True),
     dict(src="base", dst="dungeon", dashed=True),
 ]
-emit("mapdesign-strategy", "맵 뷰어 Strategy — View 공유 · 데이터 소스만 교체", ms_nodes, ms_edges)
+emit("mapdesign-strategy", "맵 뷰어 Strategy — View 공유 · 맵 종류별 표시 규칙 교체", ms_nodes, ms_edges)

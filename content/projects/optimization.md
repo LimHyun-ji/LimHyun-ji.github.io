@@ -4,7 +4,7 @@ order: 2
 title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
-summary: "'보이지 않는 것은 그리지 않는다'를 원칙으로, 모바일 타겟의 UI 렌더링·틱·메모리(GC/풀링/수명)를 다층적으로 최적화."
+summary: "Unreal Insights 측정 기반 Slate Invalidation, LOD 파츠 숨김, Tick · UObject 절감으로 모바일 비용 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass", "LOD"]
 ---
 
@@ -69,7 +69,7 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 
 <div id="case-forcevolatile" class="case-anchor"></div>
 
-- <strong>부작용 대응 — 계속 바뀌는 위젯만 Volatile</strong>
+- <strong>부작용 대응 — 계속 바뀌는 위젯의 Volatile 지정</strong>
   - Invalidation을 켜자 스크롤 리스트 · 파티클처럼 계속 바뀌는 UI가 갱신되지 않는 문제 발생
   - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 컨텐츠까지 캐시 대상에 들어감
   - 해당 위젯만 Volatile로 캐시에서 빼고 나머지 UI는 Invalidation 유지 — HUD에서 항상 Paint하는 위젯 · 선택상자 팝업 · 특성 강화 UI · UI Particle

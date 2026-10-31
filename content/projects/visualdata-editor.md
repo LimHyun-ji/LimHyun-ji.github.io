@@ -35,7 +35,7 @@ images:
 
 ## 구현 내용
 
-### 아트 테스트 환경 — 서버 없이 인게임과 동일하게
+### 아트 테스트 환경 — 서버 없는 인게임 동일 프리뷰
 
 - 파츠별 메시 · Override Material · Attachment · 본 트랜스폼을 에디터에서 바로 설정하고 프리뷰
 - 몽타주와 Custom ActionNotify를 서버 없이 재생해 전투 연출을 확인 (Notify_Editor 경로)

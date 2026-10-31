@@ -4,9 +4,14 @@ order: 1
 title: "외형 시스템"
 role: "Client Developer · 핵심 담당"
 period: "2023 — 현재"
-summary: "모든 Entity에 외형을 세팅 · 로드하는 VisualData 인게임 모듈과 데이터 소유 · 수명 구조."
+summary: "모든 Entity에 외형을 세팅 · 로드하는 인게임 모듈과 데이터 소유 · 수명 구조."
 tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"]
 ---
+
+<div class="shot-row">
+  <figure><img src="/images/projects/visualdata/appearance-attachment.gif" alt="장비 교체 시 무기 · 방어구 Attachment가 소켓에 부착되며 외형이 바뀌는 모습" /><figcaption>외형 변경 — Attachment 교체</figcaption></figure>
+  <figure><img src="/images/projects/visualdata/appearance-transition.gif" alt="외형 전환 연출과 함께 캐릭터 외형이 바뀌는 모습" /><figcaption>외형 변경 — 전이</figcaption></figure>
+</div>
 
 ## 문제 해결 요약
 
@@ -14,18 +19,18 @@ tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"
   <div class="case">
     <p class="case-title">구조 정립을 통한 전역 데이터 참조 문제 해결</p>
     <dl>
-      <dt>문제</dt><dd>모든 Entity가 VD 데이터를 각자 산발적으로 들고 있던 구조</dd>
+      <dt>문제</dt><dd>모든 Entity가 VD 데이터를 각자 산발적으로 참조하여 생명주기가 관리되지 않던 구조</dd>
       <dt>해결</dt><dd>Module 시스템에서 각 Entity 타입별 Apply Module을 정의 후 필요한 컴포넌트에 데이터만 할당(필요 시 WeakPtr), 생명주기는 모듈 한 곳에서 관리</dd>
-      <dt>결과</dt><dd>불필요한 전체 VD 데이터 참조 제거</dd>
+      <dt>결과</dt><dd>불필요한 전체 VD 데이터 참조 제거, 생명주기 관리를 ModuleComponent에서 일원화</dd>
     </dl>
     <a class="case-more" href="#case-allocating">자세히 ↓</a>
   </div>
   <div class="case">
     <p class="case-title">UObject 최대 개수 초과 크래시</p>
     <dl>
-      <dt>문제</dt><dd>Attachment를 UObject로 만들어 Entity가 많은 장면에서 UObject 최대 개수 초과(Exceed)</dd>
-      <dt>해결</dt><dd>Attachment를 UObject 대신 TSharedPtr 기반 경량 객체로 전환</dd>
-      <dt>결과</dt><dd>Attachment가 UObject 개수 · GC 추적 대상에서 빠짐</dd>
+      <dt>문제</dt><dd>VisualModule을 UObject로 만들어 Entity가 많은 장면에서 UObject 최대 개수 초과(Exceed)</dd>
+      <dt>해결</dt><dd>UObject 대신 TSharedPtr 기반 경량 객체로 전환</dd>
+      <dt>결과</dt><dd>Module이 UObject 개수 · GC 추적 대상에서 빠져 경량화</dd>
     </dl>
     <a class="case-more" href="#case-attachment">자세히 ↓</a>
   </div>
@@ -48,7 +53,6 @@ tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"
 - 처음에는 여러 객체가 VisualData를 각자 들고 있어, 데이터가 언제 만들어지고 사라지는지가 흩어져 있었음
 - 각 컴포넌트에는 필요한 데이터만 할당(필요하면 WeakPtr로 참조)하고, 데이터 생명주기는 모듈 한 곳에서 관리
 - 모듈 생성은 `CreateModule` Factory로 통일
-- PC · NPC · Spirit · 필드오브젝트 · 아이템 등 <strong>모든 Entity 부착 대상</strong>
 - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성 · 재적용
 
   ```cpp
@@ -68,7 +72,7 @@ tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"
 
 - <strong>타입별 모듈 + 경량 폴리모피즘</strong>
   - `UObject` 대신 `TSharedPtr` 경량 모듈 채택 — 대량 Entity 생성 · GC 등록 · 추적 비용 회피
-  - Entity 종류별 외형 규칙 차이 → `FVisualDataModuleBase` 상속 타입별 분리(PC / NPC / Spirit / Item / FieldObject / Totem)
+  - Entity 종류별 외형 규칙 차이 → 기존 슈퍼 클래스에서 `FVisualDataModuleBase` 상속 타입별 분리 Refactoring
   - `UObject`가 아니라 `Cast<>`를 쓸 수 없으므로 커스텀 RTTI(`ModuleCast<T>`)로 안전 다운캐스트
 
 ### 전이 규칙으로 부분 갱신 최적화
@@ -80,42 +84,16 @@ tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"
   - <strong>FullReset</strong>: 전면 재구성
 - 실제 변경 파츠로 재로드 범위 한정 → 불필요한 전신 재로드 제거
 
-### Override Material — 파츠 단위 공통화
-
-- NPC · Spirit 등 타입별 클래스에 따로 있던 Override Material 필드(본체 / Helmet / Torso 배열)를 캐릭터 공통 클래스(`UVisualGameData_Character`)의 파츠 키 맵 하나로 통합
-- 에디터에서 파츠 메시를 바꾸면 해당 파츠의 기본 머티리얼 목록을 맵에 다시 채우고, 런타임은 파츠 타입으로 찾아 적용
-- 통합 후 기존 VisualData 에셋을 새 필드 구조로 갱신하고, PC 헬멧에 Override Material이 적용되지 않던 누락을 수정
-
 <div id="case-attachment" class="case-anchor"></div>
 
 ### Attachment — 무기 / 방어구 / 헬멧
 
 - PC 모듈은 방어구 · 헬멧 · 주 / 보조 무기를 <strong>소켓 기반 Attachment</strong>(`FPCModuleAttachment` 파생)로 부착
-- Attachment는 `TSharedPtr` 기반 경량 객체 → Entity가 많은 장면에서도 UObject 개수 · GC 추적 대상에 포함되지 않음
-- 경량 RTTI(`AttachmentCast<T>`) + 비동기 로드 · FX · 소켓 전환 처리
-  - 무기 메시 · 추가 메시 · 이펙트를 한 번의 `FStreamableHandle`로 비동기 로드, 다시 로드하거나 Detach할 때 이전 핸들을 취소
-- <strong>무기 FX 정리</strong>
-  - FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기를 바꾸면 이전 무기의 나이아가라가 남는 문제
-  - `ReleaseToPool()`만으로는 이펙트가 꺼지지 않아, 매니저가 없을 때 Detach에서 직접 즉시 비활성화
+- 무기 메시 · 추가 메시 · 이펙트를 한 번의 `FStreamableHandle`로 비동기 로드, 다시 로드하거나 Detach할 때 이전 핸들을 취소
 
-    ```cpp
-    // PCModuleAttachment.cpp — FPCModuleAttachment_Weapon::Detach
-    if (UFXSystemManagerComponent* FXSystemManagerComponent = UFXSystemManagerComponent::Get(OwnerActor))
-    {
-        FXSystemManagerComponent->RemoveFXSystemComponentsByTag(GetFXTagName(), true);
-    }
-    else // FX System Manager가 없는 경우 별도로 정리
-    {
-        for (const auto& NiagaraComp : NiagaraComponents)
-        {
-            if (NiagaraComp.IsValid())
-                NiagaraComp->DeactivateImmediate();
-        }
-    }
-    NiagaraComponents.Empty();
-    ```
 
 ### 로딩 · 렌더 최적화
 
 - <strong>가시성 게이팅</strong>: VisualData <strong>로드가 끝난 Entity만 표시</strong> (`EntityVisibilityRule_VisualDataCompleted`) — 로딩 중 깜빡임 · 미완성 노출 방지
 - <strong>렌더 비용 제어</strong>: `OptimizeLOD`(2) 이상에서 Helmet / Face 파츠를 숨기는 LOD별 파츠 통합 — 상세는 [퍼포먼스 최적화 페이지](/projects/optimization/) 참고
+- OverrideMaterial : Material만 변경하여 에셋을 재사용할 수 있는 구조 지원

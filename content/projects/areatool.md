@@ -267,7 +267,7 @@ tags: ["Editor Tooling", "AreaTool", "Geometry", "Validator", "Commandlet", "CI"
     // FDelete(CurrExistDataFiles) → FCheckOut(EditFiles) → 저장 → FMarkForAdd(AddedFiles)
     ```
 
-- <strong>같은 데이터는 같은 문자열로</strong>
+- <strong>GUID 정렬 기반 직렬화 순서 고정</strong>
   - 문자열 비교가 의미 있으려면 직렬화 순서가 매번 같아야 함
   - export 전에 액터를 GUID 순으로 정렬, DataAsset도 GUID 키 순으로 정렬해 저장
 - <strong>JSON · DataAsset 두 경로</strong>
