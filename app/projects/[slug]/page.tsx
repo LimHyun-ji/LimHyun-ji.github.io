@@ -9,6 +9,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ImageGallery from '@/components/ImageGallery';
 import ImageSlider from '@/components/ImageSlider';
 import CodeToggle from '@/components/CodeToggle';
+import LoopVideo, { gifToVideo } from '@/components/LoopVideo';
 import KeepWords from '@/components/KeepWords';
 import TableOfContents, { type Heading } from '@/components/TableOfContents';
 import { glue, rehypeKeepWords } from '@/lib/keepWords';
@@ -78,6 +79,12 @@ function makeHeadingComponents(headings: Heading[]): Partial<Components> {
   return {
     h2: renderHeading(2),
     h3: renderHeading(3),
+    // GIF는 같은 이름의 mp4 반복 영상으로 대체 (용량 약 1/10)
+    img: ({ src, alt, className, node: _node, ...rest }) => {
+      const video = gifToVideo(typeof src === 'string' ? src : undefined);
+      if (video) return <LoopVideo src={video} alt={alt} className={className} />;
+      return <img src={src} alt={alt} className={className} {...rest} />;
+    },
   };
 }
 

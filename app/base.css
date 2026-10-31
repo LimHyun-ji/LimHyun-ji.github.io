@@ -66,8 +66,9 @@ a:hover { text-decoration: underline; }
   transition: transform 0.2s, background 0.3s;
 }
 #theme-toggle:hover { transform: scale(1.1); }
-/* 에메랄드 상단바 안에서는 어두운 톤으로 */
-.nav #theme-toggle { background: rgba(0,0,0,.14); border-color: rgba(0,0,0,.28); color: #0B1310; }
+/* 유리 상단바 안에서는 테두리 없는 아이콘 버튼 */
+.nav #theme-toggle { background: transparent; border-color: transparent; width: 36px; height: 36px; }
+.nav #theme-toggle:hover { background: color-mix(in srgb, var(--text) 8%, transparent); transform: none; }
 /* 상세 페이지 상단바 */
 .detail-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 

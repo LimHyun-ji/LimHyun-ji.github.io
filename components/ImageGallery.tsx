@@ -1,4 +1,5 @@
 'use client';
+import LoopVideo, { gifToVideo } from './LoopVideo';
 
 import { useState, useCallback, useEffect } from 'react';
 
@@ -36,7 +37,9 @@ export default function ImageGallery({ images, slug }: ImageGalleryProps) {
       <div className="img-gallery" data-count={images.length}>
         {images.map((img, i) => (
           <figure className="img-gallery-item" key={`${slug}-${i}`} onClick={() => setLightbox(i)}>
-            <img src={img.src} alt={img.alt || `${slug} 이미지 ${i + 1}`} loading="lazy" />
+            {gifToVideo(img.src)
+              ? <LoopVideo src={gifToVideo(img.src)!} alt={img.alt} />
+              : <img src={img.src} alt={img.alt || `${slug} 이미지 ${i + 1}`} loading="lazy" />}
             {img.caption && <figcaption>{img.caption}</figcaption>}
             <div className="img-gallery-zoom">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

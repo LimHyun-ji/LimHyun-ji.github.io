@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import LoopVideo, { gifToVideo } from './LoopVideo';
 
 interface ImageSliderProps {
   images: { src: string; alt?: string; caption?: string }[];
@@ -72,7 +73,9 @@ export default function ImageSlider({ images }: ImageSliderProps) {
         >
           {images.map((img, i) => (
             <div className="img-slider-slide" key={i} style={{ width: `${slideWidth}%`, marginRight: `${gap}%` }}>
-              <img src={img.src} alt={img.alt || `이미지 ${i + 1}`} loading="lazy" draggable={false} />
+              {gifToVideo(img.src)
+                ? <LoopVideo src={gifToVideo(img.src)!} alt={img.alt} />
+                : <img src={img.src} alt={img.alt || `이미지 ${i + 1}`} loading="lazy" draggable={false} />}
               {img.caption && <p className="img-slider-caption">{img.caption}</p>}
             </div>
           ))}
