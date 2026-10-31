@@ -85,7 +85,7 @@ highlights:
 - <strong>VisualData Export Commandlet</strong>
 
   - <strong>에디터 UI 없이 Commandlet</strong>(`UVisualDataExportCommandlet`)으로 VisualData 데이터를 JSON export → Jenkins CI에서 실행
-    - Commandlet은 소스 컨트롤 사용 여부에 따라 P4 연동 export(`Execute_ExportAllJsonWithP4v`)와 일반 export를 선택하는 기존 구조
+    - Commandlet은 소스 컨트롤 사용 여부에 따라 P4 연동 export와 일반 export를 선택하는 기존 구조 (`Execute_ExportAllJsonWithP4v`)
   - NPC · 갓아머 · 정령 · 필드오브젝트 매핑과 액션 메타데이터를 export
   - export된 데이터는 런타임 메타데이터로 사용 → [메타데이터 파이프라인 페이지](/projects/metadata-pipeline/)
   - <strong>타입별 클래스 분리에 맞춘 export 정리</strong>

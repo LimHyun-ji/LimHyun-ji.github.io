@@ -177,7 +177,7 @@ highlights:
       // 교차점 → InverseTransformPosition → Point3D.Insert(LocalPos, CurrentIdx + 1)
       ```
 
-    - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역(`Quat.GetInverse().RotateVector`)으로 돌려 로컬 공간 기준으로 반영
+    - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역으로 돌려 로컬 공간 기준으로 반영 (`Quat.GetInverse().RotateVector`)
   - <strong>스폰 프리뷰 기준점 — 다각형 무게중심</strong>
     - 스폰 그룹 프리뷰 메시를 Territory 중앙에 두기 위해 Shoelace 공식으로 면적 기준 무게중심 계산
     - 꼭짓점 평균과 달리 오목 다각형에서도 면적 분포를 반영한 중심을 얻음
@@ -217,7 +217,7 @@ highlights:
     - District는 폴더 · 레벨, TeleportGroup은 확률 · 폴더 · 리전, SpawnNpc는 NavMesh · 폴더 · 리전 검증
     - 하나라도 실패하면 그 액터는 export 대상에서 제외
   - <strong>검증 규칙</strong>
-    - `FNameValidator` — 액터 라벨 중복 검사(`TSet`), 상태를 가지므로 Export 시작 때 `ClearCachedData()`로 초기화
+    - `FNameValidator` — 액터 라벨 중복 검사(`TSet`), 상태를 가지므로 Export 시작 때 `ClearCachedData()` 호출로 초기화
     - `FFolderValidator` — Outliner의 `Design/Level/` · `Design/Quest/` 하위 액터만 export
     - `FRegionValidator` / `RegionValidator` — 폴더에서 뽑은 리전 이름 / 현재 레벨 이름이 Region 메타데이터에 있는지 확인
     - `FTeleportProbValidator` — 한 텔레포트 그룹 안에서 확률이 있는 항목과 0인 항목이 섞이면 실패

@@ -144,7 +144,7 @@ highlights:
   - <strong>UObject → 일반 C++ 클래스 전환</strong>
     - 아이템 수집 UI의 레시피 슬롯 · 수집 조건 데이터를 `UObject`에서 일반 클래스(`TSharedPtr<FItemCollectionRecipeSlot>`, `FItemCollectionCondition`)로 변경 → 리스트 데이터가 UObject 개수 · GC 추적 대상에서 빠짐
   - <strong>VisualData 무기 FX 정리</strong>
-    - FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기 교체 시 나이아가라 잔상이 남던 문제 → Detach에서 직접 `DeactivateImmediate()`로 정리 (`ReleaseToPool()`만으로는 꺼지지 않음)
+    - FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기 교체 시 나이아가라 잔상이 남던 문제 → Detach에서 직접 `DeactivateImmediate()` 호출로 정리 (`ReleaseToPool()`만으로는 꺼지지 않음)
   - <strong>함께 적용된 프로젝트 공통 구조</strong>
     - 위젯 / 액터 오브젝트 풀링
     - 큰 UI 전환 · 무거운 탭 닫기 직후 명시적 GC(`ForceGarbageCollection`) → 메모리 스파이크 누적 방지
