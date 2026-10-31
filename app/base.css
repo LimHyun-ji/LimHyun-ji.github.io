@@ -8,14 +8,14 @@
   --border: #263a32;
   --text: #E6ECE8;
   --muted: #869089;
-  --accent: #6A8759;
-  --accent-2: #FFC66D;
-  --accent-3: #CC7832;
-  --accent-soft: rgba(106, 135, 89, 0.16);
-  --accent-2-soft: rgba(255, 198, 109, 0.14);
+  --accent: #22A862;
+  --accent-2: #F5C000;
+  --accent-3: #F7845A;
+  --accent-soft: rgba(34, 168, 98, 0.14);
+  --accent-2-soft: rgba(245, 192, 0, 0.14);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  /* Rider Darcula 구문 강조 팔레트 — 주요 색: 초록(string) · 노랑(method) · 주황(keyword) */
-  --rd-orange: #CC7832; --rd-yellow: #FFC66D; --rd-green: #6A8759; --rd-blue: #6897BB;
+  /* 주요 색: 초록 · 노랑 · 주황 (Claude Code 터미널 상태줄 색 기준) + Rider Darcula 보조 색 */
+  --rd-orange: #F7845A; --rd-yellow: #F5C000; --rd-green: #22A862; --rd-blue: #6897BB;
   --rd-purple: #9876AA; --rd-olive: #BBB529; --rd-gold: #E8BF6A; --rd-slate: #A9B7C6;
   --code-bg: #2B2B2B;
 }
@@ -27,14 +27,14 @@
   --border: #d3e2da;
   --text: #14201A;
   --muted: #5a6b62;
-  --accent: #4E7A3A;
-  --accent-2: #A87400;
-  --accent-3: #B5561B;
-  --accent-soft: rgba(78, 122, 58, 0.10);
-  --accent-2-soft: rgba(168, 116, 0, 0.12);
+  --accent: #138A4C;
+  --accent-2: #A67C00;
+  --accent-3: #C9572E;
+  --accent-soft: rgba(19, 138, 76, 0.10);
+  --accent-2-soft: rgba(166, 124, 0, 0.12);
   --shadow: 0 8px 24px rgba(90, 107, 98, 0.2);
   /* Darcula 팔레트 — 라이트 배경 대비 보정 (같은 색상 계열을 어둡게) */
-  --rd-orange: #B5561B; --rd-yellow: #A87400; --rd-green: #4E7A3A; --rd-blue: #2F6A9E;
+  --rd-orange: #C9572E; --rd-yellow: #A67C00; --rd-green: #138A4C; --rd-blue: #2F6A9E;
   --rd-purple: #7A5A93; --rd-olive: #7E7A12; --rd-gold: #9A6B12; --rd-slate: #4E5B66;
   --code-bg: #2B2B2B;
 }

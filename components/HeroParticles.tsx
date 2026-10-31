@@ -49,7 +49,7 @@ export default function HeroParticles() {
       // 테마
       const applyTheme = () => {
         const light = document.documentElement.getAttribute('data-theme') === 'light';
-        pMat.color.set(light ? 0x4e7a3a : 0x6a8759); // Darcula 초록 (사이트 강조색)
+        pMat.color.set(light ? 0x138a4c : 0x22a862); // 사이트 강조색 (초록)
         pMat.opacity = light ? 0.4 : 0.6;
       };
       applyTheme();

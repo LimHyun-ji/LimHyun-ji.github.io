@@ -8,8 +8,8 @@
 .mermaid { overflow-x: auto; }
 
 /* ───────────── 홈 재구성 (zachjordan 스타일) ───────────── */
-:root { --accent: #6A8759; --accent-2: #FFC66D; --accent-3: #CC7832; --line: color-mix(in srgb, currentColor 14%, transparent); --surf: color-mix(in srgb, currentColor 4%, transparent); }
-:root[data-theme="light"] { --accent: #4E7A3A; --accent-2: #A87400; --accent-3: #B5561B; }
+:root { --accent: #22A862; --accent-2: #F5C000; --accent-3: #F7845A; --line: color-mix(in srgb, currentColor 14%, transparent); --surf: color-mix(in srgb, currentColor 4%, transparent); }
+:root[data-theme="light"] { --accent: #138A4C; --accent-2: #A67C00; --accent-3: #C9572E; }
 
 /* NAV (sticky) */
 /* 에메랄드 메뉴바 — 밝은 에메랄드 배경 + 어두운 글자 */
