@@ -1,10 +1,10 @@
 ---
 layout: project
 order: 3
-title: "인게임 컨텐츠 & 네트워크 — 길드 · 수집 · 순례 · 경제 · 채팅 · 시간보정"
+title: "인게임 컨텐츠 — 길드 · 수집 · 순례 · 경제 · 채팅 · 시간보정"
 role: "Client Developer · Schema 설계·컨텐츠 구현 담당"
 period: "2023 — 현재"
-summary: "길드·수집·순례·경제·채팅 등 컨텐츠를 기획~UI~서버 동기화까지 담당. TCP·WebSocket·HTTP API 3방식 구분 적용."
+summary: "길드·수집·순례·경제·채팅 등 컨텐츠를 기획~UI~서버 동기화까지 담당. TCP · WebSocket · HTTP API 네트워크 구조 위에서 컨텐츠별 통신 구현."
 tags: ["Gameplay", "Content", "Guild", "Economy", "Chat", "DeltaTime", "CommonUI", "Protobuf", "TCP", "WebSocket", "HTTP API"]
 imageLayout: slider
 images:
@@ -21,7 +21,7 @@ highlights:
 >
 > **성과** — 길드 장기 담당, 메시지 시스템 리팩토링으로 확장 비용↓, 성장 컨텐츠 지연 조회로 로그인 패킷 과부하 완화
 >
-> **기여** — 길드/수집/연구/채팅 초기 설계~리팩토링 전 주기, 수집 ListView·FClass GC 개선, TCP/WebSocket/HTTP API 3방식 구분 적용
+> **기여** — 길드/수집/연구/채팅 초기 설계~리팩토링 전 주기, 수집 ListView·FClass GC 개선, TCP · WebSocket · HTTP API 구조 위에서 컨텐츠별 통신 구현
 
 
 ## 문제 해결 요약
@@ -108,7 +108,7 @@ highlights:
 
 ## 채팅 채널 시스템
 
-채팅은 갱신 주기가 잦아 게임 서버(TCP)와 별도로 **채널 서버(WebSocket)** 를 분리했습니다. `UNetworkChannelSystem` 이 단일 WebSocket 연결을 유지하고, 채널 타입별 클래스(`UNetworkChannel_Geo` · `UNetworkChannel_Guild` · `UNetworkChannel_World` · `UNetworkChannel_Direct`)가 채널 고유 동작을 캡슐화합니다.
+채팅은 게임 서버(TCP)와 별도인 **채널 서버(WebSocket)** 를 사용합니다. 클라이언트에서는 `UNetworkChannelSystem` 이 단일 WebSocket 연결을 유지하고, 채널 타입별 클래스(`UNetworkChannel_Geo` · `UNetworkChannel_Guild` · `UNetworkChannel_World` · `UNetworkChannel_Direct`)가 채널 고유 동작을 캡슐화합니다.
 
 ### Channel Key — Channel Instance 매핑
 
@@ -186,7 +186,7 @@ protected:
 
 ### 문제
 
-경험치 획득 파티클이 NPC 피격 위치에서 플레이어를 향해 날아가는 연출 중, **네트워크 지연으로 Delta Time이 비정상적으로 커지면** 파티클이 충돌 판정 범위를 한 프레임에 뛰어넘어 무한히 회전하는 문제가 발생했습니다.
+경험치 획득 파티클이 NPC 피격 위치에서 플레이어를 향해 날아가는 연출 중, **프레임 드랍(히칭)으로 Delta Time이 비정상적으로 커지면** 파티클이 충돌 판정 범위를 한 프레임에 뛰어넘어 무한히 회전하는 문제가 발생했습니다.
 
 ### 해결 — MaxDeltaTime 루프 분할
 
@@ -197,11 +197,11 @@ protected:
 void AObtainEffectObject::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    // 네트워크 지연 등으로 DeltaSeconds가 MaxDeltaTime을 초과하면
+    // 프레임 드랍 등으로 DeltaSeconds가 MaxDeltaTime을 초과하면
     // MaxDeltaTime 단위로 쪼개어 각 스텝마다 충돌 판정을 수행
     while (DeltaSeconds > 0)
     {
-        UpdateEffect(DeltaSeconds);
+        UpdateEffect(FMath::Min(DeltaSeconds, MaxDeltaTime));  // 스텝마다 최대 MaxDeltaTime만 진행
         DeltaSeconds -= MaxDeltaTime;
     }
 }

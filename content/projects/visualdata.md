@@ -8,7 +8,7 @@ summary: "모든 Entity에 외형(파츠 · Attachment · Material)을 세팅 ·
 tags: ["VisualData", "Character", "Module", "Attachment", "LOD", "Async Loading"]
 highlights:
   - "PC · NPC · Spirit · 필드오브젝트 · 아이템 등 모든 Entity에 부착되는 UVisualDataModuleComponent로, 파츠(Master / Face / Torso / Helmet) · Override Material · Attachment · 본 트랜스폼을 세팅 · 로드"
-  - "**데이터 소유 일원화** — 여러 객체가 나눠 갖던 VisualData를 컴포넌트별로 필요한 데이터만 할당하고, 생명주기는 모듈 한 곳에서 관리 (CreateModule Factory)"
+  - "**데이터 소유 일원화** — 여러 객체가 나눠 갖던 VisualData를 컴포넌트별로 필요한 데이터만 할당하고, 생명주기는 모듈 한 곳에서 관리"
   - "**전이 규칙(FullReset / PartialUpdate / NoUpdate)**으로 바뀐 파츠만 부분 갱신, Override Material · Color Tint · LOD로 에셋 재사용성 향상"
   - "무기 / 방어구 / 헬멧 Attachment를 소켓 기반으로 부착 — UObject 대신 TSharedPtr 경량 객체로 UObject 개수 초과 방지"
 ---
@@ -149,7 +149,7 @@ private:
 | 컴포넌트 | `UVisualDataModuleComponent` (전 Entity 공통) |
 | 파츠 | `EVisualDataCharacterPartType` (Master · Face · Torso · Helmet · Wing · Cape) |
 | 모듈 | 타입별(`PC / NPC / Spirit / Item / FieldObject / Totem`) + 커스텀 RTTI `ModuleCast<T>` |
-| 데이터 소유 | 컴포넌트별 필요 데이터만 할당(WeakPtr) · 모듈 단일 생명주기 · `CreateModule` Factory |
+| 데이터 소유 | 컴포넌트별 필요 데이터만 할당(WeakPtr) · 모듈 단일 생명주기 |
 | 갱신 | `EvaluateTransitionRule` → FullReset / PartialUpdate / NoUpdate |
 | Attachment | 무기 · 방어구 · 헬멧, 소켓 부착, `TSharedPtr` 경량 객체 |
 | 로딩 | `StreamableManager` 비동기 + 로드 완료 기준 EntityVisibility 게이팅 |

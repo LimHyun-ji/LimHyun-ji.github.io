@@ -37,9 +37,3 @@ cases:
     summary: "Unreal Insights로 측정해 화면 단위로 적용하고, 그 뒤 생긴 위젯 미갱신까지 원인에서 해결"
     tags: ["UI", "최적화"]
     link: "/projects/optimization/#case-slate-hitching"
-
-  - id: chat-order
-    title: "채팅 메시지 순서 보장"
-    summary: "브로드캐스트와 히스토리 응답이 섞여 오는 스트림을 (시각, 서버 Index) 복합 키와 역방향 삽입으로 정렬"
-    tags: ["네트워크 연동", "UI"]
-    link: "/projects/sol-content/#case-chat"

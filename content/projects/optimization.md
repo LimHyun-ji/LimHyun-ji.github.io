@@ -16,7 +16,7 @@ highlights:
 >
 > **성과** — UI 재계산 비용↓, 풀링으로 CPU 비용↓
 >
-> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링(freed-tick 차단)·명시적 GC
+> **기여** — Unreal Insights 기반 Slate Tick 측정 → Global Invalidation 동적 토글, 액터 풀링 · 명시적 GC
 
 
 ## 문제 해결 요약
@@ -43,7 +43,7 @@ highlights:
 </div>
 
 
-<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Significance·상태별), 메모리(오브젝트 풀링 freed-tick 방지·명시적 GC)" />
+<img class="diagram" src="/images/diagrams/optimization-map.svg" alt="최적화 기법 맵: UI 렌더링(Global Invalidation·ForceVolatile·풀스크린 시 GameRendering false), Tick 제어(Sector 거리별·상태별), 메모리(오브젝트 풀링·명시적 GC로 UObject 개수 초과 방지)" />
 
 ## 1. UI 렌더링 최적화 (Slate Invalidation)
 
