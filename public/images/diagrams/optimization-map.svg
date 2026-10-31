@@ -3,7 +3,7 @@
 <rect x="0.5" y="0.5" width="863" height="353" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
 <text x="20" y="30" font-size="14" font-weight="700" fill="#0f172a">퍼포먼스 최적화 — 기법 한눈에</text>
 <path d="M 435.0 94.0 L 435.0 113.0 L 160.0 113.0 L 160.0 132.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>
-<path d="M 435.0 94.0 L 435.0 113.0 L 430.0 113.0 L 430.0 132.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 435.0 94.0 L 435.0 132.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>
 <path d="M 435.0 94.0 L 435.0 113.0 L 710.0 113.0 L 710.0 132.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>
 <path d="M 160.0 178.0 L 160.0 195.0 L 160.0 195.0 L 160.0 212.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>
 <path d="M 160.0 264.0 L 160.0 273.0 L 160.0 273.0 L 160.0 282.0" fill="none" stroke="#7787a2" stroke-width="1.5" marker-end="url(#arrow)"/>

@@ -86,6 +86,11 @@ def svg_edge(nodes, e):
         sx, sy, ex, ey = scx, Sb, dcx, Dt
         d = f"M {sx:.1f} {sy:.1f} L {ex:.1f} {ey:.1f}"
         lx, ly = (sx+ex)/2, (sy+ey)/2
+    # 시작 · 끝 좌표 차이가 작으면 꺾지 않고 직선으로 (2px 단차로 화살표가 깨져 보이는 문제 방지)
+    if abs(sy-ey) < 8 and sx != ex and abs(sy-ey) > 0:
+        ey = sy; d = f"M {sx:.1f} {sy:.1f} L {ex:.1f} {ey:.1f}"
+    elif abs(sx-ex) < 8 and sy != ey and abs(sx-ex) > 0:
+        ex = sx; d = f"M {sx:.1f} {sy:.1f} L {ex:.1f} {ey:.1f}"
     dash = ' stroke-dasharray="5 4"' if e.get("dashed") else ""
     out = f'<path d="{d}" fill="none" stroke="{EDGE}" stroke-width="1.5"{dash} marker-end="url(#arrow)"/>'
     if e.get("label"):
