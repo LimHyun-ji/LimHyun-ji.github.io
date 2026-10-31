@@ -15,14 +15,6 @@ intro: >
   RenderTarget·SceneCapture·LevelSequence 기반 인게임 연출 렌더링과 UI·메모리·틱 최적화까지,
   엔진 표준 패턴을 이해하고 그 위에 모바일용 보강을 설계하는 방식으로 일합니다.
 
-# 히어로 키워드 (설명을 대신하는 핵심 키워드 문구)
-keywords:
-  - "UE5 · C++ MMORPG 클라이언트/엔진 툴"
-  - "퍼포먼스 · 메모리 최적화"
-  - "인게임 연출 · GPU 렌더링"
-  - "게임 컨텐츠 · 데이터 파이프라인"
-  - "라이브 안정화 · 디버깅"
-
 # 인적사항 / 학력 (메인에 작게 표기)
 about:
   born: "1999.11.23"
@@ -38,16 +30,41 @@ links:
   # linkedin: "https://www.linkedin.com/in/..."
   # blog: "https://..."
 
-# 보유 기술 — 카테고리별
+# 보유 기술 — 히어로 왼쪽 (이력서 Skill Set과 동일)
 skills:
   - category: "Languages"
-    items: ["C++", "C#", "Python"]
-  - category: "Engine / Framework"
-    items: ["Unreal Engine 5", "CommonUI", "Slate/UMG", "Niagara", "Sequencer / LevelSequence", "AnimBP / Mesh"]
-  - category: "Networking"
-    items: ["TCP Socket", "WebSocket", "HTTP API", "Protobuf", "Client-Server Sync"]
-  - category: "Tools"
-    items: ["Perforce", "Git", "Commandlet / Editor Module", "Jenkins CI", "Jira"]
+    items: ["C++", "Python", "C#"]
+  - category: "Engine / Library"
+    items: ["UE5", "Unity"]
+  - category: "Network"
+    items: ["TCP", "WebSocket", "HTTP", "Protobuf"]
+  - category: "Tooling / DevOps"
+    items: ["Perforce", "Git", "Jenkins CI", "Jira"]
+
+# 이력 — 히어로 오른쪽, 연도 역순 (경력 · 교육 · 수상 · 학력)
+history:
+  - period: "2023.01 — 현재"
+    title: "알트나인"
+    sub: "클라이언트 · 재직 중"
+    kind: work
+  - period: "2022.06 — 2022.12"
+    title: "메타버스 아카데미"
+    sub: "한국전파진흥협회"
+    kind: activity
+  - period: "2021"
+    title: "메타버스개발자경진대회 우수상"
+    kind: activity
+  - period: "2021.06 — 2021.12"
+    title: "실감 콘텐츠 개발과정"
+    sub: "한국전파진흥협회"
+    kind: activity
+  - period: "2018.03 — 2022.08"
+    title: "이화여자대학교 졸업"
+    sub: "국어국문학(주전공) · 컴퓨터공학(부전공) · 소프트웨어(복수전공)"
+    kind: edu
+  - period: "2018.02"
+    title: "과천외국어고등학교 졸업"
+    kind: edu
 
 # 대표 프로젝트
 # ※ 프로젝트는 이제 _projects/*.md 파일로 관리합니다 (클릭 시 상세 페이지로 이동).

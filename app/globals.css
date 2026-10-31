@@ -36,16 +36,29 @@
 @media (max-width: 860px) { .lead { grid-template-columns: 1fr; } }
 .lead-main { min-width: 0; }
 /* 히어로 우측 스킬 — 카드/칩 아님. 왼쪽 액센트 라인 + 구분선 스펙 리스트 */
-.lead-skills { scroll-margin-top: 90px; align-self: center; display: flex; flex-direction: column;
-  padding-left: 18px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
-.ls-row { display: grid; grid-template-columns: 108px 1fr; gap: 6px 16px; align-items: baseline;
-  padding: 12px 0; border-top: 1px solid var(--line); }
+.lead-skills { scroll-margin-top: 90px; display: flex; flex-direction: column; max-width: 560px; margin: 6px 0 26px;
+  padding-left: 16px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+.ls-row { display: grid; grid-template-columns: 136px 1fr; gap: 4px 16px; align-items: baseline;
+  padding: 8px 0; border-top: 1px solid var(--line); }
 .ls-row:first-child { border-top: 0; padding-top: 2px; }
 .ls-cat { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
   letter-spacing: .11em; text-transform: uppercase; color: var(--accent-2); }
 .ls-vals { font-size: 14px; font-weight: 600; line-height: 1.7;
   text-shadow: 0 1px 10px var(--bg), 0 0 2px var(--bg); }
 .ls-sep { color: var(--accent); opacity: .55; font-style: normal; margin: 0 7px; }
+/* 히어로 우측 이력 — 연도 역순 타임라인 */
+.lead-history { scroll-margin-top: 90px; align-self: center; padding-left: 18px;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+.lh-list { list-style: none; margin: 0; padding: 0; }
+.lh-item { display: grid; grid-template-columns: 150px 1fr; gap: 4px 16px; align-items: baseline;
+  padding: 12px 0; border-top: 1px solid var(--line); }
+.lh-item:first-child { border-top: 0; padding-top: 2px; }
+.lh-period { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; color: var(--accent-2); white-space: nowrap; }
+.lh-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lh-title { font-size: 14.5px; font-weight: 700; }
+.lh-sub { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.lh-work .lh-title { color: var(--accent); }
+@media (max-width: 520px) { .lh-item { grid-template-columns: 1fr; gap: 2px; } }
 @media (max-width: 520px) { .ls-row { grid-template-columns: 1fr; gap: 2px; } }
 /* 항목 단위로만 줄바꿈 — 항목 하나(예: Unreal Engine 5)가 중간에서 끊기지 않도록 */
 .ls-vals { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }

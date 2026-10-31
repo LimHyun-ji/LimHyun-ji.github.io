@@ -41,6 +41,8 @@ export default function Home() {
   if (rest.length) grouped[grouped.length - 1].items.push(...rest);
   // 히어로 우측 스킬 패널 — 사이트의 유일한 스킬 표시 영역(전체 카테고리)
   const heroSkills = p.skills ?? [];
+  // 히어로 우측 이력 (연도 역순)
+  const history = p.history ?? [];
 
   // 사이드 네비 항목 — 섹션 단위
   const navItems: NavItem[] = [
@@ -48,7 +50,7 @@ export default function Home() {
     { id: 'sol', label: 'Sol' },
     { id: 'systems', label: '담당 시스템', indent: true },
     { id: 'side', label: 'Side' },
-    { id: 'skills', label: 'Skills' },
+    { id: 'history', label: '이력' },
   ];
 
   return (
@@ -63,7 +65,7 @@ export default function Home() {
           <a href="#cases">기술 사례</a>
           <a href="#sol">Sol</a>
           <a href="#side">Side Projects</a>
-          <a href="#skills">Skills</a>
+          <a href="#history">이력</a>
           {p.links?.github && <a href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
           <ThemeToggle />
         </div>
@@ -100,39 +102,38 @@ export default function Home() {
             </div>
             {id.tagline && <p className="lead-tagline">{glue(id.tagline)}</p>}
             <p className="lead-headline">{glue(p.headline)}</p>
-            {p.keywords && (
-              <ul className="lead-keywords">
-                {p.keywords.map((k) => <li key={k}>{glue(k)}</li>)}
-              </ul>
-            )}
-            {p.about && (
-              <ul className="lead-bio">
-                {p.about.school && p.about.school.split('\n').map((line, i, arr) => (
-                  <li key={i}><span className="bi">{i === 0 ? '🎓' : ''}</span>
-                    {/* 학교 이름과 기간을 한 덩어리로 묶어 기간이 별도 칸으로 떨어지지 않게 함 */}
-                    <span className="bi-text">{glue(line)}
-                      {i === arr.length - 1 && p.about?.schoolPeriod && <em className="bi-sub"> · {glue(p.about.schoolPeriod)}</em>}</span></li>
+            {heroSkills.length > 0 && (
+              <div className="lead-skills" id="skills" aria-label="Skills">
+                {heroSkills.map((g) => (
+                  <div className="ls-row" key={g.category}>
+                    <span className="ls-cat">{g.category}</span>
+                    <span className="ls-vals">
+                      {g.items.map((it, i) => (
+                        <span key={it}>{i > 0 && <i className="ls-sep">·</i>}{it}</span>
+                      ))}
+                    </span>
+                  </div>
                 ))}
-                {p.about.highschool && <li><span className="bi">🏫</span><span className="bi-text">{glue(p.about.highschool)}</span></li>}
-              </ul>
+              </div>
             )}
             <div className="lead-actions">
               {p.links?.github && <a className="btn" href={p.links.github} target="_blank" rel="noopener">GitHub</a>}
               {p.links?.email && <a className="btn ghost" href={`mailto:${p.links.email}`}>Email</a>}
             </div>
           </div>
-          {heroSkills.length > 0 && (
-            <aside className="lead-skills" id="skills" aria-label="Skills">
-              {heroSkills.map((g) => (
-                <div className="ls-row" key={g.category}>
-                  <span className="ls-cat">{g.category}</span>
-                  <span className="ls-vals">
-                    {g.items.map((it, i) => (
-                      <span key={it}>{i > 0 && <i className="ls-sep">·</i>}{it}</span>
-                    ))}
-                  </span>
-                </div>
-              ))}
+          {history.length > 0 && (
+            <aside className="lead-history" id="history" aria-label="이력">
+              <ol className="lh-list">
+                {history.map((h) => (
+                  <li className={`lh-item lh-${h.kind ?? 'activity'}`} key={h.period + h.title}>
+                    <span className="lh-period">{glue(h.period)}</span>
+                    <span className="lh-body">
+                      <span className="lh-title">{glue(h.title)}</span>
+                      {h.sub && <span className="lh-sub">{glue(h.sub)}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ol>
             </aside>
           )}
         </header>
