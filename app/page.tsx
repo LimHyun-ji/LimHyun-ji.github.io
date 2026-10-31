@@ -164,8 +164,6 @@ export default function Home() {
             <figcaption>© Netmarble Corp. &amp; ALT9 Inc. All Rights Reserved.</figcaption>
           </figure>
         </div>
-        <img className="arch-diagram" src="/images/diagrams/sol-architecture.svg"
-          alt="클라이언트 서버 아키텍처: 로비(HTTP)·게임서버 Geo(TCP)·Noti(WebSocket)·API(HTTP 다수) → UGeoSubsystem·UNetworkNotiClient → Feature Managers" loading="lazy" />
         <div id="systems" className="systems">
           <h3 className="systems-h">담당 시스템<span>{glue(' — 사례의 배경이 되는 시스템')}</span></h3>
           <div className="sys-groups">
