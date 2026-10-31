@@ -16,12 +16,12 @@ export default function CaseIndex({ cases, tagOrder }: { cases: TechCase[]; tagO
     <div className="ci">
       <div className="ci-tags" role="group" aria-label="분야로 거르기">
         <button className={`ci-tag${tag === null ? ' on' : ''}`} aria-pressed={tag === null} onClick={() => setTag(null)}>
-          전체 <span>{cases.length}</span>
+          전체
         </button>
         {tags.map((t) => (
           <button key={t} className={`ci-tag${tag === t ? ' on' : ''}`} aria-pressed={tag === t}
             onClick={() => setTag(tag === t ? null : t)}>
-            {glue(t)} <span>{cases.filter((c) => c.tags.includes(t)).length}</span>
+            {glue(t)}
           </button>
         ))}
       </div>
