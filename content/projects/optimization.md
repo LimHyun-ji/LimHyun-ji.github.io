@@ -4,7 +4,7 @@ order: 2
 title: "퍼포먼스 / 메모리 최적화"
 role: "Client Developer · 핵심 담당"
 period: "상시"
-summary: "Unreal Insights 측정 기반 Slate Invalidation, LOD 파츠 숨김, Tick · UObject 절감으로 모바일 비용 최적화."
+summary: "Unreal Insights 측정 기반 Slate Invalidation, LOD, Tick · UObject 절감으로 모바일 비용 최적화."
 tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPass", "LOD"]
 ---
 
@@ -16,7 +16,7 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
     <dl>
       <dt>문제</dt><dd>UI 화면에서 Slate Hitching(프레임 튐) 발생</dd>
       <dt>해결</dt><dd>Unreal Insights로 원인을 측정하고 화면 · 레이어 단위로 Invalidation 적용</dd>
-      <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감</dd>
+      <dt>결과</dt><dd>매 프레임 위젯 재계산 비용 절감, 갱신 타이밍이 맞지 않는 화면은 화면 단위로 제외</dd>
     </dl>
     <a class="case-more" href="#case-slate-hitching">자세히 ↓</a>
   </div>
@@ -83,6 +83,11 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
     }
     ```
 
+- <strong>부작용 대응 — 갱신 누락 시 지연 갱신 · 전체 재무효화</strong>
+  - 무효화가 걸리지 않는 경로로 값이 바뀌면 화면이 갱신되지 않아, 해당 화면은 2틱 뒤 갱신하도록 보정
+  - 재접속 · 게임 접속 시점처럼 UI 상태가 한꺼번에 바뀌는 지점에서는 `InvalidateAllWidget`으로 전체 재무효화
+- <strong>한계와 적용 기준</strong>
+  - 갱신 경로가 어긋나면 전체 재갱신이 필요해, 데이터 갱신이 잦거나 타이밍이 맞지 않는 화면은 화면 단위로 끄고 적용 범위를 제한
 - <strong>풀스크린 UI 아래 3D 렌더링 중지</strong>
   - 풀스크린 UI가 뜨면 가려지는 인게임 3D는 그리지 않는 기존 구조 (`USolDisableGameRenderingSubsystem`) 와 같은 화면 전환 지점에서 Invalidation 토글이 함께 동작
 
@@ -123,6 +128,8 @@ tags: ["Optimization", "Memory", "Mobile", "Slate", "Object Pooling", "RenderPas
 
 - <strong>월드맵 위젯 Tick 분리</strong>
   - 월드맵 지역 화면의 `NativeTick`을 제거하고, 화면이 열려 있는 동안에만 `FTSTicker`에 틱을 등록 · 닫힐 때 해제
+- <strong>아이템 수집 정렬 키 사전 계산</strong>
+  - 정렬 비교마다 슬롯 × 인벤토리를 Lookup하던 구조(비교 O(N log N)회)를, 정렬 전 컬렉션별 1회 계산(O(N))한 키를 비교하도록 변경
 - <strong>함께 적용된 프로젝트 공통 구조</strong>
   - Sector 기반으로 카메라 거리에 따른 NPC 틱 빈도 조절
   - 조작 불가 / 원격 상태 플레이어의 상태 기반 Tick 비활성화
