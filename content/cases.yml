@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────
+# 메인 "기술 사례" — 사이트의 중심. 사례 하나 = 문제 하나를 끝까지 판 기록.
+# tags: 채용 공고 키워드. 사례 하나에 여러 개 가능(태그 필터로 찾음).
+#   게임플레이 · UI · 렌더링 · 게임 수학 · 최적화 · 엔진 툴 · 네트워크 연동
+# link: 지금은 시스템 상세 페이지의 해당 섹션. 사례 글이 생기면 그 주소로 바꾼다.
+# metric: 카드에 크게 보일 대표 증거(숫자 우선)
+# ─────────────────────────────────────────────────────────────
+
+tagOrder: ["게임플레이", "UI", "렌더링", "게임 수학", "최적화", "엔진 툴", "네트워크 연동"]
+
+cases:
+  - id: hit-timing
+    title: "피격 연출 타이밍"
+    summary: "판정은 서버가 확정하고, 클라이언트는 표시 시점만 맞춘다 — 등속 투영에서 이펙트와 같은 속도 커브 기준으로"
+    metric: "1프레임 정밀도"
+    tags: ["게임플레이", "게임 수학"]
+    link: "/projects/combat/#case-hit-delay"
+
+  - id: visualdata-redesign
+    title: "VisualData 구조 재설계"
+    summary: "하나의 슈퍼클래스에 엉킨 타입별 데이터를 분리하고, 두 번의 롤백 끝에 기존 에셋을 손실 없이 이전"
+    metric: "에셋 3,343개"
+    tags: ["게임플레이", "엔진 툴"]
+    link: "/projects/visualdata-editor/#case-refactor"
+
+  - id: minimap-gpu
+    title: "미니맵 퀘스트를 GPU로"
+    summary: "퀘스트 데이터를 Material Parameter로 넘겨 위젯 대신 GPU에서 그리고, 미지원 모바일 기기는 포맷을 낮춰 대응"
+    metric: "32 → 16bit"
+    tags: ["렌더링", "최적화"]
+    link: "/projects/mapdesign/#case-minimap-cost"
+
+  - id: areatool
+    title: "AreaTool — 수동 툴에서 검증 · CI까지"
+    summary: "레벨 데이터 저작 툴을 3년간 키움 — 검증자 체인, 변경분만 P4 반영, Commandlet CI, 선분 교차 판정"
+    metric: "3년"
+    tags: ["엔진 툴", "게임 수학"]
+    link: "/projects/areatool/"
+
+  - id: global-invalidation
+    title: "Slate Global Invalidation"
+    summary: "Unreal Insights로 측정해 화면 단위로 적용하고, 그 뒤 생긴 위젯 미갱신까지 원인에서 해결"
+    metric: "2.11 → 0.67ms"
+    tags: ["UI", "최적화"]
+    link: "/projects/optimization/#case-slate-hitching"
+
+  - id: chat-order
+    title: "채팅 메시지 순서 보장"
+    summary: "브로드캐스트와 히스토리 응답이 섞여 오는 스트림을 (시각, 서버 Index) 복합 키와 역방향 삽입으로 정렬"
+    metric: "평균 O(1) 삽입"
+    tags: ["네트워크 연동", "UI"]
+    link: "/projects/sol-content/#case-chat"

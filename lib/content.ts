@@ -34,16 +34,15 @@ export function getProfile(): Profile {
   return yaml.load(raw) as Profile;
 }
 
-export interface CompetencyCase { title: string; slug?: string; situation: string; decision: string; result: string; }
-export interface CompetencyGroup {
-  id: string; title: string; name: string; headline?: string; proof?: string; proofLabel?: string; cases: CompetencyCase[];
-}
+export interface TechCase { id: string; title: string; summary: string; metric?: string; tags: string[]; link: string; }
+export interface TechCases { tagOrder: string[]; cases: TechCase[]; }
 
-// 메인 "어떻게 일하나" — 행동 패턴별 사례 (content/competencies.yml)
-export function getCompetencies(): CompetencyGroup[] {
-  const file = path.join(CONTENT, 'competencies.yml');
-  if (!fs.existsSync(file)) return [];
-  return ((yaml.load(fs.readFileSync(file, 'utf8')) as { groups?: CompetencyGroup[] })?.groups) ?? [];
+// 메인 "기술 사례" (content/cases.yml)
+export function getCases(): TechCases {
+  const file = path.join(CONTENT, 'cases.yml');
+  if (!fs.existsSync(file)) return { tagOrder: [], cases: [] };
+  const d = (yaml.load(fs.readFileSync(file, 'utf8')) as Partial<TechCases>) ?? {};
+  return { tagOrder: d.tagOrder ?? [], cases: d.cases ?? [] };
 }
 
 export function getIdentity(): Identity {
