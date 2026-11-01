@@ -99,11 +99,15 @@ images:
     }
     ```
 
+    <img class="diagram fig" src="/images/diagrams/fig-obtain.png" alt="획득 판정과 Delta 분할: 끝점이 반경 밖이어도 이동 선분이 반경을 지나면 획득, 긴 프레임은 MaxDeltaTime 단위 스텝으로 나눠 적분하고 MaxSubSteps로 상한" />
+
 - <strong>궤적 설계 — 로컬 기저에서 확산 방향 생성</strong>
   - 발사 방향을 회전으로 바꾸고, 그 회전으로 Right · Up 축을 돌려 발사 방향에 수직인 기저를 구성
   - 두 축에 랜덤 가중치를 곱해 합성 → 발사 방향과 수직인 평면 위의 무작위 방향
   - 가속이 누적될수록 랜덤 성분이 줄어들어, 처음엔 퍼지고 점점 목표로 수렴하는 곡선 궤적
   - 피격자와 획득자의 거리에 반비례하는 `CurveDistanceInterpolator`를 곱해, 거리가 멀수록 초기 확산 반경을 크게 설정
+
+    <img class="diagram fig" src="/images/diagrams/fig-traj.png" alt="궤적 로컬 기저: 발사 방향에 수직인 Right · Up 평면에서 랜덤 확산 방향을 만들고, 거리 보정으로 퍼졌다가 목표로 모이는 곡선" />
 
     ```cpp
     // 발사 방향 기준 로컬 기저 — 캐릭터가 어느 쪽을 보든 같은 모양의 곡선
@@ -123,6 +127,8 @@ images:
 ### PocketLevel · 시퀀스 수명 관리
 
 <figure style="text-align:center"><img src="/images/projects/rendering-cinema/constellation-preview.gif" alt="별자리 전환 연출 — PocketLevel 안에서 재생되는 별자리 LevelSequence" /><figcaption style="font-size:11px;color:var(--muted);margin-top:6px">별자리 전환 연출 — PocketLevel에서 재생되는 LevelSequence</figcaption></figure>
+
+<img class="diagram fig" src="/images/diagrams/fig-pocket.png" alt="PocketLevel · 시퀀스 수명: Stream In → 원점 덮어쓰기(TransformOrigin) → 재생(Soft 로드) → 시작 프레임 Jump(Keep State 원복) → Stop · Destroy → Stream Out(ViewTarget → Pawn)" />
 
 - PocketLevel Instance로 인게임과 격리된 별도 공간에서 `LevelSequence` 재생
 - <strong>진입 시 Stream In · 종료 시 Stream Out</strong>
@@ -158,6 +164,8 @@ images:
 <div id="case-uiparticle" class="case-anchor"></div>
 
 ### UI 파티클 — 부모 변환을 반영한 2D 회전 계산
+
+<img class="diagram fig" src="/images/diagrams/fig-uiparticle.png" alt="UI 파티클 회전 복원: 부모 위젯의 2×2 변환 행렬에서 회전각을 atan2로 다시 구하고, 스케일 → 회전 순서로 파티클 배치" />
 
 - 프로젝트에 도입된 UI 파티클 플러그인(Slate 기반)의 렌더 위치 계산부를 수정
 - <strong>부모 위젯에 회전 · 스케일이 걸린 화면에서 파티클의 위치와 각도가 어긋나는 문제</strong>

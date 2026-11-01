@@ -94,6 +94,8 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - 교차점을 로컬 좌표로 바꿔 해당 변 다음 인덱스에 삽입 (Undo 지원)
   - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역으로 돌려 로컬 공간 기준으로 반영 (`Quat.GetInverse().RotateVector`)
 
+    <img class="diagram fig" src="/images/diagrams/fig-ray.png" alt="광선 · 선분 교차: 클릭한 화면 좌표를 월드 광선 O + tD로 바꾸고, 폴리곤 각 변 P + sE와 외적 · 내적으로 교차 매개변수 t, s를 구해 맞은 변 뒤에 꼭짓점 삽입" />
+
     ```cpp
     // 클릭 광선 (O, D)과 폴리곤 각 변 (P, E)의 교차 → 맞은 변 뒤에 꼭짓점 삽입
     View->DeprojectFVector2D(ClickPos, O, D);
@@ -118,6 +120,8 @@ tags: ["엔진 툴 확장", "게임 수학"]
 - <strong>스폰 프리뷰 기준점 — 다각형 무게중심</strong>
   - 스폰 그룹 프리뷰 메시를 Territory 중앙에 두기 위해 면적 기준 무게중심 계산
   - 꼭짓점 평균과 달리 오목 다각형에서도 면적 분포를 반영한 중심을 얻음
+
+    <img class="diagram fig" src="/images/diagrams/fig-centroid.png" alt="Shoelace 무게중심: 꼭짓점 평균과 달리 변마다 부호 있는 면적을 가중치로 써서 오목 다각형에서도 면적을 반영한 중심을 구함" />
 
     ```cpp
     // Shoelace — 부호 있는 면적 A와 면적 가중 무게중심 C

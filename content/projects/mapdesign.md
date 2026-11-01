@@ -54,6 +54,8 @@ images:
 
 ### 미니맵 위치 동기화 — MPC 기반
 
+<img class="diagram fig" src="/images/diagrams/fig-minimap.png" alt="미니맵 좌표 변환: 월드 좌표를 맵 영역 기준 UV(0~1)로 정규화해 머티리얼 파라미터로 전달, 위젯 갱신 없이 위치 표시" />
+
 - PC 위치를 <strong>MPC</strong>(Material Parameter Collection)를 통해 미니맵 머티리얼에 <strong>실시간 위치 parameter</strong>로 전송해 동기화
 - 매 프레임 위젯 갱신 대신 머티리얼 파라미터로 위치를 반영 → 위치 표시를 GPU 측에서 처리
 - <strong>월드 좌표 → 0~1 정규화 후 MPC 전송</strong>
@@ -86,6 +88,8 @@ images:
 <div id="case-minimap-cost" class="case-anchor"></div>
 
 ### 미니맵 퀘스트 표시 — 머티리얼 직접 렌더
+
+<img class="diagram fig" src="/images/diagrams/fig-quest.png" alt="퀘스트 R16F 텍스처 인코딩: 퀘스트 영역 (x, y, r)을 월드 크기로 정규화해 FFloat16 배열로 1 × 3N 텍스처에 기록하고, 머티리얼이 N개의 원을 직접 그림" />
 
 - <strong>퀘스트 위치를 아이콘 위젯으로 하나씩 표시하면, 표시 대상이 늘어날수록 위젯 비용도 함께 늘어나는 구조</strong>
 - Quest Data를 미니맵 머티리얼에서 직접 표시해, 별도 아이콘 위젯 없이 영역을 제공하여 표시 대상이 늘어도 위젯 비용이 늘지 않는 구조

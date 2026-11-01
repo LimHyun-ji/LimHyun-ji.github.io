@@ -139,6 +139,8 @@ main { max-width: none; width: 100%; margin: 0; padding: 0; }
 /* 코드 분석 기반 아키텍처 다이어그램 (draw.io → SVG) */
 .detail-body img.diagram, img.diagram { display: block; width: 100%; max-width: 880px;
   margin: 10px auto 26px; border-radius: 14px; }
+/* 수식 · 개념 그림 (pdf/figures.py 생성 fig-*.svg) — 원본 폭이 좁아 과하게 커지지 않게 */
+.detail-body img.diagram.fig, img.diagram.fig { max-width: 640px; margin: 12px auto 20px; }
 .arch-diagram { display: block; width: 100%; max-width: 960px; margin: 4px auto 14px; }
 /* 마크다운 본문 내 이미지 — 절반 크기, 중앙 정렬 */
 .detail-body img:not(.diagram) { max-width: 50%; display: block; margin: 10px auto; }

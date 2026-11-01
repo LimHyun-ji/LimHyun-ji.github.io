@@ -64,6 +64,8 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
 
 ### 에디터 본 트랜스폼 프리뷰 — AnimPreviewInstance
 
+<img class="diagram fig" src="/images/diagrams/fig-editorBone.png" alt="에디터 본 프리뷰 경로: 인게임은 ULocomotionAnimInstance로 체형을 적용하지만 프리뷰 메시는 UAnimPreviewInstance를 타므로, UEditorTransformBonesComponent가 ModifyBone으로 본 노드를 직접 주입" />
+
 - PC의 체형 값을 인게임에서는 AnimInstance로 넘겨 적용 (`ULocomotionAnimInstance`)
 - 에디터 프리뷰 메시(`UDebugSkelMeshComponent`)는 `UAnimPreviewInstance`로 재생돼 이 경로를 타지 않음 → 에디터 전용 `UEditorTransformBonesComponent`에서 프리뷰 인스턴스에 직접 적용
 - <strong>본별 Bone Modify 노드 주입</strong>
@@ -88,6 +90,8 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
 <div id="case-module-reuse" class="case-anchor"></div>
 
 ### 에디터 프리뷰의 인게임 모듈 재사용
+
+<img class="diagram fig" src="/images/diagrams/fig-editorModule.png" alt="에디터 모듈 재사용: 에디터 컴포넌트가 CreateModule을 override해 인게임 모듈을 상속한 에디터 모듈을 생성, 다른 부분만 override" />
 
 - 기존에는 에디터 전용 `VisualDataEditorComponent`가 인게임 외형 로직을 따로 구현 → 외형 기능을 바꿀 때마다 인게임 · 에디터 양쪽 수정
 - <strong>상속 + 모듈 생성 교체 (Factory Method)</strong>

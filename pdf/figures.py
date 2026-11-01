@@ -1,10 +1,15 @@
 """PDF 사례별 설명 그림(SVG) 생성기 — 코드 대신 수식 · 구조를 그림으로 보여준다.
 실행: python pdf/figures.py  → pdf/assets/fig/*.svg (build.mjs가 HTML에 인라인으로 넣는다)
+      웹사이트용 사본은 pdf/assets/web/*.svg → node pdf/webfigs.mjs가 PNG로 렌더해
+      public/images/diagrams/fig-*.png로 저장 (<img>로 넣은 SVG는 웹 폰트를 못 써서 글자 폭이 달라짐)
 """
 import math, os
 
 OUT = os.path.join(os.path.dirname(__file__), 'assets', 'fig')
+WEB_OUT = os.path.join(os.path.dirname(__file__), 'assets', 'web')
+WEB = {'hit', 'obtain', 'traj', 'uiparticle', 'ray', 'centroid', 'minimap', 'transition', 'pocket', 'lod', 'quest', 'editorBone', 'editorModule'}
 os.makedirs(OUT, exist_ok=True)
+os.makedirs(WEB_OUT, exist_ok=True)
 
 G, g = '#0F7A42', '#22A862'      # green (진한 / 밝은)
 Y, y = '#8A6700', '#F5C000'      # yellow
@@ -30,6 +35,13 @@ def svg(name, w, h, body):
     s = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
          f'font-family="Pretendard, \'Malgun Gothic\', sans-serif">{defs()}{"".join(body)}</svg>')
     open(os.path.join(OUT, name + '.svg'), 'w', encoding='utf-8').write(s)
+    # 웹사이트용 사본 — 다크 테마 위에서도 보이게 흰 카드 배경 + 여백 (public/images/diagrams/fig-*.svg)
+    if name in WEB:
+        p = 16
+        web = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-p} {-p} {w + 2 * p} {h + 2 * p}" width="{w + 2 * p}" height="{h + 2 * p}" '
+               f'font-family="Pretendard, \'Malgun Gothic\', sans-serif">{defs()}'
+               f'<rect x="{-p}" y="{-p}" width="{w + 2 * p}" height="{h + 2 * p}" rx="14" fill="#ffffff"/>{"".join(body)}</svg>')
+        open(os.path.join(WEB_OUT, 'fig-' + name + '.svg'), 'w', encoding='utf-8').write(web)
 
 
 def T(x, y, s, size=13, c=K, w=500, a='start', mono=False, italic=False):

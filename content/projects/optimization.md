@@ -86,6 +86,8 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
 
 ### LOD별 파츠 통합
 
+<img class="diagram fig" src="/images/diagrams/fig-lod.png" alt="LOD별 파츠 표시: Torso LOD가 OptimizeLOD(2) 이상이면 Face · Helmet 숨김, 1초 Tick에서 LOD가 바뀐 경우에만 Visibility 갱신" />
+
 - 원거리 Entity는 분리된 파츠 중 LOD에 따라 파츠를 통합, 원거리에서 그리는 파츠 수를 줄임
 - <strong>판정 기준</strong>
   - Torso 메시의 `GetPredictedLODLevel()` 값이 `OptimizeLOD`(2) 이상이면 대상 파츠를 숨김
