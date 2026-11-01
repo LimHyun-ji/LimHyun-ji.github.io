@@ -82,6 +82,13 @@ b { color: #0c1a13; }
 .toc .tt { font-weight: 800; font-size: 17.5px; line-height: 1.35; }
 .toc .th { font-size: 14.5px; color: #5d6863; margin-top: 3px; line-height: 1.45; }
 .toc.compact .th { display: none; } .toc.compact li a.item { padding: 10px 14px; align-items: center; }
+.toc.grouped .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; align-items: start; }
+.toc.grouped ol { grid-template-columns: 1fr; }
+.toc.grouped ol { gap: 7px; } .toc.grouped li a.item { padding: 8px 14px; } .toc.grouped .tt { font-size: 16.5px; } .toc.grouped .th { font-size: 13.5px; margin-top: 2px; line-height: 1.4; }
+.toc.grouped .lead { margin-bottom: 10px; } .toc .grp + .grp { margin-top: 12px; }
+.toc .grp + .grp { margin-top: 16px; }
+.toc .gh { font-size: 15px; font-weight: 800; color: #B24A22; letter-spacing: .04em; margin: 0 0 8px 2px; padding-left: 10px; border-left: 3px solid #B24A22; }
+.hd .grp-l { font-weight: 800; color: #B24A22; margin-left: 10px; }
 .toc .chips { margin-top: 6px; } .toc .chips .chip { font-size: 13px; padding: 1px 8px; }
 
 /* 사례 */
@@ -156,15 +163,42 @@ function cover(v) {
     </div></section>`;
 }
 
+// 묶음(groups)이 있으면 각 장이 속한 묶음 이름을 돌려준다
+function groupOf(v, i) {
+  let acc = 0;
+  for (const g of v.groups ?? []) { acc += g.n; if (i < acc) return g.title; }
+  return null;
+}
+
 function toc(v, total) {
-  const items = v.slides.map((k, i) => {
+  const item = (k, i) => {
     const s = SLIDES[k];
     return `<li><a class="item" href="#s-${k}"><span class="num">${String(i + 1).padStart(2, '0')}</span>
       <span><div class="tt">${esc(s.toc ?? s.title)}</div><div class="th">${esc(s.thesis)}</div></span></a></li>`;
-  }).join('');
-  return `<section class="page toc${v.slides.length > 10 ? ' compact' : ''}" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
-    <div class="lead">각 항목을 누르면 해당 장으로 이동합니다. 각 장의 제목은 웹 포트폴리오의 해당 섹션으로 연결됩니다.</div>
+  };
+  const head = `<section class="page toc__C__" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
+    <div class="lead">각 항목을 누르면 해당 장으로 이동합니다. 각 장의 제목은 웹 포트폴리오의 해당 섹션으로 연결됩니다.</div>`;
+  if (!v.groups) {
+    const items = v.slides.map(item).join('');
+    return head.replace('__C__', v.slides.length > 10 ? ' compact' : '') + `
     <ol style="grid-auto-flow: column; grid-template-rows: repeat(${Math.ceil(v.slides.length / 2)}, auto)">${items}</ol>${foot(v, 2, total)}</section>`;
+  }
+  // 묶음 단위로 왼쪽 열을 채우고(전체의 절반이 넘기 전까지), 나머지는 오른쪽 열
+  let i = 0;
+  const blocks = v.groups.map((g) => {
+    const ks = v.slides.slice(i, i + g.n);
+    const html = `<div class="grp"><div class="gh">${esc(g.title)}</div><ol>${ks.map((k, j) => item(k, i + j)).join('')}</ol></div>`;
+    const b = { html, n: g.n, start: i };
+    i += g.n;
+    return b;
+  });
+  const left = [];
+  let cnt = 0;
+  for (const b of blocks) { if (left.length && cnt + b.n > Math.ceil(v.slides.length / 2) + 1) break; left.push(b); cnt += b.n; }
+  const right = blocks.slice(left.length);
+  const maxCol = Math.max(cnt, v.slides.length - cnt);
+  return head.replace('__C__', ' grouped') + `
+    <div class="cols"><div>${left.map((b) => b.html).join('')}</div><div>${right.map((b) => b.html).join('')}</div></div>${foot(v, 2, total)}</section>`;
 }
 
 // 사례 그림(pdf/assets/fig/*.svg, figures.py 생성)은 인라인으로 넣어 웹 폰트가 적용되게 한다
@@ -188,7 +222,7 @@ function slide(v, k, i, total) {
   const s = SLIDES[k];
   const [pl, cl] = s.labels ?? ['문제', '원인'];
   return `<section class="page" id="s-${k}">
-    <div class="hd"><span class="no">${String(i + 1).padStart(2, '0')} / ${String(v.slides.length).padStart(2, '0')}</span><span>${s.tags.map(chip).join('')}</span></div>
+    <div class="hd"><span><span class="no">${String(i + 1).padStart(2, '0')} / ${String(v.slides.length).padStart(2, '0')}</span>${groupOf(v, i) ? `<span class="grp-l">${esc(groupOf(v, i))}</span>` : ''}</span><span>${s.tags.map(chip).join('')}</span></div>
     <h2 class="t"><a href="${s.url}">${esc(s.title)}</a></h2>
     <p class="thesis">${esc(s.thesis)}</p>
     <div class="body">
