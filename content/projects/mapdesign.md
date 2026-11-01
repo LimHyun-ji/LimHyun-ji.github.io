@@ -60,12 +60,19 @@ images:
   - 맵 원점을 빼고 월드 크기로 나눠 텍스처 UV 기준 좌표로 변환
 
   ```cpp
-  // 월드 좌표 → 맵 UV(0~1) → 머티리얼 파라미터
-  const FVector2D UV = (FVector2D(Location) - MapOrigin) / WorldSize;
-  Mpc->SetScalarParameterValue("X", FMath::IsFinite(UV.X) ? UV.X : 0.f);
-  Mpc->SetScalarParameterValue("Y", FMath::IsFinite(UV.Y) ? UV.Y : 0.f);
-  Cursor->SetRenderTransformAngle(ActorYaw);    // 캐릭터 방향
-  Radar->SetRenderTransformAngle(CameraYaw);    // 카메라 시야
+  // 플레이어 월드 좌표 → 맵 기준 정규화 좌표(0~1) → MPC로 머티리얼에 전달
+  float U = (PlayerLocation.X - Map.Origin.X) / Map.WorldSize.X;
+  float V = (PlayerLocation.Y - Map.Origin.Y) / Map.WorldSize.Y;
+  U = FMath::IsFinite(U) ? U : 0.f;                         // WorldSize 0 방어
+  V = FMath::IsFinite(V) ? V : 0.f;
+
+  if (auto* Mpc = GetWorld()->GetParameterCollectionInstance(MiniMapCollection))
+  {
+      Mpc->SetScalarParameterValue("X", U);                 // 머티리얼이 이 값으로 맵 텍스처를 이동
+      Mpc->SetScalarParameterValue("Y", V);
+  }
+  PlayerCursor->SetRenderTransformAngle(PlayerYaw);         // 캐릭터 방향
+  ViewCone->SetRenderTransformAngle(CameraYaw);             // 카메라 시야
   ```
 
 - <strong>축척 · 줌 단계</strong>
@@ -75,13 +82,20 @@ images:
   - 내 위치 → 파티원 방향을 `Atan2`로 각도화해 화살표를 회전
 
   ```cpp
-  // 맵 밖 아이콘 — 박스 경계로 Clamp, 방향은 atan2로 화살표 각도
-  const FVector2D Clamped = ClampToBox(Pos, BoxMin, BoxMax);
-  if (Clamped != Pos)
+  // 파티원 아이콘 — 미니맵 박스 밖이면 경계로 Clamp하고 방향 계산
+  const bool bInside = Pos.X >= BoxMin.X && Pos.X <= BoxMax.X
+                    && Pos.Y >= BoxMin.Y && Pos.Y <= BoxMax.Y;
+  const FVector2D Clamped(FMath::Clamp(Pos.X, BoxMin.X, BoxMax.X),
+                          FMath::Clamp(Pos.Y, BoxMin.Y, BoxMax.Y));
+  if (!bInside)
   {
-      const FVector2D Dir = (Clamped - MyPos).GetSafeNormal();
-      Arrow->SetRenderTransformAngle(FMath::RadiansToDegrees(FMath::Atan2(Dir.X, -Dir.Y)));
+      const FVector2D Dir = (Clamped - MyIconPos).GetSafeNormal();
+      Party.Direction = FVector2D(Dir.X, -Dir.Y);           // UI 좌표계는 Y가 아래 → 반전
   }
+
+  // 아이콘 위젯 — 화면 밖일 때만 화살표를 방향 각도로 회전해 표시
+  const float Deg = FMath::RadiansToDegrees(FMath::Atan2(Party.Direction.X, Party.Direction.Y));
+  Arrow->SetRenderTransformAngle(Deg);
   ```
 <div id="case-minimap-cost" class="case-anchor"></div>
 
@@ -93,15 +107,23 @@ images:
   - 퀘스트 종류별로 (X, Y, 반경)을 정규화해 float16 배열로 만들고, 임시 텍스처에 복사해 머티리얼에 전달
 
   ```cpp
-  // 퀘스트 (x, y, r)을 R16F 1D 텍스처로 패킹 → 셰이더가 개수만큼 순회
-  TArray<FFloat16> Data;
-  for (const auto& Q : Quests)
-      Data.Append({ (Q.X - Origin.X) / Size.X, (Q.Y - Origin.Y) / Size.Y, Q.Radius / Size.X });
+  // 퀘스트 원 (x, y, r)을 정규화해 R16F 1 × N 텍스처로 패킹 → 머티리얼이 개수만큼 순회
+  TArray<FFloat16> Packed;
+  for (const FQuestArea& Q : Quests)
+  {
+      Packed.Add((Q.X - Map.Origin.X) / Map.WorldSize.X);
+      Packed.Add((Q.Y - Map.Origin.Y) / Map.WorldSize.Y);
+      Packed.Add(Q.Radius / Map.WorldSize.X);
+  }
+  UTexture2D* Tex = UTexture2D::CreateTransient(Packed.Num(), 1, PF_R16F);   // 16bit float 1채널
 
-  UTexture2D* Tex = UTexture2D::CreateTransient(Data.Num(), 1, PF_R16F);
-  // Mip0 BulkData Lock → Memcpy(Data) → Unlock → UpdateResource
-  Mid->SetTextureParameterValue(TexParam, Tex);
-  Mid->SetScalarParameterValue(NumParam, Data.Num());
+  FTexture2DMipMap& Mip = Tex->GetPlatformData()->Mips[0];
+  FMemory::Memcpy(Mip.BulkData.Lock(LOCK_READ_WRITE), Packed.GetData(), Packed.Num() * sizeof(FFloat16));
+  Mip.BulkData.Unlock();
+  Tex->UpdateResource();                                                     // GPU 업로드
+
+  Mid->SetTextureParameterValue(QuestTexParam[Type], Tex);
+  Mid->SetScalarParameterValue(QuestCountParam[Type], Packed.Num());
   ```
 
 - <strong>기기 포맷 지원 확인</strong>
@@ -119,14 +141,22 @@ images:
   - 두 손가락 거리 변화량을 휠 Delta와 같은 단위로 넘겨, 줌 처리 코드를 하나로 유지
 
   ```cpp
-  // 두 손가락 거리 변화량 → 줌, 한 손가락 → 드래그
-  if (Touches.Num() == 2)
+  // Slate 입력 전처리기 — 위젯보다 먼저 터치를 받아 줌 / 드래그로 변환
+  if (Touches.Contains(Finger))
   {
-      const float Dist = FVector2D::Distance(Touches[0], Touches[1]);
-      OnZoom.ExecuteIfBound((Dist - PrevDist) * ZoomSpeed);
-      PrevDist = Dist;
+      Touches[Finger] = TouchPos;
+      if (Touches.Num() == 2)                                    // 두 손가락 → 핀치
+      {
+          TArray<FVector2D> P;
+          Touches.GenerateValueArray(P);
+          const float Dist = FVector2D::Distance(P[0], P[1]);
+          PinchDelta = Dist - PrevPinchDist;                    // 거리 변화량 = 줌 입력
+          PrevPinchDist = Dist;
+          if (Dist > 0.f) bPinching = true;
+      }
   }
-  else if (bTouchStarted) OnDrag.ExecuteIfBound(Event);
+  if (bPinching)          OnZoom.ExecuteIfBound(PinchDelta * ZoomSpeed);
+  else if (bTouchStarted) OnDrag.ExecuteIfBound(PointerEvent);
   ```
 
 - <strong>클릭과 드래그 · 핀치 구분</strong>
@@ -135,10 +165,14 @@ images:
   - 뷰포트 픽셀을 슬레이트 단위로 환산한 뒤, 현재 줌에서 맵이 화면 밖으로 넘친 만큼만 이동을 허용
 
   ```cpp
-  // 배율 S에서 이동 가능한 최대 거리 = Size · (S − 1) / (2S), S < 1이면 0
-  const FVector2D S(Zoom * UIScale, Zoom * UIScale * Aspect);     // 뷰포트 비율 보정
-  const float MaxX = FMath::Max(0.f, Size.X * (S.X - 1.f) / (2.f * S.X));
-  const float MaxY = FMath::Max(0.f, Size.Y * (S.Y - 1.f) / (2.f * S.Y));
+  // 확대 상태에서 맵이 화면 밖으로 빠지지 않게 이동 범위 Clamp
+  const float DPI = UWidgetLayoutLibrary::GetViewportScale(this);
+  const FVector2D ViewSize = DPI > 0.f ? ViewportSize / DPI : ViewportSize;     // Slate 단위
+  const FVector2D S(Zoom * UIScale, Zoom * UIScale * ViewSize.X / ViewSize.Y);   // 축별 배율 (화면비 보정)
+
+  // 최대 이동량 = Size · (S − 1) / (2S) — 배율이 1 미만이면 이동 불가 (0)
+  const float MaxX = FMath::Max(0.f, LocalSize.X * (S.X - 1.f) / (2.f * S.X)) * DragLimit.X;
+  const float MaxY = FMath::Max(0.f, LocalSize.Y * (S.Y - 1.f) / (2.f * S.Y)) * DragLimit.Y;
   Pos.X = FMath::Clamp(Pos.X, Origin.X - MaxX, Origin.X + MaxX);
   Pos.Y = FMath::Clamp(Pos.Y, Origin.Y - MaxY, Origin.Y + MaxY);
   ```

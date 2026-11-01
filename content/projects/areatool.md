@@ -56,14 +56,25 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - `GetDynamicMeshElements` — 렌더 스레드에서 매 프레임 와이어프레임 실린더를 그려 스폰 반경 표시
 
     ```cpp
-    // SceneProxy — 뷰마다 와이어 실린더 제출
-    void GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector) const override
+    // SceneProxy — 뷰마다 원주 꼭짓점(위 · 아래) 포인트 + 와이어 실린더 제출
+    void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& Family,
+                                uint32 VisibilityMap, FMeshElementCollector& Collector) const override
     {
+        const FVector Origin = GetLocalToWorld().GetOrigin();
+        const float Step = 2.f * UE_PI / Sides;                           // 원주 분할 각
         for (int32 V = 0; V < Views.Num(); ++V)
         {
-            if (!(VisibilityMap & (1 << V))) continue;
-            // 원주 꼭짓점 i = Origin + (cos θi, sin θi, 0) · R,  θi = 2π · i / N
-            DrawWireCylinder(Collector.GetPDI(V), Origin, X, Y, Z, Color, Radius, HalfHeight, N, SDPG_World);
+            if (!(VisibilityMap & (1 << V))) continue;                    // 이 뷰에서 안 보이면 건너뜀
+            FPrimitiveDrawInterface* PDI = Collector.GetPDI(V);
+
+            for (int32 i = 0; i < Sides; ++i)                             // θi = 2π · i / N
+            {
+                const FVector P = Origin + FVector(FMath::Cos(Step * i), FMath::Sin(Step * i), 0.f) * Radius;
+                PDI->DrawPoint(P - FVector::UpVector * HalfHeight, WireColor, PointSize, SDPG_World);
+                PDI->DrawPoint(P + FVector::UpVector * HalfHeight, WireColor, PointSize, SDPG_World);
+            }
+            DrawWireCylinder(PDI, Origin, FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+                             WireColor, Radius, HalfHeight, Sides, SDPG_World, Thickness);
         }
     }
     ```
@@ -71,13 +82,30 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - `FComponentVisualizer` — 선택 시 솔리드 메시 + 삼각화된 캡 면을 `FDynamicMeshBuilder`로 빌드해 영역을 시각적으로 구분
 
     ```cpp
-    // ComponentVisualizer — 솔리드 실린더 + 2D 폴리곤 캡을 삼각화해 그림
-    DrawCylinder(PDI, Origin, X, Y, Z, Radius, HalfHeight, N, MaterialProxy, SDPG_World);
+    // ComponentVisualizer — 선택된 컴포넌트를 솔리드 실린더 + 폴리곤 캡 면으로 그림
+    void FCylinderVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View,
+                                                FPrimitiveDrawInterface* PDI)
+    {
+        const auto* Cyl = Cast<const UCylinderComponent>(Component);
+        const FMatrix LocalToWorld = Cyl->GetOwner()->GetActorTransform().ToMatrixWithScale();
+        auto* Material = new FColoredMaterialRenderProxy(GEditor->GeomMaterial->GetRenderProxy(), Cyl->MeshColor);
 
-    FDynamicMeshBuilder Builder(FeatureLevel);
-    for (const auto& Tri : Triangulate(Polygon))
-        Builder.AddTriangle(AddVertex(Tri.V[0]), AddVertex(Tri.V[1]), AddVertex(Tri.V[2]));
-    Builder.Draw(PDI, LocalToWorld, MaterialProxy, SDPG_World);
+        // 1) 솔리드 실린더
+        DrawCylinder(PDI, LocalToWorld.GetOrigin(), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+                     Cyl->Radius, Cyl->HalfHeight, Cyl->Sides, Material, SDPG_World);
+
+        // 2) 캡 면 — 2D 폴리곤을 삼각형으로 분할해 동적 메시로 제출
+        FDynamicMeshBuilder Builder(PDI->View->GetFeatureLevel());
+        for (const auto& Tri : TriangulatePolygon(Points))
+        {
+            int32 Idx[3];
+            for (int32 k = 0; k < 3; ++k)
+                Idx[k] = Builder.AddVertex(FVector3f(Tri.V[k].X, Tri.V[k].Y, 0.f), FVector2f::ZeroVector,
+                                           TangentX, TangentY, TangentZ, FColor::White);
+            Builder.AddTriangle(Idx[0], Idx[1], Idx[2]);
+        }
+        Builder.Draw(PDI, LocalToWorld, Material, SDPG_World);
+    }
     ```
 
   - `GetViewRelevance` — `bDrawOnlyIfSelected`로 에디터에서 선택된 액터만 표시
@@ -91,17 +119,32 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - 회전된 액터 위에서 꼭짓점을 드래그할 때는 이동량을 액터 회전의 역으로 돌려 로컬 공간 기준으로 반영 (`Quat.GetInverse().RotateVector`)
 
     ```cpp
-    // 클릭 광선 (O, D) × 폴리곤 변 (P, E) — 처음 맞은 변 뒤에 꼭짓점 삽입
-    for (int32 i = 0; i < Num; ++i)
+    // 클릭 위치 → 월드 광선 (O, D), 광선을 충분히 긴 선분으로 (t ∈ [0, 1])
+    View->DeprojectFVector2D(FVector2D(Click.GetClickPos()), O, D);
+    D *= WORLD_MAX / 2.f;
+
+    const FTransform& T = Polygon->GetComponentTransform();
+    for (int32 i = 0; i < Pts.Num(); ++i)
     {
-        const FVector P = ToWorld(Pts[i]), E = ToWorld(Pts[(i + 1) % Num]) - P;
-        const FVector N = D ^ E;
-        if (N.IsNearlyZero()) continue;                         // 평행
+        const FVector P = T.TransformPosition(Pts[i]);
+        const FVector E = T.TransformPosition(Pts[(i + 1) % Pts.Num()]) - P;        // 변 방향
+
+        // 1) 평행 — D × E = 0
+        const FVector N = FVector::CrossProduct(D, E);
+        if (N.GetSafeNormal().IsNearlyZero()) continue;
+
+        // 2) 동일 평면 — (P − O)가 법선 N과 수직이어야 교차 가능
         const FVector W = P - O;
-        if (!FMath::IsNearlyZero(W.GetSafeNormal() | N.GetSafeNormal())) continue;   // 동일 평면 아님
-        const float t = ((W ^ E) | N) / N.SizeSquared();        // 광선 매개변수
-        const float s = ((W ^ D) | N) / N.SizeSquared();        // 변 매개변수
-        if (In01(t) && In01(s)) { Pts.Insert(ToLocal(O + t * D), i + 1); break; }
+        if (!FMath::IsNearlyZero(FVector::DotProduct(W.GetSafeNormal(), N.GetSafeNormal()), Tol)) continue;
+
+        // 3) 교차 매개변수 t(광선) · s(변) — 둘 다 [0, 1] 안이면 교차
+        const float t = FVector::DotProduct(FVector::CrossProduct(W, E), N) / N.SizeSquared();
+        const float s = FVector::DotProduct(FVector::CrossProduct(W, D), N) / N.SizeSquared();
+        if (t >= -Tol && t <= 1.f + Tol && s >= -Tol && s <= 1.f + Tol)
+        {
+            Pts.Insert(T.InverseTransformPosition(O + t * D), i + 1);               // 맞은 변 뒤에 삽입
+            break;
+        }
     }
     ```
 
@@ -110,17 +153,22 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - 꼭짓점 평균과 달리 오목 다각형에서도 면적 분포를 반영한 중심을 얻음
 
     ```cpp
-    // Shoelace — 부호 있는 면적 A와 무게중심 C
-    float A = 0.f;
-    FVector2D C(0.f, 0.f);
-    for (int32 i = 0; i < Num; ++i)
+    // Shoelace — 부호 있는 면적 A와 면적 가중 무게중심 C
+    FVector2D GetPolygonCentroid(const TArray<FVector>& Pts)
     {
-        const FVector2D P = Pts[i], Q = Pts[(i + 1) % Num];
-        const float Cross = P ^ Q;          // 변이 만드는 부호 있는 면적 × 2
-        A += Cross;
-        C += (P + Q) * Cross;
+        float A = 0.f;
+        FVector2D C(0.f, 0.f);
+        for (int32 i = 0; i < Pts.Num(); ++i)
+        {
+            const FVector2D P(Pts[i]), Q(Pts[(i + 1) % Pts.Num()]);
+            const float Cross = FVector2D::CrossProduct(P, Q);     // 변이 만드는 부호 있는 면적 × 2
+            A += Cross;
+            C.X += (P.X + Q.X) * Cross;
+            C.Y += (P.Y + Q.Y) * Cross;
+        }
+        A *= 0.5f;
+        return C / (6.f * A);
     }
-    return C / (6.f * (0.5f * A));
     ```
 
 <div id="case-validation" class="case-anchor"></div>
@@ -150,10 +198,19 @@ tags: ["엔진 툴 확장", "게임 수학"]
   - 레벨마다 내비게이션 시스템 추가 → 기획 배치용 데이터 레이어(`DL_Design`) 로드 → 월드 전체 범위 로드
 
     ```cpp
-    // 맵 로드 → 에디터 내비 시스템 추가 → 디자인 데이터 레이어 · 월드 전체 영역 로드
-    FEditorFileUtils::LoadMap(MapPackage, false);
-    FNavigationSystem::AddNavigationSystemToWorld(*World, FNavigationSystemRunMode::EditorMode);
-    LoadDesignDataLayer();
-    MakeUnique<FLoaderAdapterShape>(World, EntireWorldBox, TEXT("Loaded Region"))->Load();
+    // 툴 진입 — 맵 로드 후 툴에 필요한 데이터만 에디터 월드에 올림
+    void UAreaToolSubsystem::LoadWorld(const FAssetData& MapAsset)
+    {
+        FEditorFileUtils::LoadMap(FPackageName::ObjectPathToPackageName(MapAsset.GetObjectPathString()), false);
+        UWorld* World = GEditor->GetEditorWorldContext().World();
+
+        // 에디터 모드에서도 NavMesh를 쓰도록 내비 시스템 추가
+        FNavigationSystem::AddNavigationSystemToWorld(*World, FNavigationSystemRunMode::EditorMode);
+        LoadDesignDataLayer();                                    // 기획 배치용 데이터 레이어만 로드
+
+        // World Partition — 월드 전체 박스를 로더 어댑터로 로드
+        static const FBox EntireWorld(FVector(-HALF_WORLD_MAX), FVector(HALF_WORLD_MAX));
+        Adapters.Add_GetRef(MakeUnique<FLoaderAdapterShape>(World, EntireWorld, TEXT("Loaded Region")))->Load();
+    }
     ```
 
