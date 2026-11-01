@@ -466,6 +466,16 @@ export const VERSIONS = [
   },
   {
     key: '3_client', file: '임현지_포트폴리오_클라이언트_통합',
+    label: 'Client', title: '클라이언트 통합',
+    pitch: '런타임 구조 · 전투 동기화 · 게임 수학 · 에디터 툴 · 최적화를 문제 단위로 끝까지 다룹니다.',
+    focus: ['런타임 아키텍처', '게임 수학', '엔진 툴 확장', '퍼포먼스 최적화'],
+    slides: ['vdmodule', 'transition', 'sync', 'hit', 'notify', 'obtain', 'uiparticle', 'network', 'strategy', 'dragclamp', 'minimap',
+      'editorBone', 'editorModule', 'areaPipe', 'slate', 'quest'],
+    cols: 3,
+    groups: [{ title: '외형 시스템', n: 2 }, { title: '전투 동기화 · 연출', n: 3 }, { title: '연출 게임 수학', n: 2 }, { title: '컨텐츠 통신 · 월드맵', n: 4 }, { title: '에디터 툴', n: 3 }, { title: '렌더링 · UI 최적화', n: 2 }],
+  },
+  {
+    key: '5_full', file: '임현지_포트폴리오_클라이언트_엔진툴_통합',
     label: 'Client · Engine Tools', title: '클라이언트 · 엔진 툴 통합',
     pitch: '런타임 구조 · 전투 동기화 · 게임 수학 · 에디터 툴 · 렌더링 최적화를 문제 단위로 끝까지 다룹니다.',
     focus: ['런타임 아키텍처', '게임 수학', '엔진 툴 확장', '렌더링 · 최적화'],
