@@ -19,16 +19,12 @@ export const SLIDES = {
     ],
     result: '이펙트가 닿는 순간에 피격 연출 표시 · 툴에서 본 타이밍 = 게임 타이밍',
     formula: 't* = min { t | S(t / T) ≥ r },  T = Duration / PlayRate',
-    visual: { type: 'code', file: '피격 타이밍 역산', code: `// 피격 지연 — 속도 커브에서 "타깃까지 이동한 비율"에 처음 도달하는 시각을 역산
-const double PathLength  = FVector::Dist2D(Start, End);                 // 이펙트 전체 경로 길이
-const float  Duration    = PathDuration / PlayRate;                     // 공격 속도 배율 반영
-const float  TargetRatio = FMath::Min(FVector::Dist2D(Start, TargetLocation) / PathLength, 1.0);
+    visual: { type: 'code', file: '피격 타이밍 역산', code: `// 속도 커브에서 "타깃까지 이동 비율 r"에 처음 도달하는 시각 t*를 역산
+const float Duration = PathDuration / PlayRate;                          // 공격 속도 반영
+const float r = FMath::Min(FVector::Dist2D(Start, Target) / FVector::Dist2D(Start, End), 1.0);
 
-for (float t = 0.f; t < Duration; t += 1.f / 60.f)                      // 60fps 간격 샘플링
-{
-    const float Ratio = EvaluateSpeedCurve(SpeedCurve, t / Duration);   // 누적 이동 비율 S(t / T)
-    if (Ratio >= TargetRatio) return t;                                 // t* = min{ t | S(t / T) ≥ r }
-}
+for (float t = 0.f; t < Duration; t += 1.f / 60.f)                       // 60fps 간격 샘플링
+    if (EvaluateSpeedCurve(SpeedCurve, t / Duration) >= r) return t;     // t* = min{ t | S(t / T) ≥ r }
 return Duration;` },
     frames: 'combat-preview',
   },
@@ -81,19 +77,18 @@ return Duration;` },
     ],
     result: '판정 반경을 한 프레임에 지나쳐도 획득 처리, 긴 히칭에도 갱신 횟수는 상한 안',
     formula: 'dist( P_target , segment(P_t , P_t+Δt) ) ≤ r  ⇒  snap',
-    visual: { type: 'code', file: '서브스텝 적분 + 선분 판정', code: `// MaxDeltaTime 단위로 나눠 적분 — 프레임 드랍에도 궤적이 튀지 않게
-int32 Step = 0;
-while (DeltaSeconds > KINDA_SMALL_NUMBER && Step < MaxSubSteps && !bFinished)
+    visual: { type: 'code', file: '서브스텝 적분 + 선분 판정', code: `// 큰 DeltaTime을 MaxDeltaTime 단위로 나눠 적분 — 프레임 드랍에도 궤적이 튀지 않게
+for (int32 Step = 0; DeltaSeconds > KINDA_SMALL_NUMBER && Step < MaxSubSteps && !bFinished; ++Step)
 {
     const float Dt = FMath::Min(DeltaSeconds, MaxDeltaTime);
     UpdateEffect(Dt);
-    DeltaSeconds -= Dt;
-    ++Step;                                        // 상한으로 최악 비용 제한
+    DeltaSeconds -= Dt;                                // 상한 (MaxSubSteps)으로 최악 비용 제한
 }
 
-// 이동 구간(선분)과 목표의 최단 거리로 도착 판정 — 고속에서 반경을 건너뛰지 않게
+// 이동 구간 (선분)과 목표의 최단 거리로 도착 판정 — 끝점만 보면 고속에서 반경을 건너뜀
 FVector Next = Cur + Velocity * DeltaTime;
-if (FMath::PointDistToSegment(Target, Cur, Next) <= ObtainRange) Next = Target;` },
+if (FMath::PointDistToSegment(Target, Cur, Next) <= ObtainRange)
+    Next = Target;                                     // 목표로 스냅` },
     frames: 'exp-obtain-effect',
   },
 
@@ -114,21 +109,16 @@ if (FMath::PointDistToSegment(Target, Cur, Next) <= ObtainRange) Next = Target;`
     result: '거리와 무관하게 비슷한 비율의 곡선 궤적, 발사 방향과 겹치지 않는 확산',
     formula: 'dir = normalize( R·a + U·b ),  R, U ⟂ forward',
     visual: { type: 'code', file: '로컬 기저 + 거리 보정', code: `// 발사 방향 기준 로컬 기저 — 캐릭터가 어느 쪽을 보든 같은 모양의 곡선
-const FRotator Basis = Data.StartDirection.Rotation();
+const FRotator Basis = StartDirection.Rotation();
 const FVector Right = Basis.RotateVector(FVector::RightVector);
 const FVector Up    = Basis.RotateVector(FVector::UpVector);
 
-// 거리 보정 — (Near, Far)를 0~1로 정규화해 가까울수록 곡선 힘을 키움 (1 ~ MaxBoost)
-const FVector& K = Data.DistanceInterp;                              // (Near, Far, MaxBoost)
-const float Closeness = 1.f - FMath::Clamp((Distance - K.X) / (K.Y - K.X), 0.f, 1.f);
-const float Boost = FMath::Clamp(Closeness * K.Z, 1.f, K.Z);
+// 거리 보정 — (Near, Far)를 0~1로 정규화해 가까울수록 곡선 힘 증가 (1 ~ MaxBoost)
+const float Closeness = 1.f - FMath::Clamp((Distance - Near) / (Far - Near), 0.f, 1.f);
+const float Boost = FMath::Clamp(Closeness * MaxBoost, 1.f, MaxBoost);
 
 // 로컬 Right · Up 평면의 랜덤 방향 → 이펙트마다 다른 궤적
-const float RandY = FMath::RandRange(Data.RandMin.Y, Data.RandMax.Y);
-const float RandZ = FMath::RandRange(Data.RandMin.Z, Data.RandMax.Z);
-const FVector SideDir = (Right * RandY + Up * RandZ).GetSafeNormal();
-
-Effect.CurveVelocity = SideDir * Data.CurveForce * Boost;` },
+CurveVelocity = (Right * RandY + Up * RandZ).GetSafeNormal() * CurveForce * Boost;` },
   },
 
   uiparticle: {
@@ -145,24 +135,16 @@ Effect.CurveVelocity = SideDir * Data.CurveForce * Boost;` },
     ],
     result: '회전 · 스케일된 UI 안에서도 파티클이 의도한 위치 · 방향으로 표시',
     formula: "p' = R(θ) · (S · p),  R(θ) = [cos θ  −sin θ ; sin θ  cos θ]",
-    visual: { type: 'code', file: 'UI 파티클 회전 복원', code: `// 부모 위젯들의 누적 회전을 렌더 행렬 [A B; C D]에서 복원 — θ = atan2(B, A)
+    visual: { type: 'code', file: 'UI 파티클 회전 복원', code: `// 렌더 행렬 [A B; C D]에서 부모 누적 회전 복원 — θ = atan2(B, A)
 float A, B, C, D;
 RenderTransform.GetMatrix().GetMatrix(A, B, C, D);
 const float Theta = FMath::Atan2(B, A);
-const float CosT = FMath::Cos(Theta), SinT = FMath::Sin(Theta);
-auto Rotate = [CosT, SinT](const FVector2D& V)
-{
-    return FVector2D(V.X * CosT - V.Y * SinT, V.Y * CosT + V.X * SinT);   // 2D 회전 행렬
-};
+const float c = FMath::Cos(Theta), s = FMath::Sin(Theta);
+auto Rotate = [c, s](const FVector2D& V) { return FVector2D(V.X * c - V.Y * s, V.Y * c + V.X * s); };
 
-// 파티클 자체 회전에 부모 회전을 합쳐 그림
-const FSlateRenderTransform ParticleXform(::Concatenate(
-    FScale2D(FlipX, FlipY), FQuat2D(Theta - FMath::DegreesToRadians(ParticleRotation))));
-
-// 크기 · 위치를 스케일 → 회전 순으로 변환, 중심 기준으로 맞춘 뒤 로컬 좌표로
-const FVector2D Size  = Rotate(FVector2D(SizeX, SizeY) * Scale);
-const FVector2D Pos   = Rotate(ParticlePos * Scale);
-const FVector2D Local = Geometry.AbsoluteToLocal(Pos - Size / 2 + BasePos - WindowOffset);` },
+// 스케일 → 회전 순으로 변환, 중심 기준으로 맞춘 뒤 위젯 로컬 좌표로
+const FVector2D Size = Rotate(ParticleSize * Scale);
+const FVector2D Pos  = Geometry.AbsoluteToLocal(Rotate(ParticlePos * Scale) - Size / 2 + BasePos);` },
   },
 
   ray: {
@@ -180,30 +162,21 @@ const FVector2D Local = Geometry.AbsoluteToLocal(Pos - Size / 2 + BasePos - Wind
     ],
     result: '클릭한 변 위에 바로 꼭짓점 추가, 회전된 영역에서도 드래그 방향대로 편집',
     formula: 't = ((w × e) · n) / |n|²,  s = ((w × d) · n) / |n|²,  w = P − O',
-    visual: { type: 'code', file: '광선-선분 교차', code: `// 클릭 위치 → 월드 광선 (O, D), 광선을 충분히 긴 선분으로 (t ∈ [0, 1])
-View->DeprojectFVector2D(FVector2D(Click.GetClickPos()), O, D);
-D *= WORLD_MAX / 2.f;
-
-const FTransform& T = Polygon->GetComponentTransform();
-for (int32 i = 0; i < Pts.Num(); ++i)
+    visual: { type: 'code', file: '광선-선분 교차', code: `// 클릭 광선 (O, D)과 폴리곤 각 변 (P, E)의 교차 → 맞은 변 뒤에 꼭짓점 삽입
+View->DeprojectFVector2D(ClickPos, O, D);
+for (int32 i = 0; i < Num; ++i)
 {
     const FVector P = T.TransformPosition(Pts[i]);
-    const FVector E = T.TransformPosition(Pts[(i + 1) % Pts.Num()]) - P;        // 변 방향
-
-    // 1) 평행 — D × E = 0
-    const FVector N = FVector::CrossProduct(D, E);
-    if (N.GetSafeNormal().IsNearlyZero()) continue;
-
-    // 2) 동일 평면 — (P − O)가 법선 N과 수직이어야 교차 가능
+    const FVector E = T.TransformPosition(Pts[(i + 1) % Num]) - P;
+    const FVector N = D ^ E;                                    // 외적
+    if (N.IsNearlyZero()) continue;                             // 평행
     const FVector W = P - O;
-    if (!FMath::IsNearlyZero(FVector::DotProduct(W.GetSafeNormal(), N.GetSafeNormal()), Tol)) continue;
-
-    // 3) 교차 매개변수 t(광선) · s(변) — 둘 다 [0, 1] 안이면 교차
-    const float t = FVector::DotProduct(FVector::CrossProduct(W, E), N) / N.SizeSquared();
-    const float s = FVector::DotProduct(FVector::CrossProduct(W, D), N) / N.SizeSquared();
-    if (t >= -Tol && t <= 1.f + Tol && s >= -Tol && s <= 1.f + Tol)
+    if (!FMath::IsNearlyZero(W.GetSafeNormal() | N.GetSafeNormal())) continue;   // 동일 평면 아님
+    const float t = ((W ^ E) | N) / N.SizeSquared();            // 광선 매개변수
+    const float s = ((W ^ D) | N) / N.SizeSquared();            // 변 매개변수
+    if (InRange01(t) && InRange01(s))
     {
-        Pts.Insert(T.InverseTransformPosition(O + t * D), i + 1);               // 맞은 변 뒤에 삽입
+        Pts.Insert(T.InverseTransformPosition(O + t * D), i + 1);   // 로컬 좌표로 삽입
         break;
     }
 }` },
@@ -224,21 +197,16 @@ for (int32 i = 0; i < Pts.Num(); ++i)
     result: '오목 · 비대칭 다각형에서도 영역의 실제 중심에 프리뷰 배치',
     formula: 'A = ½ Σ (xᵢ yᵢ₊₁ − xᵢ₊₁ yᵢ),   Cx = (1/6A) Σ (xᵢ + xᵢ₊₁)(xᵢ yᵢ₊₁ − xᵢ₊₁ yᵢ)',
     visual: { type: 'code', file: 'Shoelace 무게중심', code: `// Shoelace — 부호 있는 면적 A와 면적 가중 무게중심 C
-FVector2D GetPolygonCentroid(const TArray<FVector>& Pts)
+float A = 0.f;
+FVector2D C = FVector2D::ZeroVector;
+for (int32 i = 0; i < Num; ++i)
 {
-    float A = 0.f;
-    FVector2D C(0.f, 0.f);
-    for (int32 i = 0; i < Pts.Num(); ++i)
-    {
-        const FVector2D P(Pts[i]), Q(Pts[(i + 1) % Pts.Num()]);
-        const float Cross = FVector2D::CrossProduct(P, Q);     // 변이 만드는 부호 있는 면적 × 2
-        A += Cross;
-        C.X += (P.X + Q.X) * Cross;
-        C.Y += (P.Y + Q.Y) * Cross;
-    }
-    A *= 0.5f;
-    return C / (6.f * A);
-}` },
+    const FVector2D P(Pts[i]), Q(Pts[(i + 1) % Num]);
+    const float Cross = FVector2D::CrossProduct(P, Q);     // 변이 만드는 부호 있는 면적 × 2
+    A += Cross;
+    C += (P + Q) * Cross;
+}
+return C / (6.f * (A * 0.5f));` },
   },
 
   minimap: {
@@ -256,17 +224,20 @@ FVector2D GetPolygonCentroid(const TArray<FVector>& Pts)
     ],
     result: '위치 갱신이 위젯 레이아웃 비용에서 분리, 화면 밖 대상도 방향으로 표시',
     formula: 'uv = (P − Origin) / WorldSize,   angle = atan2(dir.x, dir.y)',
-    visual: { type: 'code', file: '미니맵 좌표 변환', code: `// 월드 좌표 → 맵 기준 정규화 좌표(0~1) → MPC로 머티리얼에 전달
-float U = (PlayerLocation.X - Map.Origin.X) / Map.WorldSize.X;
-float V = (PlayerLocation.Y - Map.Origin.Y) / Map.WorldSize.Y;
-Mpc->SetScalarParameterValue("X", FMath::IsFinite(U) ? U : 0.f);   // WorldSize 0 방어
+    visual: { type: 'code', file: '미니맵 좌표 변환', code: `// 월드 좌표 → 맵 정규화 좌표 (0~1) → MPC로 머티리얼에 전달
+const float U = (PlayerLocation.X - Map.Origin.X) / Map.WorldSize.X;
+const float V = (PlayerLocation.Y - Map.Origin.Y) / Map.WorldSize.Y;
+Mpc->SetScalarParameterValue("X", FMath::IsFinite(U) ? U : 0.f);    // WorldSize 0 방어
 Mpc->SetScalarParameterValue("Y", FMath::IsFinite(V) ? V : 0.f);
 
-// 박스 밖 파티원 — 경계로 Clamp, UI 좌표계(Y 아래)에 맞춰 반전 후 atan2로 화살표 각도
+// 박스 밖 파티원 — 경계로 Clamp, UI 좌표계 (Y 아래)에 맞춰 반전 후 atan2로 화살표 각도
 const FVector2D Clamped(FMath::Clamp(Pos.X, BoxMin.X, BoxMax.X),
                         FMath::Clamp(Pos.Y, BoxMin.Y, BoxMax.Y));
-const FVector2D Dir = (Clamped - MyIconPos).GetSafeNormal();
-Arrow->SetRenderTransformAngle(FMath::RadiansToDegrees(FMath::Atan2(Dir.X, -Dir.Y)));` },
+if (Clamped != Pos)
+{
+    const FVector2D Dir = (Clamped - MyIconPos).GetSafeNormal();
+    Arrow->SetRenderTransformAngle(FMath::RadiansToDegrees(FMath::Atan2(Dir.X, -Dir.Y)));
+}` },
     frames: 'mapdesign-preview',
   },
 
@@ -323,11 +294,8 @@ Arrow->SetRenderTransformAngle(FMath::RadiansToDegrees(FMath::Atan2(Dir.X, -Dir.
 EVisualDataModuleTransitionRule
 FVisualDataEditorModulePC::EvaluateTransitionRule(const UVisualGameDataBase* Next)
 {
-    if (!VisualGameData || !Next)
-        return EVisualDataModuleTransitionRule::FullReset;          // 비교 대상 없음 → 전면
-    if (const auto* NextPC = Cast<UVisualGameData_PC>(Next))
-        if (VisualGameData->MainParts != NextPC->MainParts)
-            return EVisualDataModuleTransitionRule::FullReset;      // 메인 파츠 교체 → 전면 재구성
+    if (!VisualGameData || !Next || VisualGameData->MainParts != Next->MainParts)
+        return EVisualDataModuleTransitionRule::FullReset;
     return EVisualDataModuleTransitionRule::PartialUpdate;          // 나머지는 바뀐 파츠만
 }` },
     frames: 'appearance-attachment',
@@ -381,27 +349,17 @@ FVisualDataEditorModulePC::EvaluateTransitionRule(const UVisualGameDataBase* Nex
       '종료 시 재생 위치를 처음으로 되돌린 뒤 정지 · 파괴, ViewTarget은 이전 대상이 아닌 Pawn으로 복귀',
     ],
     result: '연출 후 자원이 남지 않고, 연출이 겹쳐도 카메라가 꼬이지 않음',
-    visual: { type: 'code', file: '시퀀스 생성 · 파괴', code: `// 연출용 PocketLevel은 월드 어딘가에 스트리밍됨 → 시퀀스를 그 원점 기준으로 재생
-if (UPocketLevelInstance* Pocket = PocketSubsystem->GetPocketLevelInstance(StageTag))
-{
-    const FVector Origin = Pocket->GetBounds().Origin;
-    SeqActor->SetActorLocationAndRotation(Origin, FRotator::ZeroRotator);
+    visual: { type: 'code', file: '시퀀스 생성 · 파괴', code: `// 스트리밍된 PocketLevel 원점으로 시퀀스 액터와 트랜스폼 트랙 원점을 함께 이동
+const FVector Origin = PocketLevel->GetBounds().Origin;
+SeqActor->SetActorLocationAndRotation(Origin, FRotator::ZeroRotator);
+SeqActor->bOverrideInstanceData = true;
+Cast<UDefaultLevelSequenceInstanceData>(SeqActor->DefaultInstanceData)->TransformOrigin = FTransform(Origin);
 
-    // 시퀀스 안 트랜스폼 트랙도 PocketLevel 원점 기준으로 덮어씀
-    SeqActor->bOverrideInstanceData = true;
-    if (auto* Instance = Cast<UDefaultLevelSequenceInstanceData>(SeqActor->DefaultInstanceData))
-        Instance->TransformOrigin = FTransform(Origin);
-}
-
-// 시퀀스 정리 — Keep State 트랙이 바꾼 상태가 남지 않게 시작 시점으로 되돌린 뒤 파괴
-if (ULevelSequencePlayer* Player = SeqActor->GetSequencePlayer())
-{
-    Player->SetPlaybackPosition(FMovieSceneSequencePlaybackParams(
-        Player->GetStartTime().Time, EUpdatePositionMethod::Jump));     // 시작 프레임으로 Jump
-    Player->Stop();
-}
-SeqActor->Destroy();
-SeqActor = nullptr;` },
+// 파괴 전 시작 프레임으로 Jump — Keep State 트랙이 바꾼 상태를 원복
+Player->SetPlaybackPosition(FMovieSceneSequencePlaybackParams(
+    Player->GetStartTime().Time, EUpdatePositionMethod::Jump));
+Player->Stop();
+SeqActor->Destroy();` },
     frames: 'constellation-preview',
   },
 
@@ -420,10 +378,9 @@ SeqActor = nullptr;` },
     ],
     result: '매 프레임 위젯 재계산 비용 절감, 적용 기준이 화면 단위 데이터로 남음',
     visual: { type: 'image', src: 'projects/optimization/image-20250709-123225.png', caption: 'Unreal Insights — Slate::Tick · DrawWindows · Prepass · PaintSlowPath' },
-    code2: `bool bUseGlobalInvalidation = true;                  // 풀스크린 화면이 없으면 (HUD만) 활성
-if (const auto* Screen = Cast<UScreenWidgetBase>(ScreenStack->GetActiveWidget()))
-    bUseGlobalInvalidation = Screen->UseGlobalInvalidation();   // 화면별 데이터
-FSlateApplication::Get().ToggleGlobalInvalidation(bUseGlobalInvalidation);`,
+    code2: `// 활성 화면이 바뀔 때 — 화면별 데이터로 토글 (풀스크린 화면이 없으면 활성)
+const auto* Screen = Cast<UScreenWidgetBase>(ScreenStack->GetActiveWidget());
+FSlateApplication::Get().ToggleGlobalInvalidation(Screen ? Screen->UseGlobalInvalidation() : true);`,
   },
 
   lod: {
@@ -440,24 +397,13 @@ FSlateApplication::Get().ToggleGlobalInvalidation(bUseGlobalInvalidation);`,
       '무기 FX: 풀 반환만으로 꺼지지 않던 나이아가라를 Detach에서 <code>DeactivateImmediate()</code>',
     ],
     result: '원거리에서 그리는 파츠 수 감소, 정렬 비용이 데이터 크기에 선형',
-    visual: { type: 'code', file: 'LOD 파츠 최적화', code: `// 캐릭터 외형 모듈 Tick — LOD가 바뀐 순간에만 파츠 표시 여부 갱신
-void FVisualDataModulePC::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-    if (!bUseLODOptimize) return;                                    // 에셋 단위 On / Off
-    const int32 LOD = GetPartMesh(EPart::Torso)->GetPredictedLODLevel();   // 몸통 기준 LOD
-    if (LOD == LastLOD) return;                                      // 변화 없으면 비용 0
-    LastLOD = LOD;
-    ApplyLOD(LOD);
-}
+    visual: { type: 'code', file: 'LOD 파츠 최적화', code: `// LOD가 바뀐 순간에만 파츠 표시 여부 갱신 — 평소 Tick 비용은 비교 한 번
+const int32 LOD = GetPartMesh(EPart::Torso)->GetPredictedLODLevel();   // 몸통 기준 LOD
+if (LOD == LastLOD) return;
+LastLOD = LOD;
 
-void FVisualDataModulePC::ApplyLOD(int32 LOD)
-{
-    // 타입별 숨김 파츠 — PC: Face, 갑옷 외형: Helmet · Face
-    for (EPart Part : LODHiddenParts.FindRef(DataType))
-        if (USkeletalMeshComponent* Mesh = GetPartMesh(Part))
-            Mesh->SetVisibility(LOD < OptimizeLOD);                  // 임계 LOD 이상이면 숨김
-}` },
+for (EPart Part : LODHiddenParts.FindRef(DataType))                     // PC: Face, 갑옷: Helmet · Face
+    GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);                // 임계 LOD 이상이면 숨김` },
   },
 
   quest: {
@@ -477,20 +423,14 @@ void FVisualDataModulePC::ApplyLOD(int32 LOD)
     visual: { type: 'code', file: 'R16F 퀘스트 텍스처', code: `// 퀘스트 원 (x, y, r)을 정규화해 R16F 1 × N 텍스처로 패킹 → 머티리얼이 개수만큼 순회
 TArray<FFloat16> Packed;
 for (const FQuestArea& Q : Quests)
-{
-    Packed.Add((Q.X - Map.Origin.X) / Map.WorldSize.X);
-    Packed.Add((Q.Y - Map.Origin.Y) / Map.WorldSize.Y);
-    Packed.Add(Q.Radius / Map.WorldSize.X);
-}
-UTexture2D* Tex = UTexture2D::CreateTransient(Packed.Num(), 1, PF_R16F);   // 16bit float 1채널
+    Packed.Append({ (Q.X - Origin.X) / Size.X, (Q.Y - Origin.Y) / Size.Y, Q.Radius / Size.X });
 
+UTexture2D* Tex = UTexture2D::CreateTransient(Packed.Num(), 1, PF_R16F);
 FTexture2DMipMap& Mip = Tex->GetPlatformData()->Mips[0];
 FMemory::Memcpy(Mip.BulkData.Lock(LOCK_READ_WRITE), Packed.GetData(), Packed.Num() * sizeof(FFloat16));
 Mip.BulkData.Unlock();
-Tex->UpdateResource();                                                     // GPU 업로드
-
-Mid->SetTextureParameterValue(QuestTexParam[Type], Tex);
-Mid->SetScalarParameterValue(QuestCountParam[Type], Packed.Num());` },
+Tex->UpdateResource();                                              // GPU 업로드
+Mid->SetScalarParameterValue(QuestCountParam, Packed.Num());` },
   },
 
   editorBone: {
@@ -506,25 +446,17 @@ Mid->SetScalarParameterValue(QuestCountParam[Type], Packed.Num());` },
       '<b>적용 공간 분리</b> — 스케일은 컴포넌트 공간에서 교체, 이동은 부모 본 공간에서 더하기, 회전은 무시',
     ],
     result: '체형 값을 바꾸면 에디터 프리뷰에 즉시 반영',
-    visual: { type: 'code', file: 'ModifyBone 프리뷰', code: `// 에디터 프리뷰 — 애니메이션 위에 본 트랜스폼을 얹어 체형 값을 즉시 확인
-if (auto* Preview = Cast<UAnimPreviewInstance>(SkelMesh->PreviewInstance))
+    visual: { type: 'code', file: 'ModifyBone 프리뷰', code: `// 프리뷰 인스턴스에 ModifyBone 노드 추가 — 애니메이션 위에 체형 값을 바로 반영
+auto Apply = [Preview](FName Bone, const FVector& Scale, const FVector& Offset = FVector::ZeroVector)
 {
-    auto Apply = [Preview](FName Bone, const FVector& Scale, const FVector& Offset = FVector::ZeroVector)
-    {
-        FAnimNode_ModifyBone& Node = Preview->ModifyBone(Bone);         // 본 이름으로 find-or-add
-        Node.ScaleMode        = EBoneModificationMode::BMM_Replace;      // 스케일은 교체
-        Node.Scale            = Scale;
-        Node.ScaleSpace       = EBoneControlSpace::BCS_ComponentSpace;
-        Node.TranslationMode  = EBoneModificationMode::BMM_Additive;     // 이동은 더하기
-        Node.Translation      = Offset;
-        Node.TranslationSpace = EBoneControlSpace::BCS_ParentBoneSpace;
-        Node.RotationMode     = EBoneModificationMode::BMM_Ignore;       // 회전은 애니메이션 그대로
-    };
-    Apply("head",   Body.HeadScale);
-    Apply("pelvis", Body.PelvisScale, Body.PelvisOffset);
-    Apply("upperarm_l", Body.ArmScale);
-    // spine · clavicle · thigh 등 12개 본
-}` },
+    FAnimNode_ModifyBone& Node = Preview->ModifyBone(Bone);                 // 본 이름으로 find-or-add
+    Node.ScaleMode       = BMM_Replace;   Node.ScaleSpace       = BCS_ComponentSpace;    // 스케일: 교체
+    Node.TranslationMode = BMM_Additive;  Node.TranslationSpace = BCS_ParentBoneSpace;   // 이동: 더하기
+    Node.RotationMode    = BMM_Ignore;                                                  // 회전: 애니메이션 그대로
+    Node.Scale = Scale;
+    Node.Translation = Offset;
+};
+Apply("pelvis", Body.PelvisScale, Body.PelvisOffset);                      // head · spine · thigh 등 12개 본` },
     frames: 'editor-bone-transform',
   },
 
@@ -541,18 +473,12 @@ if (auto* Preview = Cast<UAnimPreviewInstance>(SkelMesh->PreviewInstance))
       '에디터 전용 동작만 override — 전이 규칙, 무기 소켓 프리뷰(<code>ApplySocket</code> · <code>ClearModule</code>), Spirit Dissolve 고정',
     ],
     result: '에디터 전용 컴포넌트 삭제, 캐릭터 뷰어 · FX 에디터도 같은 컴포넌트로 전환 → 인게임 수정이 프리뷰에 그대로 반영',
-    visual: { type: 'code', file: 'Factory Method override', code: `// 에디터 컴포넌트는 Factory Method만 override — 캐릭터 타입만 에디터 전용 모듈로 교체
+    visual: { type: 'code', file: 'Factory Method override', code: `// 에디터 컴포넌트는 Factory Method만 override — 캐릭터 타입만 에디터 모듈로 교체
 TSharedPtr<FVisualDataModuleBase> UVisualDataEditorModuleComponent::CreateModule(const UVisualGameDataBase* Data)
 {
-    if (Data->DataType == EVisualGameDataType::PC || Data->DataType == EVisualGameDataType::GodArmor)
-    {
-        // FVisualDataEditorModulePC : FVisualDataModulePC — 인게임 로직은 상속, 프리뷰 처리만 추가
-        auto Module = MakeShared<FVisualDataEditorModulePC>(this);
-        Module->SetVisualGameData(Data);
-        return Module;
-    }
-    // NPC · Spirit · Item도 같은 방식
-    return Super::CreateModule(Data);                   // 그 외 타입은 인게임 모듈 그대로
+    if (IsCharacterType(Data->DataType))                            // PC · GodArmor
+        return MakeShared<FVisualDataEditorModulePC>(this, Data);   // 인게임 PC 모듈 상속 + 프리뷰 처리
+    return Super::CreateModule(Data);                               // 그 외 타입은 인게임 모듈 그대로
 }` },
   },
 
@@ -570,30 +496,15 @@ TSharedPtr<FVisualDataModuleBase> UVisualDataEditorModuleComponent::CreateModule
       'AreaTool Outliner에서 <code>rid = 1</code>처럼 조건 검색 → 대상 액터 즉시 이동',
     ],
     result: '구역 · 스폰 · 순찰 데이터를 뷰포트에서 바로 확인하며 저작',
-    visual: { type: 'code', file: '캡 면 삼각화', code: `// ComponentVisualizer — 선택된 컴포넌트를 솔리드 실린더 + 폴리곤 캡 면으로 그림
-void FCylinderVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View,
-                                            FPrimitiveDrawInterface* PDI)
-{
-    const auto* Cyl = Cast<const UCylinderComponent>(Component);
-    const FMatrix LocalToWorld = Cyl->GetOwner()->GetActorTransform().ToMatrixWithScale();
-    auto* Material = new FColoredMaterialRenderProxy(GEditor->GeomMaterial->GetRenderProxy(), Cyl->MeshColor);
+    visual: { type: 'code', file: '캡 면 삼각화', code: `// ComponentVisualizer — 선택 시 솔리드 실린더 + 폴리곤 캡 면을 에디터 뷰에 그림
+auto* Material = new FColoredMaterialRenderProxy(GEditor->GeomMaterial->GetRenderProxy(), MeshColor);
+DrawCylinder(PDI, Origin, X, Y, Z, Radius, HalfHeight, Sides, Material, SDPG_World);
 
-    // 1) 솔리드 실린더
-    DrawCylinder(PDI, LocalToWorld.GetOrigin(), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
-                 Cyl->Radius, Cyl->HalfHeight, Cyl->Sides, Material, SDPG_World);
-
-    // 2) 캡 면 — 2D 폴리곤을 삼각형으로 분할해 동적 메시로 제출
-    FDynamicMeshBuilder Builder(PDI->View->GetFeatureLevel());
-    for (const auto& Tri : TriangulatePolygon(Points))
-    {
-        int32 Idx[3];
-        for (int32 k = 0; k < 3; ++k)
-            Idx[k] = Builder.AddVertex(FVector3f(Tri.V[k].X, Tri.V[k].Y, 0.f), FVector2f::ZeroVector,
-                                       TangentX, TangentY, TangentZ, FColor::White);
-        Builder.AddTriangle(Idx[0], Idx[1], Idx[2]);
-    }
-    Builder.Draw(PDI, LocalToWorld, Material, SDPG_World);
-}` },
+// 캡 면 — 2D 폴리곤을 삼각형으로 분할해 동적 메시로 제출
+FDynamicMeshBuilder Builder(PDI->View->GetFeatureLevel());
+for (const auto& Tri : TriangulatePolygon(Points))
+    Builder.AddTriangle(AddVertex(Builder, Tri.V[0]), AddVertex(Builder, Tri.V[1]), AddVertex(Builder, Tri.V[2]));
+Builder.Draw(PDI, LocalToWorld, Material, SDPG_World);` },
     image: 'projects/areatool/areatool-patrol-spawn.jpg',
   },
 

@@ -79,14 +79,10 @@ images:
   - 가속이 상한에 닿으면 랜덤 속도 성분을 0으로 만들어 목표로 직진, `LifeTime`을 넘기면 강제 종료하는 안전장치
 
     ```cpp
-    // 이펙트 한 개 이동 — 이번 프레임 이동 구간(선분)으로 도착 판정
+    // 이동 구간 (선분)과 목표의 최단 거리로 도착 판정 — 끝점만 보면 고속에서 반경을 건너뜀
     FVector Next = Cur + Velocity * DeltaTime;
-
-    // 이동 후 점만 검사하면 고속일 때 획득 반경을 건너뜀 → 선분과 목표의 최단 거리로 판정
     if (FMath::PointDistToSegment(Target, Cur, Next) <= ObtainRange)
-    {
-        Next = Target;                                     // 목표로 스냅 → 도착 처리
-    }
+        Next = Target;                                     // 목표로 스냅
     ```
 
 - <strong>해결 2 — Delta 분할 갱신 + 스텝 수 상한</strong>
@@ -94,18 +90,12 @@ images:
   - 스텝 수를 `MaxSubSteps`(8)로 제한하고 남은 시간은 버림 → 긴 히칭에서 갱신 횟수가 늘어 프레임이 더 길어지는 따라잡기 루프 방지
 
     ```cpp
-    // 프레임 드랍으로 DeltaTime이 커져도 궤적이 튀지 않게 — MaxDeltaTime 단위로 나눠 적분
-    void AObtainEffect::Tick(float DeltaSeconds)
+    // 큰 DeltaTime을 MaxDeltaTime 단위로 나눠 적분 — 프레임 드랍에도 궤적이 튀지 않게
+    for (int32 Step = 0; DeltaSeconds > KINDA_SMALL_NUMBER && Step < MaxSubSteps && !bFinished; ++Step)
     {
-        Super::Tick(DeltaSeconds);
-        int32 Step = 0;
-        while (DeltaSeconds > KINDA_SMALL_NUMBER && Step < MaxSubSteps && !bFinished)
-        {
-            const float Dt = FMath::Min(DeltaSeconds, MaxDeltaTime);
-            UpdateEffect(Dt);
-            DeltaSeconds -= Dt;
-            ++Step;                                        // 상한으로 최악 비용 제한
-        }
+        const float Dt = FMath::Min(DeltaSeconds, MaxDeltaTime);
+        UpdateEffect(Dt);
+        DeltaSeconds -= Dt;                                // 상한 (MaxSubSteps)으로 최악 비용 제한
     }
     ```
 
@@ -117,21 +107,16 @@ images:
 
     ```cpp
     // 발사 방향 기준 로컬 기저 — 캐릭터가 어느 쪽을 보든 같은 모양의 곡선
-    const FRotator Basis = Data.StartDirection.Rotation();
+    const FRotator Basis = StartDirection.Rotation();
     const FVector Right = Basis.RotateVector(FVector::RightVector);
     const FVector Up    = Basis.RotateVector(FVector::UpVector);
 
-    // 거리 보정 — (Near, Far)를 0~1로 정규화해 가까울수록 곡선 힘을 키움 (1 ~ MaxBoost)
-    const FVector& K = Data.DistanceInterp;                              // (Near, Far, MaxBoost)
-    const float Closeness = 1.f - FMath::Clamp((Distance - K.X) / (K.Y - K.X), 0.f, 1.f);
-    const float Boost = FMath::Clamp(Closeness * K.Z, 1.f, K.Z);
+    // 거리 보정 — (Near, Far)를 0~1로 정규화해 가까울수록 곡선 힘 증가 (1 ~ MaxBoost)
+    const float Closeness = 1.f - FMath::Clamp((Distance - Near) / (Far - Near), 0.f, 1.f);
+    const float Boost = FMath::Clamp(Closeness * MaxBoost, 1.f, MaxBoost);
 
     // 로컬 Right · Up 평면의 랜덤 방향 → 이펙트마다 다른 궤적
-    const float RandY = FMath::RandRange(Data.RandMin.Y, Data.RandMax.Y);
-    const float RandZ = FMath::RandRange(Data.RandMin.Z, Data.RandMax.Z);
-    const FVector SideDir = (Right * RandY + Up * RandZ).GetSafeNormal();
-
-    Effect.CurveVelocity = SideDir * Data.CurveForce * Boost;
+    CurveVelocity = (Right * RandY + Up * RandZ).GetSafeNormal() * CurveForce * Boost;
     ```
 
 
@@ -148,17 +133,11 @@ images:
   - 별자리(`PocketLevel.Constellation`) · 순례(`PocketLevel.Pilgrimage`) 모두 GameplayTag로 인스턴스를 찾아 같은 방식 적용
 
     ```cpp
-    // 연출용 PocketLevel은 월드 어딘가에 스트리밍됨 → 시퀀스를 그 원점 기준으로 재생
-    if (UPocketLevelInstance* Pocket = PocketSubsystem->GetPocketLevelInstance(StageTag))
-    {
-        const FVector Origin = Pocket->GetBounds().Origin;
-        SeqActor->SetActorLocationAndRotation(Origin, FRotator::ZeroRotator);
-
-        // 시퀀스 안 트랜스폼 트랙도 PocketLevel 원점 기준으로 덮어씀
-        SeqActor->bOverrideInstanceData = true;
-        if (auto* Instance = Cast<UDefaultLevelSequenceInstanceData>(SeqActor->DefaultInstanceData))
-            Instance->TransformOrigin = FTransform(Origin);
-    }
+    // 스트리밍된 PocketLevel 원점으로 시퀀스 액터와 트랜스폼 트랙 원점을 함께 이동
+    const FVector Origin = PocketLevel->GetBounds().Origin;
+    SeqActor->SetActorLocationAndRotation(Origin, FRotator::ZeroRotator);
+    SeqActor->bOverrideInstanceData = true;
+    Cast<UDefaultLevelSequenceInstanceData>(SeqActor->DefaultInstanceData)->TransformOrigin = FTransform(Origin);
     ```
 
 - <strong>필요 시점 로드 · 시퀀스별 액터 캐시</strong>
@@ -169,15 +148,11 @@ images:
   - 연출 종료 시 캐시된 시퀀스 액터를 일괄 파괴해, 연출 후 자원이 남지 않도록 관리
 
     ```cpp
-    // 시퀀스 정리 — Keep State 트랙이 바꾼 상태가 남지 않게 시작 시점으로 되돌린 뒤 파괴
-    if (ULevelSequencePlayer* Player = SeqActor->GetSequencePlayer())
-    {
-        Player->SetPlaybackPosition(FMovieSceneSequencePlaybackParams(
-            Player->GetStartTime().Time, EUpdatePositionMethod::Jump));     // 시작 프레임으로 Jump
-        Player->Stop();
-    }
+    // 파괴 전 시작 프레임으로 Jump — Keep State 트랙이 바꾼 상태를 원복
+    Player->SetPlaybackPosition(FMovieSceneSequencePlaybackParams(
+        Player->GetStartTime().Time, EUpdatePositionMethod::Jump));
+    Player->Stop();
     SeqActor->Destroy();
-    SeqActor = nullptr;
     ```
 
 <div id="case-uiparticle" class="case-anchor"></div>
@@ -195,22 +170,14 @@ images:
   - 자식 Geometry의 렌더 변환은 `FScale2D` · `FQuat2D(부모 회전 − 파티클 회전)`을 합성
 
     ```cpp
-    // 부모 위젯들의 누적 회전을 렌더 행렬 [A B; C D]에서 복원 — θ = atan2(B, A)
+    // 렌더 행렬 [A B; C D]에서 부모 누적 회전 복원 — θ = atan2(B, A)
     float A, B, C, D;
     RenderTransform.GetMatrix().GetMatrix(A, B, C, D);
     const float Theta = FMath::Atan2(B, A);
-    const float CosT = FMath::Cos(Theta), SinT = FMath::Sin(Theta);
-    auto Rotate = [CosT, SinT](const FVector2D& V)
-    {
-        return FVector2D(V.X * CosT - V.Y * SinT, V.Y * CosT + V.X * SinT);   // 2D 회전 행렬
-    };
+    const float c = FMath::Cos(Theta), s = FMath::Sin(Theta);
+    auto Rotate = [c, s](const FVector2D& V) { return FVector2D(V.X * c - V.Y * s, V.Y * c + V.X * s); };
 
-    // 파티클 자체 회전에 부모 회전을 합쳐 그림
-    const FSlateRenderTransform ParticleXform(::Concatenate(
-        FScale2D(FlipX, FlipY), FQuat2D(Theta - FMath::DegreesToRadians(ParticleRotation))));
-
-    // 크기 · 위치를 스케일 → 회전 순으로 변환, 중심 기준으로 맞춘 뒤 로컬 좌표로
-    const FVector2D Size  = Rotate(FVector2D(SizeX, SizeY) * Scale);
-    const FVector2D Pos   = Rotate(ParticlePos * Scale);
-    const FVector2D Local = Geometry.AbsoluteToLocal(Pos - Size / 2 + BasePos - WindowOffset);
+    // 스케일 → 회전 순으로 변환, 중심 기준으로 맞춘 뒤 위젯 로컬 좌표로
+    const FVector2D Size = Rotate(ParticleSize * Scale);
+    const FVector2D Pos  = Geometry.AbsoluteToLocal(Rotate(ParticlePos * Scale) - Size / 2 + BasePos);
     ```

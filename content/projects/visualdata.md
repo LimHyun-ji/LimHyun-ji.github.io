@@ -56,16 +56,12 @@ tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
 - 파츠별 스켈레탈 메시를 맵으로 보유, 데이터 변경 시 모듈 재생성 · 재적용
 
   ```cpp
-  // 모든 Entity 공통 외형 컴포넌트 — 데이터 → 모듈 생성 → 적용, 로드 · 정리까지 담당
+  // 모든 Entity 공통 외형 컴포넌트 — 데이터 → 모듈 생성 → 적용 · 로드 · 정리
   class UVisualDataModuleComponent : public UActorComponent
   {
-      void SetVisualGameData(const UVisualGameDataBase* Data);     // 데이터가 바뀌면 모듈 재생성 · 재적용
-      virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* Data);   // Factory
-
-      // 파츠별 스켈레탈 메시 (Master / Face / Torso / Helmet / Wing / Cape)
-      TMap<EVisualDataPartType, USkeletalMeshComponent*> PartMeshes;
-
-      // 비동기 로드 (StreamableManager) + 완료 콜백
+      void SetVisualGameData(const UVisualGameDataBase* Data);                    // 바뀌면 모듈 재생성 · 재적용
+      virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* Data);   // Factory Method
+      TMap<EVisualDataPartType, USkeletalMeshComponent*> PartMeshes;              // Master / Face / Torso / Helmet …
       TSharedPtr<FStreamableHandle> LoadAssets(const TArray<FSoftObjectPath>& Assets, FStreamableDelegate&& OnLoaded);
   };
   ```

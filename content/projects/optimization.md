@@ -56,13 +56,9 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 게임 진입 / 종료 시점에도 전역 토글 → 로딩 중 UI 재계산 절감
 
     ```cpp
-    // 활성 화면이 바뀔 때 — 화면별 데이터로 Global Invalidation 사용 여부 결정
-    bool bUseGlobalInvalidation = true;                        // 풀스크린 화면이 없으면 (HUD만) 활성
-    if (const auto* Screen = Cast<UScreenWidgetBase>(ScreenStack->GetActiveWidget()))
-    {
-        bUseGlobalInvalidation = Screen->UseGlobalInvalidation();   // 화면 에셋에 설정한 값
-    }
-    FSlateApplication::Get().ToggleGlobalInvalidation(bUseGlobalInvalidation);
+    // 활성 화면이 바뀔 때 — 화면별 데이터로 토글 (풀스크린 화면이 없으면 활성)
+    const auto* Screen = Cast<UScreenWidgetBase>(ScreenStack->GetActiveWidget());
+    FSlateApplication::Get().ToggleGlobalInvalidation(Screen ? Screen->UseGlobalInvalidation() : true);
     ```
 
 <div id="case-forcevolatile" class="case-anchor"></div>
@@ -72,11 +68,11 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 콘텐츠까지 캐시 대상에 들어감
 
     ```cpp
-    // UI 파티클 — 재생 중 매 프레임 바뀌므로 위젯이 다시 만들어질 때마다 Volatile 지정
+    // 매 프레임 바뀌는 UI 파티클 — 위젯이 다시 만들어질 때마다 캐시 대상에서 제외
     void UUIParticle::OnWidgetRebuilt()
     {
         Super::OnWidgetRebuilt();
-        ForceVolatile(true);           // 캐시에서 제외 → 매 프레임 다시 그림
+        ForceVolatile(true);
     }
     ```
 
@@ -96,24 +92,13 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 컴포넌트 Tick(1초 간격)에서 LOD 값이 바뀐 경우에만 Visibility를 갱신하고, 에셋 로드 완료 시점에 한 번 다시 적용
 
     ```cpp
-    // 캐릭터 외형 모듈 Tick — LOD가 바뀐 순간에만 파츠 표시 여부 갱신
-    void FVisualDataModulePC::Tick(float DeltaTime)
-    {
-        Super::Tick(DeltaTime);
-        if (!bUseLODOptimize) return;                                    // 에셋 단위 On / Off
-        const int32 LOD = GetPartMesh(EPart::Torso)->GetPredictedLODLevel();   // 몸통 기준 LOD
-        if (LOD == LastLOD) return;                                      // 변화 없으면 비용 0
-        LastLOD = LOD;
-        ApplyLOD(LOD);
-    }
+    // LOD가 바뀐 순간에만 파츠 표시 여부 갱신 — 평소 Tick 비용은 비교 한 번
+    const int32 LOD = GetPartMesh(EPart::Torso)->GetPredictedLODLevel();   // 몸통 기준 LOD
+    if (LOD == LastLOD) return;
+    LastLOD = LOD;
 
-    void FVisualDataModulePC::ApplyLOD(int32 LOD)
-    {
-        // 타입별 숨김 파츠 — PC: Face, 갑옷 외형: Helmet · Face
-        for (EPart Part : LODHiddenParts.FindRef(DataType))
-            if (USkeletalMeshComponent* Mesh = GetPartMesh(Part))
-                Mesh->SetVisibility(LOD < OptimizeLOD);                  // 임계 LOD 이상이면 숨김
-    }
+    for (EPart Part : LODHiddenParts.FindRef(DataType))                     // PC: Face, 갑옷: Helmet · Face
+        GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);                // 임계 LOD 이상이면 숨김
     ```
 
 ### Tick / 기타 비용 절감

@@ -78,16 +78,12 @@ tags: ["네트워크 동기화", "애니메이션", "게임 수학"]
 - 커브가 단조롭지 않을 수 있어 이분 탐색 대신 1/60초 간격 선형 탐색으로 "처음 도달" 시각을 찾음 (정밀도)
 
   ```cpp
-  // 피격 지연 — 속도 커브에서 "타깃까지 이동한 비율"에 처음 도달하는 시각을 역산
-  const double PathLength  = FVector::Dist2D(Start, End);                 // 이펙트 전체 경로 길이
-  const float  Duration    = PathDuration / PlayRate;                     // 공격 속도 배율 반영
-  const float  TargetRatio = FMath::Min(FVector::Dist2D(Start, TargetLocation) / PathLength, 1.0);
+  // 속도 커브에서 "타깃까지 이동 비율 r"에 처음 도달하는 시각 t*를 역산
+  const float Duration = PathDuration / PlayRate;                          // 공격 속도 반영
+  const float r = FMath::Min(FVector::Dist2D(Start, Target) / FVector::Dist2D(Start, End), 1.0);
 
-  for (float t = 0.f; t < Duration; t += 1.f / 60.f)                      // 60fps 간격 샘플링
-  {
-      const float Ratio = EvaluateSpeedCurve(SpeedCurve, t / Duration);   // 누적 이동 비율 S(t / T)
-      if (Ratio >= TargetRatio) return t;                                 // t* = min{ t | S(t / T) ≥ r }
-  }
+  for (float t = 0.f; t < Duration; t += 1.f / 60.f)                       // 60fps 간격 샘플링
+      if (EvaluateSpeedCurve(SpeedCurve, t / Duration) >= r) return t;     // t* = min{ t | S(t / T) ≥ r }
   return Duration;
   ```
 
