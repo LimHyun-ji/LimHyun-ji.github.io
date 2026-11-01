@@ -8,6 +8,12 @@
 tagOrder: ["런타임 아키텍처", "엔진 툴 확장", "퍼포먼스 최적화", "메모리 최적화", "렌더링", "애니메이션", "게임 수학", "네트워크 동기화"]
 
 cases:
+  - id: visualdata-structure
+    title: "VisualData 구조 정립 — 데이터 소유 · 생명주기 일원화"
+    summary: "모든 Entity가 외형 데이터를 각자 참조해 생명주기가 흩어진 구조를, 타입별 Module이 필요한 데이터만 할당하고 생명주기는 ModuleComponent 한 곳에서 관리하도록 정리"
+    tags: ["런타임 아키텍처"]
+    link: "/projects/visualdata/#case-allocating"
+
   - id: editor-preview
     title: "에디터 프리뷰 — 인게임 코드 재사용 · 본 트랜스폼"
     summary: "에디터 전용 컴포넌트를 인게임 모듈 상속 구조로 바꿔 외형 로직을 하나로 합치고, UAnimPreviewInstance에 Bone Modify 노드를 넣어 체형 값을 프리뷰에 반영"

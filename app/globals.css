@@ -65,7 +65,11 @@
 .lh-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .lh-title { font-size: 14.5px; font-weight: 700; }
 .lh-sub { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
-.lh-work .lh-title { color: var(--accent); }
+.lh-work .lh-title { color: var(--accent); font-size: 17px; }
+.lh-work .lh-sub { font-size: 13.5px; color: var(--text); }
+/* 실무 경력을 강조하고 입사 전 교육 · 학력은 한 단계 작게 */
+.lh-item:not(.lh-work) .lh-title { font-size: 13.5px; font-weight: 650; }
+.lh-item:not(.lh-work) .lh-sub, .lh-item:not(.lh-work) .lh-period { opacity: .85; }
 .lh-note { margin-top: 2px; font-size: 12.5px; font-weight: 600; color: var(--accent-2); line-height: 1.5; }
 @media (max-width: 520px) { .lh-item { grid-template-columns: 1fr; gap: 2px; } }
 @media (max-width: 520px) { .ls-row { grid-template-columns: 1fr; gap: 2px; } }
