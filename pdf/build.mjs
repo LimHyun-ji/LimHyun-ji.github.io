@@ -126,6 +126,8 @@ pre .file { display: block; color: #808080; font-style: italic; margin-bottom: 6
 pre.snip { flex: 0 0 auto; padding: 10px 14px; line-height: 1.55; }
 .frames { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .frames img { width: 100%; height: 106px; object-fit: contain; background: #0d1411; border-radius: 7px; border: 1px solid #e3e9e5; }
+.solo .frames { grid-template-columns: 1fr 1fr; } .solo .frames img { height: 150px; } .solo .frames img:first-child { grid-column: 1 / -1; height: 300px; }
+.solo .photos.row { grid-template-columns: 1fr; } .solo .photos.row img { height: 228px; }
 .cap { font-size: 13px; color: #6b7570; display: flex; justify-content: space-between; }
 .cap a { color: #0F7A42; font-weight: 700; }
 .shot { display: block; border-radius: 8px; object-fit: contain; }
@@ -242,7 +244,7 @@ function slide(v, k, i, total) {
         ${s.formula ? `<div class="formula">${esc(s.formula)}</div>` : ''}
         <div class="blk"><span class="lb r">결과</span><p>${s.result}</p></div>
       </div>
-      <div class="col-r">${visual(s)}</div>
+      <div class="col-r${s.visual ? '' : ' solo'}">${visual(s)}</div>
     </div>${foot(v, i + 3, total)}</section>`;
 }
 

@@ -276,35 +276,41 @@ def fig_minimap():
 
 # ─────────────────────────────────────────── 8. 외형 전이 규칙
 def fig_transition():
+    # 헬멧만 바꿨을 때 다시 로드하는 파츠 범위 비교 (전: 전신, 후: 바뀐 파츠만)
     W, H = 540, 250
-    b = [box(20, 26, 150, 54, 'Next 외형 데이터', '현재 상태와 비교'),
-         Ln(170, 53, 206, 53, K, 1.8, arrow=1, ak='k'),
-         box(210, 22, 310, 62, 'EvaluateTransitionRule(Next)', '모듈 가상 함수 — 타입별로 override', BG_B, B, B, 13.5)]
-    cols = [('NoUpdate', '동일 → 아무것도 안 함', BG_K, M, M),
-            ('PartialUpdate', ['바뀐 파츠만 교체', '예: 헬멧만'], BG_G, g, G),
-            ('FullReset', ['전면 재구성', '예: 메인 파츠 교체'], BG_O, o, O)]
-    for i, (t, s, f, st, tc) in enumerate(cols):
-        x = 20 + i * 172
-        b.append(Ln(365, 84, x + 80, 128, M, 1.4, arrow=1, ak='m'))
-        b.append(box(x, 132, 160, 74, t, s, f, st, tc, 14))
-    b.append(T(20, 236, '재로드 범위 = 실제로 바뀐 파츠 → 전신 재로드 제거', 12.5, G, 700))
+    parts = ['Master', 'Face', 'Torso', 'Helmet', 'Attach']
+    x0, pw, gap = 96, 80, 6
+    b = [T(20, 24, '예: 헬멧만 바꾼 경우 — 다시 로드하는 파츠', 13, K, 800),
+         T(20, 74, '이전', 14, O, 800),
+         T(20, 144, '이후', 14, G, 800)]
+    for k, name in enumerate(parts):
+        x = x0 + k * (pw + gap)
+        b.append(R(x, 46, pw, 44, BG_O, o, 6))
+        b.append(T(x + pw / 2, 64, name, 12, K, 700, 'middle'))
+        b.append(T(x + pw / 2, 81, '재로드', 11, O, 700, 'middle'))
+        hit = name == 'Helmet'
+        b.append(R(x, 116, pw, 44, BG_G if hit else '#f4f5f4', g if hit else L, 6, dash=None if hit else '3 3'))
+        b.append(T(x + pw / 2, 134, name, 12, K if hit else M, 700, 'middle'))
+        b.append(T(x + pw / 2, 151, '교체' if hit else '유지', 11, G if hit else M, 700, 'middle'))
+    b += [Ln(20, 180, 520, 180, L, 1),
+          T(20, 204, 'EvaluateTransitionRule(Next)', 12, B, 700, mono=True),
+          T(20, 226, 'NoUpdate 동일 · PartialUpdate 바뀐 파츠만 · FullReset 메인 파츠 교체 시', 11.5, M, 600)]
     svg('transition', W, H, b)
 
 
 # ─────────────────────────────────────────── 9. PocketLevel · 시퀀스 수명
 def fig_pocket():
     W, H = 540, 250
-    top = [('Stream In', 'PocketLevel Instance'), ('원점 덮어쓰기', ['액터 위치 · TransformOrigin', '= PocketLevel 경계 원점']),
-           ('재생', ['첫 재생 때 Soft 로드', '같은 그룹은 먼저 정지'])]
-    bot = [('시작 프레임 Jump', 'Keep State 원복'), ('Stop · Destroy', '시퀀스 액터 정리'),
+    top = [('Stream In', 'PocketLevel'), ('원점 덮어쓰기', 'TransformOrigin'), ('재생', 'Soft 로드')]
+    bot = [('시작 프레임 Jump', 'Keep State 원복'), ('Stop · Destroy', None),
            ('Stream Out', 'ViewTarget → Pawn')]
     b = [T(20, 22, '생성', 12.5, G, 800), T(20, 142, '정리', 12.5, O, 800)]
     for i, (t, s) in enumerate(top):
         x = 20 + i * 176
-        b.append(box(x, 30, 160, 84, t, s, BG_G, g, G))
+        b.append(box(x, 30, 160, 70, t, s, BG_G, g, G))
         if i < 2:
-            b.append(Ln(x + 160, 72, x + 174, 72, K, 1.6, arrow=1, ak='k'))
-    b.append(Path('M 452 114 C 452 136, 452 136, 452 148', K, 1.6, arrow=1, ak='k'))
+            b.append(Ln(x + 160, 65, x + 174, 65, K, 1.6, arrow=1, ak='k'))
+    b.append(Path('M 452 100 C 452 130, 452 130, 452 148', K, 1.6, arrow=1, ak='k'))
     for i, (t, s) in enumerate(bot[::-1]):
         x = 20 + i * 176
         b.append(box(x, 150, 160, 70, t, s, BG_O, o, O))
@@ -377,14 +383,11 @@ def fig_editorbone():
          box(20, 190, 200, 50, 'UAnimPreviewInstance', '인게임 경로를 타지 않음', BG_B, B, B, 12.5),
          Path('M 120 116 C 120 98, 120 98, 120 84', O, 1.4, dash='3 3'),
          T(132, 100, '✗ 체형 미반영', 12, O, 700),
-         Ln(220, 215, 262, 215, G, 1.8, arrow=1, ak='g'),
-         R(266, 130, 256, 120, BG_G, g), T(278, 152, 'ModifyBone(Bone) — find-or-add', 12.5, G, 800),
-         T(278, 176, '스케일  Replace · 컴포넌트 공간', 12, K, 600),
-         T(278, 196, '이동    Additive · 부모 본 공간', 12, K, 600),
-         T(278, 216, '회전    Ignore (애니메이션 유지)', 12, K, 600),
-         T(278, 238, '값이 바뀌면 같은 노드만 갱신', 11.5, M, 600),
-         T(266, 52, '에디터 전용 컴포넌트에서', 12, M, 600), T(266, 70, '프리뷰 인스턴스에 본 노드 직접 주입', 12.5, K, 700),
-         T(266, 96, '→ 체형 값 변경이 프리뷰에 즉시 반영', 12.5, G, 700)]
+         Ln(262, 215, 224, 215, G, 1.8, arrow=1, ak='g'), T(243, 207, '주입', 10.5, G, 700, 'middle'),
+         box(266, 190, 256, 50, 'UEditorTransformBonesComponent', 'ModifyBone(Bone) — find-or-add', BG_G, g, G, 12.5),
+         T(266, 120, '에디터 전용 경로', 12.5, G, 800),
+         T(266, 142, '인게임 AnimInstance 대신', 12, K, 600),
+         T(266, 162, '프리뷰 인스턴스에 본 노드를 직접 추가', 12, K, 600)]
     svg('editorBone', W, H, b)
 
 
