@@ -445,11 +445,11 @@ def fig_areavis():
     svg('areaVis', W, H, b)
 
 
-# ─────────────────────────────────────────── 16. 무기 Attachment · FX 정리
+# ─────────────────────────────────────────── 16. 파츠 Attachment · FX 정리
 def fig_weaponfx():
     W, H = 540, 250
     b = [T(20, 22, 'Attach', 12.5, G, 800),
-         box(20, 30, 230, 74, '한 번의 FStreamableHandle', ['무기 메시 · 추가 메시 · 이펙트', '함께 비동기 로드'], BG_G, g, G, 13),
+         box(20, 30, 230, 74, '한 번의 FStreamableHandle', ['파츠 메시 · 추가 메시 · 이펙트', '함께 비동기 로드'], BG_G, g, G, 13),
          Ln(250, 67, 284, 67, K, 1.6, arrow=1, ak='k'),
          box(288, 30, 232, 74, '소켓 기반 Attachment', ['FPCModuleAttachment 파생', '주 / 보조 무기 · 방어구 · 헬멧'], BG_K, L, K, 13),
          T(20, 136, '재로드 · Detach', 12.5, O, 800),
@@ -457,7 +457,7 @@ def fig_weaponfx():
          R(288, 144, 232, 82, '#fff', L), T(300, 166, 'Detach 시 FX', 12.5, K, 800),
          T(300, 188, '✗ ReleaseToPool()만 → 잔상', 12, O, 700),
          T(300, 210, '✓ DeactivateImmediate() 직접 호출', 12, G, 700),
-         T(20, 228, '무기를 자주 바꿔도 이전 로드 · 이펙트가 남지 않음', 12, M, 600)]
+         T(20, 228, '파츠를 자주 바꿔도 이전 로드 · 이펙트가 남지 않음', 12, M, 600)]
     svg('weaponFx', W, H, b)
 
 

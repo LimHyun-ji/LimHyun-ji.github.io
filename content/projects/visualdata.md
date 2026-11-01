@@ -85,7 +85,7 @@ tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
 ### Attachment — 무기 / 방어구 / 헬멧
 
 - PC 모듈은 방어구 · 헬멧 · 주 / 보조 무기를 <strong>소켓 기반 Attachment</strong>(`FPCModuleAttachment` 파생)로 부착
-- 무기 메시 · 추가 메시 · 이펙트를 한 번의 `FStreamableHandle`로 비동기 로드, 다시 로드하거나 Detach할 때 이전 핸들을 취소
+- 파츠마다 메시 · 추가 메시 · 이펙트를 한 번의 `FStreamableHandle`로 비동기 로드, 다시 로드하거나 Detach할 때 이전 핸들을 취소
 
 
 ### 로딩 · 렌더 최적화
