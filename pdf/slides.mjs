@@ -240,6 +240,25 @@ Mpc->SetScalarParameterValue("Y", V);`,
     frames: 'appearance-attachment',
   },
 
+  weaponFx: {
+    title: '무기 Attachment — 로드 핸들 · FX 수명 관리',
+    toc: '무기 Attachment · FX 정리',
+    tags: ['런타임 아키텍처', '메모리 최적화'],
+    thesis: '무기를 자주 바꿔도 이전 로드와 이펙트가 남지 않게, 핸들과 FX의 수명을 Attach / Detach에 묶는다.',
+    url: P('visualdata', 'case-attachment'),
+    problem: 'FX System Manager가 없는 액터(갓아머 연출 시퀀스의 프리뷰 캐릭터 등)에서 무기를 교체하면 나이아가라 잔상이 남음',
+    cause: '<code>ReleaseToPool()</code>만으로는 나이아가라가 꺼지지 않았음',
+    solution: [
+      'PC 모듈은 방어구 · 헬멧 · 주 / 보조 무기를 <b>소켓 기반 Attachment</b>(<code>FPCModuleAttachment</code> 파생)로 부착',
+      '무기 메시 · 추가 메시 · 이펙트를 <b>한 번의 <code>FStreamableHandle</code></b>로 비동기 로드',
+      '다시 로드하거나 Detach할 때 <b>이전 핸들을 취소</b>',
+      'Detach에서 <code>DeactivateImmediate()</code>를 직접 호출해 FX 정리',
+    ],
+    result: '무기 교체 후 이전 무기 이펙트 잔상이 남지 않음, 로드 수명이 Attachment 단위로 정리',
+    visual: { type: 'fig', src: 'weaponFx' },
+    frames: 'appearance-attachment',
+  },
+
   network: {
     title: '콘텐츠 통신 — 특성에 맞춘 세 가지 전송 방식',
     toc: '콘텐츠 통신 방식',
@@ -437,7 +456,7 @@ export const VERSIONS = [
     label: 'Client · Combat', title: '클라이언트 전투',
     pitch: '서버가 확정한 판정 위에서, 연출이 "언제 · 어디에" 보여야 하는지를 수학으로 맞춥니다.',
     focus: ['게임 수학', '네트워크 동기화', '애니메이션'],
-    slides: ['hit', 'sync', 'notify', 'obtain', 'traj', 'uiparticle', 'ray', 'centroid', 'minimap', 'dragclamp'],
+    slides: ['hit', 'sync', 'notify', 'obtain', 'traj', 'weaponFx'],
   },
   {
     key: '2_system', file: '임현지_포트폴리오_클라이언트_시스템',
@@ -451,7 +470,8 @@ export const VERSIONS = [
     label: 'Client', title: '클라이언트 통합',
     pitch: '런타임 구조 · 전투 동기화 · 게임 수학 · 에디터 툴 · 최적화를 문제 단위로 끝까지 다룹니다.',
     focus: ['런타임 아키텍처', '게임 수학', '엔진 툴 확장', '퍼포먼스 최적화'],
-    slides: ['vdmodule', 'transition', 'sync', 'hit', 'obtain', 'uiparticle', 'editorModule', 'areaPipe', 'slate', 'quest'],
+    slides: ['vdmodule', 'transition', 'sync', 'hit', 'notify', 'obtain', 'uiparticle', 'network', 'strategy', 'dragclamp', 'minimap',
+      'editorBone', 'editorModule', 'areaPipe', 'slate', 'quest'],
   },
   {
     key: '4_engine', file: '임현지_포트폴리오_엔진툴_렌더링최적화',

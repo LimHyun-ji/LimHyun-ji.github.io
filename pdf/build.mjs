@@ -35,7 +35,7 @@ const CSS = `
 @page { size: 1280px 720px; margin: 0; }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; color: #18201c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { word-break: keep-all; overflow-wrap: break-word; font-family: 'Pretendard', 'Malgun Gothic', sans-serif; color: #18201c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 a { color: inherit; text-decoration: none; }
 .page { width: 1280px; height: 720px; position: relative; overflow: hidden; page-break-after: always; background: #fbfcfb; padding: 40px 56px 0; }
 .page:last-child { page-break-after: auto; }
@@ -64,12 +64,13 @@ b { color: #0c1a13; }
 .cover .links a { color: #22A862; font-weight: 700; border-bottom: 1px solid rgba(34,168,98,.4); }
 .sec-h { font-size: 14.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 800; color: #B24A22; margin: 0 0 10px; }
 .hist { list-style: none; margin: 0; padding: 0; }
-.hist li { display: grid; grid-template-columns: 138px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #e3e9e5; font-size: 16px; }
+.hist li { display: grid; grid-template-columns: 158px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #e3e9e5; font-size: 16px; }
 .hist li:first-child { border-top: 0; }
-.hist .per { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #B24A22; padding-top: 2px; }
+.hist .per { white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #B24A22; padding-top: 2px; }
 .hist .t { font-weight: 700; } .hist .s { color: #5d6863; font-size: 15px; } .hist .n { color: #8A6700; font-size: 15px; font-weight: 700; }
-.stack { display: grid; grid-template-columns: 128px 1fr; gap: 8px 12px; align-items: center; }
-.stack .cat { font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .08em; font-weight: 700; text-transform: uppercase; }
+.stack { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; align-items: center; }
+.stack .chip { margin-right: 4px; }
+.stack .cat { white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .02em; font-weight: 700; text-transform: uppercase; }
 
 /* 목차 */
 .toc h2 { font-size: 36px; margin: 6px 0 4px; letter-spacing: -.5px; }
@@ -79,6 +80,7 @@ b { color: #0c1a13; }
 .toc .num { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #0F7A42; font-size: 20.5px; }
 .toc .tt { font-weight: 800; font-size: 17.5px; line-height: 1.35; }
 .toc .th { font-size: 14.5px; color: #5d6863; margin-top: 3px; line-height: 1.45; }
+.toc.compact .th { display: none; } .toc.compact li a.item { padding: 10px 14px; align-items: center; }
 .toc .chips { margin-top: 6px; } .toc .chips .chip { font-size: 13px; padding: 1px 8px; }
 
 /* 사례 */
@@ -148,8 +150,8 @@ function cover(v) {
       <div class="links"><a href="${SITE}/">웹 포트폴리오 ↗</a><a href="${profile.links.github}">GitHub ↗</a><a href="mailto:${profile.links.email}">${esc(profile.links.email)}</a></div>
     </div>
     <div class="cover-r">
-      <div><div class="sec-h">이력</div><ul class="hist">${hist}</ul></div>
       <div><div class="sec-h">기술 스택</div><div class="stack">${stack}</div></div>
+      <div><div class="sec-h">이력</div><ul class="hist">${hist}</ul></div>
     </div></section>`;
 }
 
@@ -159,7 +161,7 @@ function toc(v, total) {
     return `<li><a class="item" href="#s-${k}"><span class="num">${String(i + 1).padStart(2, '0')}</span>
       <span><div class="tt">${esc(s.toc ?? s.title)}</div><div class="th">${esc(s.thesis)}</div></span></a></li>`;
   }).join('');
-  return `<section class="page toc" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
+  return `<section class="page toc${v.slides.length > 10 ? ' compact' : ''}" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
     <div class="lead">각 항목을 누르면 해당 장으로 이동합니다. 각 장의 제목은 웹 포트폴리오의 해당 섹션으로 연결됩니다.</div>
     <ol>${items}</ol>${foot(v, 2, total)}</section>`;
 }
