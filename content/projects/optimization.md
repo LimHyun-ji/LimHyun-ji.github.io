@@ -56,13 +56,9 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 게임 진입 / 종료 시점에도 전역 토글 → 로딩 중 UI 재계산 절감
 
     ```cpp
-    bool IsGlobalInvalidationEnabled = true;   // 풀스크린 화면이 없으면(HUD만) 활성
-    if (const auto* SolActivatableWidget = Cast<USolActivatableWidget>(SolWidgetContainer->GetActiveWidget()))
-    {
-        // 화면별 데이터로 사용 여부 선택
-        IsGlobalInvalidationEnabled = SolActivatableWidget->UseGlobalInvalidation();
-    }
-    FSlateApplication::Get().ToggleGlobalInvalidation(IsGlobalInvalidationEnabled);
+    // 활성 화면 설정으로 Global Invalidation 토글 (풀스크린 화면이 없으면 활성)
+    const auto* Screen = Cast<UScreenWidget>(Container->GetActiveWidget());
+    FSlateApplication::Get().ToggleGlobalInvalidation(Screen ? Screen->UseGlobalInvalidation() : true);
     ```
 
 <div id="case-forcevolatile" class="case-anchor"></div>
@@ -72,12 +68,8 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 원인: Invalidation은 바뀌지 않은 위젯을 캐시해 재계산을 건너뛰는데, 동적 콘텐츠까지 캐시 대상에 들어감
 
     ```cpp
-    // UIParticle.cpp — 재생 중 매 프레임 바뀌므로 위젯이 다시 만들어질 때마다 Volatile 지정
-    void UUIParticle::OnWidgetRebuilt()
-    {
-        Super::OnWidgetRebuilt();
-        ForceVolatile(true);
-    }
+    // 매 프레임 바뀌는 파티클 위젯 — 재생성될 때마다 Volatile 지정
+    void UUIParticle::OnWidgetRebuilt() { Super::OnWidgetRebuilt(); ForceVolatile(true); }
     ```
 
 - <strong>부작용 대응 2 — 갱신 누락 시 지연 갱신 · 전체 재무효화</strong>
@@ -96,26 +88,12 @@ tags: ["퍼포먼스 최적화", "메모리 최적화", "렌더링"]
   - 컴포넌트 Tick(1초 간격)에서 LOD 값이 바뀐 경우에만 Visibility를 갱신하고, 에셋 로드 완료 시점에 한 번 다시 적용
 
     ```cpp
-    // VisualDataModulePC.cpp
-    void FVisualDataModulePC::Tick(float DeltaTime)
-    {
-        FVisualDataModuleCharacter::Tick(DeltaTime);
-        if (!CanUseLODOptimizeBase())          // 에셋의 bUseLODOptimize
-            return;
-        const int32 CurrentLOD = GetBaseLOD(EVisualDataCharacterPartType::Torso); // GetPredictedLODLevel
-        if (CurrentLOD == LastLOD)             // LOD가 바뀔 때만 처리
-            return;
-        LastLOD = CurrentLOD;
-        OptimizeWithLOD(LastLOD);
-    }
-
-    void FVisualDataModulePC::OptimizeWithLOD(const int32 InLODIndex)
-    {
-        // LODPartTypes: PC → Face, GodArmor → Helmet · Face
-        for (const EVisualDataCharacterPartType PartType : LODPartTypes.FindRef(VisualGameData->DataType))
-            if (USkeletalMeshComponent* SkeletalComp = GetOwnerComponent()->GetSkeletalMeshComponent(PartType))
-                SkeletalComp->SetVisibility(InLODIndex < GetOwnerComponent()->OptimizeLOD);
-    }
+    // LOD가 바뀔 때만 지정 파츠(얼굴 · 헬멧) 표시 여부 갱신
+    const int32 LOD = BodyMesh->GetPredictedLODLevel();
+    if (LOD == LastLOD) return;
+    LastLOD = LOD;
+    for (EPartType Part : LODHiddenParts)
+        GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);
     ```
 
 ### Tick / 기타 비용 절감

@@ -71,25 +71,15 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
   - 스케일은 컴포넌트 공간에서 교체, 이동은 부모 본 공간에서 더하기, 회전은 건드리지 않음
 
     ```cpp
-    // EditorTransformBonesComponent.cpp
-    if (auto* PrevInst = Cast<UAnimPreviewInstance>(SkelMesh->PreviewInstance))
+    // 프리뷰 인스턴스의 ModifyBone으로 본 스케일 · 이동을 에디터에 바로 반영
+    auto Apply = [Preview](FName Bone, FVector Scale, FVector Trans = FVector::ZeroVector)
     {
-        auto Apply = [PrevInst](FName Bone, FVector Scale, FVector Trans = FVector::ZeroVector)
-        {
-            FAnimNode_ModifyBone& Mod = PrevInst->ModifyBone(Bone);   // find-or-add
-            Mod.ScaleMode        = EBoneModificationMode::BMM_Replace;
-            Mod.Scale            = Scale;
-            Mod.ScaleSpace       = EBoneControlSpace::BCS_ComponentSpace;
-            Mod.TranslationMode  = EBoneModificationMode::BMM_Additive;
-            Mod.Translation      = Trans;
-            Mod.TranslationSpace = EBoneControlSpace::BCS_ParentBoneSpace;
-            Mod.RotationMode     = EBoneModificationMode::BMM_Ignore;
-        };
-        Apply("head", Cur.HeadScale);
-        Apply("pelvis", Cur.PelvisScale, Cur.PelvisTrans);
-        Apply("upperarm_l", Cur.ArmsScale);
-        // spine · clavicle · thigh 등 12개 본
-    }
+        FAnimNode_ModifyBone& Mod = Preview->ModifyBone(Bone);           // find-or-add
+        Mod.ScaleMode = BMM_Replace;        Mod.Scale = Scale;            // 컴포넌트 공간
+        Mod.TranslationMode = BMM_Additive; Mod.Translation = Trans;      // 부모 본 공간
+    };
+    Apply("head", Cur.HeadScale);
+    Apply("pelvis", Cur.PelvisScale, Cur.PelvisTrans);
     ```
 
 
@@ -103,19 +93,12 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
   - 생성되는 에디터 모듈도 인게임 모듈을 상속 → 로드 · 파츠 적용 · 전이 규칙은 인게임 코드 그대로 실행
 
     ```cpp
-    // VisualDataEditorModuleComponent.cpp
-    TSharedPtr<FVisualDataModuleBase> UVisualDataEditorModuleComponent::CreateModule(const UVisualGameDataBase* InVisualGameData)
+    // 에디터 컴포넌트는 Factory Method만 override — 필요한 타입만 에디터 모듈로 교체
+    TSharedPtr<FModuleBase> UEditorModuleComponent::CreateModule(const UVisualData* Data)
     {
-        if (InVisualGameData->DataType == EVisualGameDataType::GodArmor
-            || InVisualGameData->DataType == EVisualGameDataType::PC)
-        {
-            // FVisualDataEditorModulePC : FVisualDataModulePC
-            TSharedPtr<FVisualDataModuleBase> Module = MakeShared<FVisualDataEditorModulePC>(this);
-            Module->SetVisualGameData(const_cast<UVisualGameDataBase*>(InVisualGameData));
-            return Module;
-        }
-        ...
-        return Super::CreateModule(InVisualGameData);   // 그 외 타입은 인게임 모듈 그대로
+        if (IsCharacterType(Data))
+            return MakeShared<FEditorCharacterModule>(this, Data);   // 인게임 모듈 상속
+        return Super::CreateModule(Data);                            // 나머지는 인게임 모듈 그대로
     }
     ```
 
@@ -143,20 +126,12 @@ tags: ["엔진 툴 확장", "애니메이션", "런타임 아키텍처"]
   - 슈퍼클래스 시절에는 `ExportParameter` 프로퍼티마다 `UPROPERTY` 메타("PC/NPC/…")를 파싱해 현재 타입에 해당하는지 걸러냈지만, 분리 후에는 각 클래스가 자기 타입의 필드만 가지므로 이 분기를 제거
 
     ```cpp
-    // VisualDataExport.cpp — FVisualDataExport::ExportJson_Property
-    for (TFieldIterator<FProperty> PropIt(InVisualGameData->GetClass(), EFieldIteratorFlags::IncludeSuper); PropIt; ++PropIt)
+    // 리플렉션으로 ExportParameter 메타가 붙은 프로퍼티만 JSON으로
+    for (TFieldIterator<FProperty> It(Data->GetClass()); It; ++It)
     {
-        const FProperty* Property = *PropIt;
-        if (!Property->GetMetaDataMap()->Contains("ExportParameter"))
-            continue;
-        // VisualType 메타 비교 제거 — 클래스 자체가 타입을 구분
-        const void* ValuePtr = Property->ContainerPtrToValuePtr<void>(InVisualGameData);
-        if (TSharedPtr<FJsonValue> PropertyValue = WriteValue(Property, ValuePtr))
-        {
-            FString PropertyName = Property->GetName().ToLower();
-            if (Property->GetMetaDataMap()->Contains(FName("ExportParameterName")))
-                PropertyName = Property->GetMetaData(FName("ExportParameterName")).ToLower();
-            OutJsonValue->SetField(PropertyName, PropertyValue);
-        }
+        if (!It->HasMetaData("ExportParameter")) continue;
+        const FString Key = It->HasMetaData("ExportParameterName")
+            ? It->GetMetaData("ExportParameterName") : It->GetName();
+        Json->SetField(Key.ToLower(), WriteValue(*It, It->ContainerPtrToValuePtr<void>(Data)));
     }
     ```

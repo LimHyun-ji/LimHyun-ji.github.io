@@ -60,19 +60,12 @@ images:
   - 맵 원점을 빼고 월드 크기로 나눠 텍스처 UV 기준 좌표로 변환
 
   ```cpp
-  // MiniMapWidget.cpp — UpdateActors()
-  float X = (ActorLocation.X - MinimapMapData.MapOrigin.X) / MinimapMapData.WorldSize.X;
-  float Y = (ActorLocation.Y - MinimapMapData.MapOrigin.Y) / MinimapMapData.WorldSize.Y;
-  X = !FMath::IsFinite(X) ? 0.f : X;
-  Y = !FMath::IsFinite(Y) ? 0.f : Y;
-
-  if (UMaterialParameterCollectionInstance* Instance = GetWorld()->GetParameterCollectionInstance(MpcMiniMap))
-  {
-      Instance->SetScalarParameterValue("X", X);
-      Instance->SetScalarParameterValue("Y", Y);
-  }
-  MinimapCursor->ImgCursor->SetRenderTransformAngle(ActorYaw);   // 캐릭터 방향
-  MinimapCursor->SzbRadar->SetRenderTransformAngle(CameraYaw);   // 카메라 시야
+  // 월드 좌표 → 맵 UV(0~1) → 머티리얼 파라미터
+  const FVector2D UV = (FVector2D(Location) - MapOrigin) / WorldSize;
+  Mpc->SetScalarParameterValue("X", FMath::IsFinite(UV.X) ? UV.X : 0.f);
+  Mpc->SetScalarParameterValue("Y", FMath::IsFinite(UV.Y) ? UV.Y : 0.f);
+  Cursor->SetRenderTransformAngle(ActorYaw);    // 캐릭터 방향
+  Radar->SetRenderTransformAngle(CameraYaw);    // 카메라 시야
   ```
 
 - <strong>축척 · 줌 단계</strong>
@@ -82,20 +75,13 @@ images:
   - 내 위치 → 파티원 방향을 `Atan2`로 각도화해 화살표를 회전
 
   ```cpp
-  // MiniMapWidget.cpp — UpdatePcIcons()
-  bool IsVisibleOnMap = AdjustedPos.X >= BoxMin.X && AdjustedPos.X <= BoxMax.X
-                     && AdjustedPos.Y >= BoxMin.Y && AdjustedPos.Y <= BoxMax.Y;
-  FVector2D ClampedPos(FMath::Clamp(AdjustedPos.X, BoxMin.X, BoxMax.X),
-                       FMath::Clamp(AdjustedPos.Y, BoxMin.Y, BoxMax.Y));
-  if (!IsVisibleOnMap)
+  // 맵 밖 아이콘 — 박스 경계로 Clamp, 방향은 atan2로 화살표 각도
+  const FVector2D Clamped = ClampToBox(Pos, BoxMin, BoxMax);
+  if (Clamped != Pos)
   {
-      FVector2D Dir = (ClampedPos - MyIndicatorSlot->GetPosition()).GetSafeNormal();
-      PcData->Direction = FVector2D(Dir.X, -Dir.Y);
+      const FVector2D Dir = (Clamped - MyPos).GetSafeNormal();
+      Arrow->SetRenderTransformAngle(FMath::RadiansToDegrees(FMath::Atan2(Dir.X, -Dir.Y)));
   }
-
-  // MapPCIconWidget.cpp — 화면 밖일 때만 화살표 표시
-  float Angle = FMath::RadiansToDegrees(FMath::Atan2(Data->Direction.X, Data->Direction.Y));
-  BodArrow->SetRenderTransformAngle(Angle);
   ```
 <div id="case-minimap-cost" class="case-anchor"></div>
 
@@ -107,24 +93,15 @@ images:
   - 퀘스트 종류별로 (X, Y, 반경)을 정규화해 float16 배열로 만들고, 임시 텍스처에 복사해 머티리얼에 전달
 
   ```cpp
-  // MiniMapWidget.cpp — OnUpdateQuest()
-  TArray<FFloat16> QuestTexData;
-  for (const FMiniMapQuestData& Quest : QuestData)
-  {
-      QuestTexData.Add((Quest.X - MapOrigin.X) / WorldSize.X);
-      QuestTexData.Add((Quest.Y - MapOrigin.Y) / WorldSize.Y);
-      QuestTexData.Add(Quest.Radius / WorldSize.X);
-  }
-  QuestNum = QuestTexData.Num();
-  QuestTex = UTexture2D::CreateTransient(QuestNum, 1, PF_R16F);
+  // 퀘스트 (x, y, r)을 R16F 1D 텍스처로 패킹 → 셰이더가 개수만큼 순회
+  TArray<FFloat16> Data;
+  for (const auto& Q : Quests)
+      Data.Append({ (Q.X - Origin.X) / Size.X, (Q.Y - Origin.Y) / Size.Y, Q.Radius / Size.X });
 
-  FFloat16* TextureData = static_cast<FFloat16*>(QuestTex->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE));
-  FMemory::Memcpy(TextureData, QuestTexData.GetData(), QuestNum * sizeof(FFloat16));
-  QuestTex->GetPlatformData()->Mips[0].BulkData.Unlock();
-  QuestTex->UpdateResource();
-
-  Dmi->SetTextureParameterValue(QuestIndicatorTexName[Kind], QuestTex);
-  Dmi->SetScalarParameterValue(QuestIndicatorNumName[Kind], QuestNum);
+  UTexture2D* Tex = UTexture2D::CreateTransient(Data.Num(), 1, PF_R16F);
+  // Mip0 BulkData Lock → Memcpy(Data) → Unlock → UpdateResource
+  Mid->SetTextureParameterValue(TexParam, Tex);
+  Mid->SetScalarParameterValue(NumParam, Data.Num());
   ```
 
 - <strong>기기 포맷 지원 확인</strong>
@@ -142,22 +119,14 @@ images:
   - 두 손가락 거리 변화량을 휠 Delta와 같은 단위로 넘겨, 줌 처리 코드를 하나로 유지
 
   ```cpp
-  // SolWidgetInputProcessor.cpp — HandleMouseMoveEvent()
-  if (TouchPositions.Contains(FingerIndex))
+  // 두 손가락 거리 변화량 → 줌, 한 손가락 → 드래그
+  if (Touches.Num() == 2)
   {
-      TouchPositions[FingerIndex] = TouchLocation;
-      if (TouchPositions.Num() == 2)
-      {
-          TArray<FVector2D> TouchPoints;
-          TouchPositions.GenerateValueArray(TouchPoints);
-          const float CurrentDistance = FVector2D::Distance(TouchPoints[0], TouchPoints[1]);
-          PinchDelta = CurrentDistance - PinchDistance;
-          PinchDistance = CurrentDistance;
-          if (CurrentDistance > 0) bIsPinching = true;
-      }
+      const float Dist = FVector2D::Distance(Touches[0], Touches[1]);
+      OnZoom.ExecuteIfBound((Dist - PrevDist) * ZoomSpeed);
+      PrevDist = Dist;
   }
-  if (bIsPinching)          OnZoom.ExecuteIfBound(PinchDelta * MouseWheelSpeed);
-  else if (IsTouchStarted)  OnDrag.ExecuteIfBound(InPointerEvent);
+  else if (bTouchStarted) OnDrag.ExecuteIfBound(Event);
   ```
 
 - <strong>클릭과 드래그 · 핀치 구분</strong>
@@ -166,17 +135,12 @@ images:
   - 뷰포트 픽셀을 슬레이트 단위로 환산한 뒤, 현재 줌에서 맵이 화면 밖으로 넘친 만큼만 이동을 허용
 
   ```cpp
-  // RegionMapWidget.cpp — GetAdjustMapPos()
-  const float ViewportDPI = UWidgetLayoutLibrary::GetViewportScale(this);
-  const FVector2D ViewportSlate = (ViewportDPI > 0.f) ? ViewportSize / ViewportDPI : ViewportSize;
-  const FVector2D ScbScale(CurrentZoom * UIScale,
-                           CurrentZoom * UIScale * ViewportSlate.X / ViewportSlate.Y);
-
-  // 최대 이동량: Size * (Scale - 1) / (2 * Scale). Scale < 1이면 0
-  const float CapableX = FMath::Max(0.f, LocalSize.X * (ScbScale.X - 1.f) / (2.f * ScbScale.X)) * DragLimitX;
-  const float CapableY = FMath::Max(0.f, LocalSize.Y * (ScbScale.Y - 1.f) / (2.f * ScbScale.Y)) * DragLimitY;
-  AdjustedPos.X = FMath::Clamp(AdjustedPos.X, OriginX - CapableX, OriginX + CapableX);
-  AdjustedPos.Y = FMath::Clamp(AdjustedPos.Y, OriginY - CapableY, OriginY + CapableY);
+  // 배율 S에서 이동 가능한 최대 거리 = Size · (S − 1) / (2S), S < 1이면 0
+  const FVector2D S(Zoom * UIScale, Zoom * UIScale * Aspect);     // 뷰포트 비율 보정
+  const float MaxX = FMath::Max(0.f, Size.X * (S.X - 1.f) / (2.f * S.X));
+  const float MaxY = FMath::Max(0.f, Size.Y * (S.Y - 1.f) / (2.f * S.Y));
+  Pos.X = FMath::Clamp(Pos.X, Origin.X - MaxX, Origin.X + MaxX);
+  Pos.Y = FMath::Clamp(Pos.Y, Origin.Y - MaxY, Origin.Y + MaxY);
   ```
 
 - <strong>드래그 후 미끄러지듯 정지</strong>

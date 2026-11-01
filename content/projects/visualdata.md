@@ -58,15 +58,9 @@ tags: ["런타임 아키텍처", "메모리 최적화", "렌더링"]
   ```cpp
   class UVisualDataModuleComponent : public UActorComponent
   {
-      // 데이터(VisualGameData) → 모듈 생성 → 적용
-      void SetVisualGameData(const UVisualGameDataBase* InVisualGameData);
-      virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* InVisualGameData);
-
-      // 파츠별 스켈레탈 메시 (Master / Face / Torso / Helmet / Wing / Cape)
-      TMap<EVisualDataCharacterPartType, USkeletalMeshComponent*> SkeletalMeshComponents;
-
-      // 비동기 로드 (StreamableManager) + 완료 델리게이트
-      TSharedPtr<FStreamableHandle> LoadAssets(const TArray<FSoftObjectPath>& AssetList, FStreamableDelegate&& OnCompleted);
+      void SetVisualGameData(const UVisualGameDataBase* Data);     // 데이터 → 모듈 생성 → 적용
+      virtual TSharedPtr<FVisualDataModuleBase> CreateModule(const UVisualGameDataBase* Data);
+      TMap<EPartType, USkeletalMeshComponent*> PartMeshes;        // 파츠별 메시
   };
   ```
 
