@@ -157,7 +157,7 @@ function toc(v, total) {
   const items = v.slides.map((k, i) => {
     const s = SLIDES[k];
     return `<li><a class="item" href="#s-${k}"><span class="num">${String(i + 1).padStart(2, '0')}</span>
-      <span><div class="tt">${esc(s.title)}</div><div class="th">${esc(s.thesis)}</div></span></a></li>`;
+      <span><div class="tt">${esc(s.toc ?? s.title)}</div><div class="th">${esc(s.thesis)}</div></span></a></li>`;
   }).join('');
   return `<section class="page toc" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
     <div class="lead">각 항목을 누르면 해당 장으로 이동합니다. 각 장의 제목은 웹 포트폴리오의 해당 섹션으로 연결됩니다.</div>

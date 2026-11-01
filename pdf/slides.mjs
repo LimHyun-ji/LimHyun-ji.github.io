@@ -6,6 +6,7 @@ const P = (slug, anchor) => `${SITE}/projects/${slug}/${anchor ? '#' + encodeURI
 export const SLIDES = {
   hit: {
     title: '피격 연출 타이밍 — 속도 커브 역산',
+    toc: '피격 타이밍 역산',
     tags: ['게임 수학', '네트워크 동기화'],
     thesis: '판정은 서버가 확정한다. 클라이언트는 판정을 바꾸지 않고 "언제 보여줄지"만 계산한다.',
     url: P('combat', 'case-hit-delay'),
@@ -27,6 +28,7 @@ export const SLIDES = {
 
   sync: {
     title: '전투 서버 동기화 — Notify 시점 처리',
+    toc: '전투 서버 동기화',
     tags: ['네트워크 동기화', '애니메이션'],
     thesis: '패킷이 도착한 순간이 아니라 몽타주 Notify 시점에 연출을 처리해 서버 · 클라이언트 순서를 맞춘다.',
     url: P('combat', '전투-서버-동기화-actionnotify-begin-시점-처리'),
@@ -44,6 +46,7 @@ export const SLIDES = {
 
   notify: {
     title: 'Action Table · Notify — 인게임 / 에디터 경로 통일',
+    toc: 'Notify 경로 통일',
     tags: ['애니메이션', '런타임 아키텍처'],
     thesis: '에디터 프리뷰도 인게임과 같은 재생 경로를 타게 하되, 인게임 코드는 에디터에 의존하지 않게 한다.',
     url: P('combat', 'case-notify'),
@@ -60,6 +63,7 @@ export const SLIDES = {
 
   obtain: {
     title: '획득 연출 — 큰 Delta에서도 안정적인 시간 적분',
+    toc: '획득 연출 시간 적분',
     tags: ['게임 수학'],
     thesis: '"지나쳐도 잡고, 무한히 따라잡지 않는다" — 판정과 적분을 프레임 길이에 독립적으로.',
     url: P('sol-content', 'case-obtain'),
@@ -81,6 +85,7 @@ export const SLIDES = {
 
   traj: {
     title: '획득 연출 궤적 — 로컬 기저 확산 · 거리 기반 곡률',
+    toc: '획득 연출 궤적',
     tags: ['게임 수학'],
     thesis: '발사 방향에 수직인 평면에서 확산을 만들고, 거리에 따라 곡률을 보정해 "퍼졌다가 모이는" 궤적을 만든다.',
     url: P('sol-content', '경험치-획득-연출-궤적-시간-보정'),
@@ -100,6 +105,7 @@ export const SLIDES = {
 
   uiparticle: {
     title: 'UI 파티클 — 누적 변환에서 회전각 복원',
+    toc: 'UI 파티클 회전 복원',
     tags: ['게임 수학', '렌더링'],
     thesis: '2×2 변환 행렬에서 각도를 정확히 다시 구하고, 스케일 → 회전 순서를 바로잡는다.',
     url: P('sol-content', 'case-uiparticle'),
@@ -119,6 +125,7 @@ const float Theta = FMath::Atan2(B, A);   // 부모 누적 회전각`,
 
   ray: {
     title: '폴리곤 편집 — 광선 · 선분 3D 교차',
+    toc: '광선 · 선분 교차',
     tags: ['게임 수학', '엔진 툴 확장'],
     thesis: '화면 클릭을 월드 광선으로 바꾸고, 폴리곤의 각 변과의 교차를 벡터 연산으로 직접 푼다.',
     url: P('areatool', 'case-polygon-edit'),
@@ -138,6 +145,7 @@ const float Theta = FMath::Atan2(B, A);   // 부모 누적 회전각`,
 
   centroid: {
     title: '스폰 프리뷰 기준점 — 면적 가중 무게중심',
+    toc: '면적 가중 무게중심',
     tags: ['게임 수학', '엔진 툴 확장'],
     thesis: '꼭짓점 평균이 아니라 Shoelace 공식으로 면적을 반영한 중심을 쓴다.',
     url: P('areatool', '저작-ux-2d-polygon-3d-point-actor'),
@@ -155,6 +163,7 @@ const float Theta = FMath::Atan2(B, A);   // 부모 누적 회전각`,
 
   minimap: {
     title: '미니맵 위치 동기화 — 좌표계 변환 · MPC',
+    toc: '미니맵 좌표 변환',
     tags: ['게임 수학', '렌더링'],
     thesis: '위치 표시를 위젯 갱신이 아니라 머티리얼 파라미터로 처리한다. 핵심은 월드 → UV 좌표 변환.',
     url: P('mapdesign', '미니맵-위치-동기화-mpc-기반'),
@@ -176,6 +185,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   dragclamp: {
     title: '월드맵 입력 — Slate 전처리기 · 이동 범위 수식',
+    toc: '월드맵 입력 · 이동 범위',
     tags: ['게임 수학', '런타임 아키텍처'],
     thesis: '모바일 · PC 입력을 Slate 전처리기 한 곳에서 해석하고, 줌 · DPI 기준으로 이동 범위를 수식으로 제한한다.',
     url: P('mapdesign', '월드맵-입력-inputprocessor-확대드래그'),
@@ -195,6 +205,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   vdmodule: {
     title: '외형 시스템 — 데이터 주도 모듈과 수명 일원화',
+    toc: '외형 모듈 · 수명 관리',
     tags: ['런타임 아키텍처', '메모리 최적화'],
     thesis: '외형을 하드코딩하지 않고 데이터로 모듈을 만들며, 데이터 수명은 한 곳에서만 관리한다.',
     url: P('visualdata', 'case-allocating'),
@@ -212,6 +223,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   transition: {
     title: '외형 전이 규칙 — 바뀐 만큼만 다시 적용',
+    toc: '외형 전이 규칙',
     tags: ['런타임 아키텍처', '메모리 최적화'],
     thesis: '외형 변경을 "상태 전이"로 보고, 다음 데이터와 현재 상태를 비교해 갱신 범위를 판정한다.',
     url: P('visualdata', '전이-규칙으로-부분-갱신-최적화'),
@@ -230,6 +242,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   network: {
     title: '콘텐츠 통신 — 특성에 맞춘 세 가지 전송 방식',
+    toc: '콘텐츠 통신 방식',
     tags: ['네트워크 동기화', '런타임 아키텍처'],
     thesis: '상시성 · 실시간성 · 진입 빈도를 기준으로 TCP · WebSocket · HTTP를 구분해 쓴다.',
     url: P('sol-content', 'case-login-packet'),
@@ -248,6 +261,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   strategy: {
     title: '맵 뷰어 — View 공유 · Strategy 교체',
+    toc: '맵 뷰어 Strategy',
     tags: ['런타임 아키텍처'],
     thesis: '변하지 않는 View는 하나로 두고, 맵 종류별로 달라지는 규칙만 Strategy로 분리한다.',
     url: P('mapdesign', 'case-dungeon'),
@@ -264,6 +278,7 @@ Mpc->SetScalarParameterValue("Y", V);`,
 
   pocket: {
     title: '연출 자원 수명 — PocketLevel · LevelSequence',
+    toc: '연출 자원 수명',
     tags: ['런타임 아키텍처', '메모리 최적화'],
     thesis: '연출 자원은 필요할 때 만들고, 끝나면 상태를 원복한 뒤 파괴한다.',
     url: P('sol-content', 'pocketlevel-시퀀스-수명-관리'),
@@ -284,6 +299,7 @@ Player->Stop();   // 원복 후 정지 · 파괴`,
 
   slate: {
     title: 'Slate Global Invalidation — 측정 · 적용 · 부작용 · 한계',
+    toc: 'Slate Global Invalidation',
     tags: ['퍼포먼스 최적화'],
     thesis: '측정으로 원인을 확인하고, 화면 단위로 적용한 뒤 생긴 부작용과 한계까지 기준으로 정리한다.',
     url: P('optimization', 'case-slate-hitching'),
@@ -303,6 +319,7 @@ Player->Stop();   // 원복 후 정지 · 파괴`,
 
   lod: {
     title: '런타임 비용 절감 — LOD 파츠 · 정렬 키',
+    toc: 'LOD 파츠 · 정렬 키',
     tags: ['퍼포먼스 최적화', '렌더링'],
     thesis: '바뀔 때만 처리하고, 반복 비용은 미리 계산해 둔다.',
     url: P('optimization', 'lod별-파츠-통합'),
@@ -322,6 +339,7 @@ GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);`,
 
   quest: {
     title: '미니맵 퀘스트 — 가변 데이터를 텍스처로 인코딩',
+    toc: '퀘스트 텍스처 인코딩',
     tags: ['렌더링', '퍼포먼스 최적화'],
     thesis: '개수가 바뀌는 퀘스트 영역을 R16F 텍스처 한 줄로 인코딩해, 위젯 없이 머티리얼이 직접 그린다.',
     url: P('mapdesign', 'case-minimap-cost'),
@@ -340,6 +358,7 @@ GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);`,
 
   editorBone: {
     title: '에디터 본 트랜스폼 프리뷰 — AnimPreviewInstance',
+    toc: '에디터 본 프리뷰',
     tags: ['엔진 툴 확장', '애니메이션'],
     thesis: '프리뷰 메시가 인게임 AnimInstance를 타지 않는다는 점을 짚고, 프리뷰 인스턴스에 본 노드를 직접 주입한다.',
     url: P('visualdata-editor', 'case-preview-bones'),
@@ -358,6 +377,7 @@ GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);`,
 
   editorModule: {
     title: '에디터 프리뷰 — 인게임 모듈 재사용 (Factory Method)',
+    toc: '에디터 모듈 재사용',
     tags: ['엔진 툴 확장', '런타임 아키텍처'],
     thesis: '에디터가 인게임 로직을 따라 만들지 않고, 인게임 모듈을 상속해 "다른 부분만" override한다.',
     url: P('visualdata-editor', 'case-module-reuse'),
@@ -375,6 +395,7 @@ GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);`,
 
   areaVis: {
     title: 'AreaTool 3D 시각화 — SceneProxy · ComponentVisualizer',
+    toc: 'AreaTool 3D 시각화',
     tags: ['엔진 툴 확장', '렌더링'],
     thesis: '레벨 데이터를 기획자가 "보면서" 배치하도록, 렌더 스레드 프록시와 에디터 비주얼라이저를 직접 구현한다.',
     url: P('areatool', '저작-ux-2d-polygon-3d-point-actor'),
@@ -393,6 +414,7 @@ GetPartMesh(Part)->SetVisibility(LOD < OptimizeLOD);`,
 
   areaPipe: {
     title: 'AreaTool 파이프라인 — 검증 체인 · 변경분 반영 · CI',
+    toc: 'AreaTool 검증 · CI',
     tags: ['엔진 툴 확장'],
     thesis: '잘못된 레벨 데이터는 런타임이 아니라 export 시점에 막고, 사람 손을 거치지 않게 CI로 강제한다.',
     url: P('areatool', 'case-validation'),
