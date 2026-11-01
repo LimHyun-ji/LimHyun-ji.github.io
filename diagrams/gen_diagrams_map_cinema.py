@@ -6,10 +6,10 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_diagrams import N, emit
 
-# ── 월드맵 입력: FSolWidgetInputProcessor → URegionMapWidget ──
+# ── 월드맵 입력: FWidgetInputProcessor → URegionMapWidget ──
 wi_nodes = [
     N("slate",  "FSlateApplication\n입력 전처리기 등록",            20, 60, 190, 52, "core"),
-    N("proc",   "FSolWidgetInputProcessor\n터치 · 마우스 판별",      310, 60, 230, 52, "manager"),
+    N("proc",   "FWidgetInputProcessor\n터치 · 마우스 판별",      310, 60, 230, 52, "manager"),
     N("zoom",   "OnZoom\n핀치 거리 변화 · 휠",                       20, 170, 190, 52, "data"),
     N("drag",   "OnDrag\n한 손가락 · 마우스 누름 이동",              290, 170, 230, 52, "data"),
     N("click",  "OnClick\n이동 8px 이하 · 핀치 아님",                560, 170, 200, 52, "data"),
@@ -27,7 +27,7 @@ wi_edges = [
     dict(src="region", dst="adjust", label="목표 위치"),
     dict(src="adjust", dst="apply", label="Tick마다"),
 ]
-emit("worldmap-input", "월드맵 입력 — FSolWidgetInputProcessor → URegionMapWidget", wi_nodes, wi_edges)
+emit("worldmap-input", "월드맵 입력 — FWidgetInputProcessor → URegionMapWidget", wi_nodes, wi_edges)
 
 # ── 맵 뷰어 Strategy: 공유 쉘 + 타입별 Strategy ──
 ms_nodes = [

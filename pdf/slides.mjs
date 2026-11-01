@@ -250,7 +250,7 @@ if (Clamped != Pos)
     problem: '모바일(핀치 · 드래그)과 PC(휠 · 드래그)에서 같은 확대 · 이동 조작을 제공',
     cause: '입력 해석을 한 계층으로 모으고, 확대 배율 · DPI가 달라도 맵이 화면 밖으로 빠지지 않는 이동 한계가 필요',
     solution: [
-      '<code>FSolWidgetInputProcessor</code>를 Slate 전처리기로 등록 → 위젯보다 먼저 받아 Zoom / Drag / Click으로 변환',
+      '<code>FWidgetInputProcessor</code>를 Slate 전처리기로 등록 → 위젯보다 먼저 받아 Zoom / Drag / Click으로 변환',
       '두 손가락 거리 변화를 휠 Delta와 같은 단위로 환산 → <b>OnZoom 하나</b>로 처리',
       '이동 8 이상 또는 핀치 중이었으면 클릭으로 처리하지 않음',
       '뷰포트 픽셀을 Slate 단위로 환산 후 <b>최대 이동량 = Size·(S − 1) / (2S)</b> (S < 1이면 0)로 Clamp, 놓은 뒤 Ticker에서 보간 감속',

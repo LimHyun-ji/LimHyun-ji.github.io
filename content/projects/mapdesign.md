@@ -111,7 +111,7 @@ images:
 
 ### 월드맵 입력 — InputProcessor 확대/드래그
 
-<img class="diagram" src="/images/diagrams/worldmap-input.svg" alt="월드맵 입력 흐름: FSlateApplication에 등록한 FSolWidgetInputProcessor가 터치 · 마우스를 판별해 OnZoom(핀치 거리 변화 · 휠), OnDrag(한 손가락 · 마우스 누름 이동), OnClick(이동 8 이하 · 핀치 아님)으로 전달하고, URegionMapWidget의 Zoom · Drag가 GetAdjustMapPos로 이동 범위를 Clamp한 뒤 SetAdjustMapPos가 Tick마다 RenderTranslation · Scale을 보간" />
+<img class="diagram" src="/images/diagrams/worldmap-input.svg" alt="월드맵 입력 흐름: FSlateApplication에 등록한 FWidgetInputProcessor가 터치 · 마우스를 판별해 OnZoom(핀치 거리 변화 · 휠), OnDrag(한 손가락 · 마우스 누름 이동), OnClick(이동 8 이하 · 핀치 아님)으로 전달하고, URegionMapWidget의 Zoom · Drag가 GetAdjustMapPos로 이동 범위를 Clamp한 뒤 SetAdjustMapPos가 Tick마다 RenderTranslation · Scale을 보간" />
 
 - 모바일과 PC를 <strong>모두 대응</strong>하기 위해 <strong>InputProcessor 기반</strong>으로 설계
 - 플랫폼별 입력 분기를 입력 처리 계층으로 일원화해 <strong>확대 · 드래그</strong> 조작 제공
