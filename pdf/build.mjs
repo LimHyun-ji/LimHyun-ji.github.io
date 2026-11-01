@@ -89,6 +89,7 @@ b { color: #0c1a13; }
 .toc .grp + .grp { margin-top: 16px; }
 .toc .gh { font-size: 15px; font-weight: 800; color: #B24A22; letter-spacing: .04em; margin: 0 0 8px 2px; padding-left: 10px; border-left: 3px solid #B24A22; }
 .hd .grp-l { font-weight: 800; color: #B24A22; margin-left: 10px; }
+.toc.c3 .cols { gap: 0 20px; } .toc.c3 li a.item { grid-template-columns: 32px 1fr; gap: 8px; padding: 6px 12px; } .toc.c3 .num { font-size: 17px; } .toc.c3 .tt { font-size: 15px; } .toc.c3 .th { font-size: 12.5px; line-height: 1.35; } .toc.c3 ol { gap: 6px; } .toc.c3 .grp + .grp { margin-top: 10px; } .toc.c3 .gh { margin-bottom: 6px; }
 .toc .chips { margin-top: 6px; } .toc .chips .chip { font-size: 13px; padding: 1px 8px; }
 
 /* 사례 */
@@ -192,13 +193,21 @@ function toc(v, total) {
     i += g.n;
     return b;
   });
-  const left = [];
-  let cnt = 0;
-  for (const b of blocks) { if (left.length && cnt + b.n > Math.ceil(v.slides.length / 2) + 1) break; left.push(b); cnt += b.n; }
-  const right = blocks.slice(left.length);
-  const maxCol = Math.max(cnt, v.slides.length - cnt);
-  return head.replace('__C__', ' grouped') + `
-    <div class="cols"><div>${left.map((b) => b.html).join('')}</div><div>${right.map((b) => b.html).join('')}</div></div>${foot(v, 2, total)}</section>`;
+  // 묶음 단위로 열을 채운다: 목표 개수(전체 / 열 수)에 더 가까워질 때만 다음 묶음을 같은 열에 넣는다
+  const nc = v.cols ?? 2;
+  const target = v.slides.length / nc;
+  const cols = [];
+  let rest = blocks;
+  for (let c = 0; c < nc; c++) {
+    if (c === nc - 1) { cols.push(rest); break; }
+    const col = [rest[0]];
+    let cnt = rest[0].n;
+    for (const b of rest.slice(1)) { if (Math.abs(cnt + b.n - target) < Math.abs(cnt - target)) { col.push(b); cnt += b.n; } else break; }
+    cols.push(col);
+    rest = rest.slice(col.length);
+  }
+  return head.replace('__C__', ' grouped' + (nc > 2 ? ' c3' : '')) + `
+    <div class="cols" style="grid-template-columns: repeat(${nc}, 1fr)">${cols.map((c) => `<div>${c.map((b) => b.html).join('')}</div>`).join('')}</div>${foot(v, 2, total)}</section>`;
 }
 
 // 사례 그림(pdf/assets/fig/*.svg, figures.py 생성)은 인라인으로 넣어 웹 폰트가 적용되게 한다
