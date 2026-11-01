@@ -456,7 +456,7 @@ export const VERSIONS = [
     label: 'Client · Combat', title: '클라이언트 전투',
     pitch: '서버가 확정한 판정 위에서, 연출이 "언제 · 어디에" 보여야 하는지를 수학으로 맞춥니다.',
     focus: ['게임 수학', '네트워크 동기화', '애니메이션'],
-    slides: ['hit', 'sync', 'notify', 'obtain', 'traj', 'weaponFx'],
+    slides: ['sync', 'hit', 'notify', 'vdmodule', 'weaponFx', 'obtain', 'traj'],
   },
   {
     key: '2_system', file: '임현지_포트폴리오_클라이언트_시스템',

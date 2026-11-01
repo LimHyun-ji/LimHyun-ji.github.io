@@ -52,7 +52,7 @@ b { color: #0c1a13; }
 /* 표지 */
 .cover { padding: 0; display: grid; grid-template-columns: 1.15fr 1fr; background: #0d1411; color: #e8eee9; }
 .cover-l { padding: 64px 56px; display: flex; flex-direction: column; }
-.cover-r { padding: 64px 52px 56px; background: #fbfcfb; color: #18201c; display: flex; flex-direction: column; gap: 22px; }
+.cover-r { padding: 64px 52px 56px; background: #fbfcfb; color: #18201c; display: flex; flex-direction: column; gap: 40px; }
 .eyebrow { font-size: 15.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 800; color: #F7845A; }
 .cover h1 { font-size: 66px; margin: 14px 0 6px; letter-spacing: -1.5px; font-weight: 800; }
 .cover .role { font-size: 21.5px; color: #9fb0a7; font-weight: 600; }
@@ -67,6 +67,7 @@ b { color: #0c1a13; }
 .hist li { display: grid; grid-template-columns: 158px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #e3e9e5; font-size: 16px; }
 .hist li:first-child { border-top: 0; }
 .hist .per { white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #B24A22; padding-top: 2px; }
+.hist .nw { white-space: nowrap; }
 .hist .t { font-weight: 700; } .hist .s { color: #5d6863; font-size: 15px; } .hist .n { color: #8A6700; font-size: 15px; font-weight: 700; }
 .stack { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; align-items: center; }
 .stack .chip { margin-right: 4px; }
@@ -135,7 +136,7 @@ function foot(v, n, total) {
 
 function cover(v) {
   const hist = (profile.history ?? []).map((h) => `<li><span class="per">${esc(h.period)}</span><span><span class="t">${esc(h.title)}</span>
-    ${h.sub ? `<div class="s">${esc(h.sub)}</div>` : ''}${h.note ? `<div class="n">🏆 ${esc(h.note)}</div>` : ''}</span></li>`).join('');
+    ${h.sub ? `<div class="s">${h.sub.split(' · ').map((x) => `<span class="nw">${esc(x)}</span>`).join(' · ')}</div>` : ''}${h.note ? `<div class="n">🏆 ${esc(h.note)}</div>` : ''}</span></li>`).join('');
   const cols = ['#B24A22', '#8A6700', '#0F7A42', '#2F6A9E'];
   const stack = (profile.skills ?? []).map((g, i) => `<span class="cat" style="color:${cols[i % 4]}">${esc(g.category)}</span>
     <span>${g.items.map((it) => `<span class="chip" style="--c:${cols[i % 4]}">${esc(it)}</span>`).join('')}</span>`).join('');
@@ -163,7 +164,7 @@ function toc(v, total) {
   }).join('');
   return `<section class="page toc${v.slides.length > 10 ? ' compact' : ''}" id="toc"><div class="eyebrow" style="color:#B24A22">Contents</div><h2>목차</h2>
     <div class="lead">각 항목을 누르면 해당 장으로 이동합니다. 각 장의 제목은 웹 포트폴리오의 해당 섹션으로 연결됩니다.</div>
-    <ol>${items}</ol>${foot(v, 2, total)}</section>`;
+    <ol style="grid-auto-flow: column; grid-template-rows: repeat(${Math.ceil(v.slides.length / 2)}, auto)">${items}</ol>${foot(v, 2, total)}</section>`;
 }
 
 // 사례 그림(pdf/assets/fig/*.svg, figures.py 생성)은 인라인으로 넣어 웹 폰트가 적용되게 한다
