@@ -208,7 +208,7 @@ function toc(v, total) {
     cols.push(col);
     rest = rest.slice(col.length);
   }
-  return head.replace('__C__', ' grouped' + (nc > 2 ? ' c3' : '')) + `
+  return head.replace('__C__', ' grouped' + (nc > 2 ? ' c3' : '') + (v.slides.length > 18 ? ' compact' : '')) + `
     <div class="cols" style="grid-template-columns: repeat(${nc}, 1fr)">${cols.map((c) => `<div>${c.map((b) => b.html).join('')}</div>`).join('')}</div>${foot(v, 2, total)}</section>`;
 }
 
