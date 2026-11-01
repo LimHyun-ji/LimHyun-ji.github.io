@@ -6,8 +6,8 @@
 # 프로필 사진
 photo: "/images/profile.png"
 name: "임현지"
-role: "Game Client Developer"
-headline: "설계–구현–최적화–라이브 운영까지 책임져 온 UE5(C++) 게임 개발자"
+role: "Game Client · Engine Tools Developer"
+headline: "SOL: enchant(넷마블) UE5 · C++ 클라이언트 — 2023년부터 개발 · 라이브 운영"
 intro: >
   Unreal Engine 5(C++) 기반 게임 개발자입니다.
   전투/액션 데이터와 결합해 각 캐릭터에 외형을 세팅·로드하는 VisualData 캐릭터 비주얼 데이터 시스템을 핵심으로 담당하고,
@@ -44,8 +44,8 @@ skills:
 # 이력 — 히어로 오른쪽, 연도 역순 (경력 · 교육 · 수상 · 학력)
 history:
   - period: "2023.01 — 현재"
-    title: "알트나인"
-    sub: "클라이언트 · 재직 중"
+    title: "알트나인 · SOL: enchant"
+    sub: "UE5 · C++ 클라이언트 · 엔진 툴"
     kind: work
   - period: "2022.06 — 2022.12"
     title: "메타버스 아카데미"
