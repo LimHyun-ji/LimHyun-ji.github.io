@@ -43,6 +43,9 @@ struct FNSInventoryList : public FFastArraySerializer
 
 	/** 서버 전용. Delta만큼 더하고 결과 수량을 반환한다. */
 	int32 AddCount(FName ItemId, int32 Delta);
+
+	/** 서버 전용. 전부 비운다. */
+	void Clear();
 	int32 GetCount(FName ItemId) const;
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
@@ -77,6 +80,9 @@ public:
 
 	/** 서버 전용. 결과 수량을 반환한다. */
 	int32 AddItem_Server(FName ItemId, int32 Delta);
+
+	/** 서버 전용. 라운드 리셋 / 사망 시 비우기. */
+	void Clear_Server();
 
 	int32 GetCount(FName ItemId) const { return Inventory.GetCount(ItemId); }
 	const TArray<FNSInventoryEntry>& GetEntries() const { return Inventory.Items; }

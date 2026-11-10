@@ -1,8 +1,8 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "",
+	"EngineAssociation": "5.8",
 	"Category": "",
-	"Description": "UE5 Dedicated Server sample: server-authoritative gathering/combat and open-world replication optimization",
+	"Description": "Ore Rush - UE5 Dedicated Server mini game (server-authoritative gathering/combat, replication optimization)",
 	"Modules": [
 		{
 			"Name": "NetSample",
@@ -12,6 +12,8 @@
 		}
 	],
 	"Plugins": [
-		{ "Name": "EnhancedInput", "Enabled": true }
+		{ "Name": "EnhancedInput", "Enabled": true },
+		{ "Name": "PythonScriptPlugin", "Enabled": true },
+		{ "Name": "EditorScriptingUtilities", "Enabled": true }
 	]
 }

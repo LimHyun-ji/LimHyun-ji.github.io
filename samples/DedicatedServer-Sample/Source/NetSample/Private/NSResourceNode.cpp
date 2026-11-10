@@ -18,30 +18,48 @@ ANSResourceNode::ANSResourceNode()
 	bReplicates = true;
 	SetReplicatingMovement(false);   // 움직이지 않는 오브젝트: 위치 복제 불필요
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	// 머티리얼 없이 모양으로 종류를 구분한다: 광석 = 큐브, 금 = 구, 떨군 더미 = 원뿔
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereAsset(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ConeAsset(TEXT("/Engine/BasicShapes/Cone.Cone"));
+	OreMesh = CubeAsset.Object;
+	GoldMesh = SphereAsset.Object;
+	DropMesh = ConeAsset.Object;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 	Mesh->SetRelativeScale3D(FVector(0.6f));
 	Mesh->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
-	if (CubeMesh.Succeeded())
-	{
-		Mesh->SetStaticMesh(CubeMesh.Object);
-	}
+	Mesh->SetStaticMesh(OreMesh);
 }
 
 void ANSResourceNode::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	FDoRepLifetimeParams Params;
-	Params.bIsPushBased = true;
-	DOREPLIFETIME_WITH_PARAMS_FAST(ANSResourceNode, bAvailable, Params);
+	FDoRepLifetimeParams InitialOnly;
+	InitialOnly.Condition = COND_InitialOnly;
+	InitialOnly.bIsPushBased = true;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ANSResourceNode, Kind, InitialOnly);
+
+	FDoRepLifetimeParams PushBased;
+	PushBased.bIsPushBased = true;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ANSResourceNode, bAvailable, PushBased);
+}
+
+void ANSResourceNode::InitNode_Server(ENSNodeKind InKind, int32 InYield)
+{
+	Kind = InKind;
+	Yield = FMath::Max(1, InYield);
+	MARK_PROPERTY_DIRTY_FROM_NAME(ANSResourceNode, Kind, this);
 }
 
 void ANSResourceNode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 클라이언트에서는 최초 복제값(Kind)이 BeginPlay 전에 적용되어 있다
+	ApplyKindVisual();
 
 	if (!HasAuthority())
 	{
@@ -66,18 +84,48 @@ void ANSResourceNode::BeginPlay()
 	}
 }
 
-bool ANSResourceNode::TryHarvest(AActor* Harvester)
+int32 ANSResourceNode::Harvest_Server(AActor* Harvester, int32 FreeSpace)
 {
-	if (!HasAuthority() || !bAvailable)
+	if (!HasAuthority() || !bAvailable || FreeSpace <= 0)
 	{
-		return false;
+		return 0;
+	}
+
+	if (Kind == ENSNodeKind::Drop)
+	{
+		const int32 Taken = FMath::Min(Yield, FreeSpace);
+		Yield -= Taken;
+		if (Yield <= 0)
+		{
+			// 남은 게 없으면 제거. Dormant 액터도 Destroy는 클라이언트에 정상 전달된다.
+			SetAvailable_Server(false);
+			Destroy();
+		}
+		return Taken;
+	}
+
+	if (Yield > FreeSpace)
+	{
+		return 0;   // 가방이 부족하면 거절 (일부만 캐고 나머지를 버리는 일이 없도록)
 	}
 
 	SetAvailable_Server(false);
 	GetWorldTimerManager().SetTimer(RespawnTimer, this, &ANSResourceNode::Respawn_Server, RespawnSeconds, false);
 
 	UE_LOG(LogNetSample, Verbose, TEXT("[Server] %s harvested by %s"), *GetName(), *GetNameSafe(Harvester));
-	return true;
+	return Yield;
+}
+
+void ANSResourceNode::ResetForRound_Server()
+{
+	if (Kind == ENSNodeKind::Drop)
+	{
+		Destroy();
+		return;
+	}
+
+	GetWorldTimerManager().ClearTimer(RespawnTimer);
+	SetAvailable_Server(true);
 }
 
 void ANSResourceNode::Respawn_Server()
@@ -102,15 +150,40 @@ void ANSResourceNode::SetAvailable_Server(bool bNewAvailable)
 	bAvailable = bNewAvailable;
 	MARK_PROPERTY_DIRTY_FROM_NAME(ANSResourceNode, bAvailable, this);
 
-	ApplyVisual();   // 리슨 서버 / 서버 측 충돌 갱신 (OnRep은 클라이언트에서만 불린다)
+	ApplyAvailableVisual();   // 서버 측 충돌 갱신 (OnRep은 클라이언트에서만 불린다)
+}
+
+void ANSResourceNode::OnRep_Kind()
+{
+	ApplyKindVisual();
 }
 
 void ANSResourceNode::OnRep_Available()
 {
-	ApplyVisual();
+	ApplyAvailableVisual();
 }
 
-void ANSResourceNode::ApplyVisual()
+void ANSResourceNode::ApplyKindVisual()
+{
+	switch (Kind)
+	{
+	case ENSNodeKind::Gold:
+		Mesh->SetStaticMesh(GoldMesh);
+		Mesh->SetRelativeScale3D(FVector(0.8f));
+		break;
+	case ENSNodeKind::Drop:
+		Mesh->SetStaticMesh(DropMesh);
+		Mesh->SetRelativeScale3D(FVector(0.5f));
+		Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);   // 떨군 더미는 길을 막지 않는다
+		break;
+	default:
+		Mesh->SetStaticMesh(OreMesh);
+		Mesh->SetRelativeScale3D(FVector(0.6f));
+		break;
+	}
+}
+
+void ANSResourceNode::ApplyAvailableVisual()
 {
 	Mesh->SetVisibility(bAvailable);
 	Mesh->SetCollisionEnabled(bAvailable ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);

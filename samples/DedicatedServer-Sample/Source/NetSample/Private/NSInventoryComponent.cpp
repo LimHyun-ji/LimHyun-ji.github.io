@@ -59,6 +59,15 @@ int32 FNSInventoryList::AddCount(FName ItemId, int32 Delta)
 	return NewEntry.Count;
 }
 
+void FNSInventoryList::Clear()
+{
+	if (Items.Num() > 0)
+	{
+		Items.Reset();
+		MarkArrayDirty();   // 항목 제거는 배열 전체를 dirty로 (클라이언트에서 PreReplicatedRemove 호출)
+	}
+}
+
 int32 FNSInventoryList::GetCount(FName ItemId) const
 {
 	for (const FNSInventoryEntry& Entry : Items)
@@ -109,4 +118,13 @@ int32 UNSInventoryComponent::AddItem_Server(FName ItemId, int32 Delta)
 
 	NotifyChanged();   // 리슨 서버 호스트 UI용 (클라이언트는 FastArray 콜백으로 받는다)
 	return NewCount;
+}
+
+void UNSInventoryComponent::Clear_Server()
+{
+	check(GetOwner() && GetOwner()->HasAuthority());
+
+	Inventory.Clear();
+	MARK_PROPERTY_DIRTY_FROM_NAME(UNSInventoryComponent, Inventory, this);
+	NotifyChanged();
 }

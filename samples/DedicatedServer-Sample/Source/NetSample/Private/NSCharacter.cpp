@@ -2,6 +2,7 @@
 
 #include "NetSample.h"
 #include "NSGameMode.h"
+#include "NSGameState.h"
 #include "NSInventoryComponent.h"
 #include "NSNetUtils.h"
 #include "NSResourceNode.h"
@@ -24,6 +25,11 @@
 #include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
+
+namespace
+{
+	const FName OreItemId(TEXT("Ore"));
+}
 
 ANSCharacter::ANSCharacter()
 {
@@ -213,7 +219,7 @@ void ANSCharacter::OnLook(const FInputActionValue& Value)
 
 void ANSCharacter::OnInteract()
 {
-	if (!IsDead())
+	if (!IsDead() && IsMatchPlaying_Local())
 	{
 		ServerInteract();
 	}
@@ -221,7 +227,7 @@ void ANSCharacter::OnInteract()
 
 void ANSCharacter::OnAttack()
 {
-	if (IsDead())
+	if (IsDead() || !IsMatchPlaying_Local())
 	{
 		return;
 	}
@@ -249,8 +255,15 @@ void ANSCharacter::OnAttack()
 
 void ANSCharacter::ServerInteract_Implementation()
 {
-	if (IsDead())
+	if (IsDead() || !IsMatchPlaying_Server())
 	{
+		return;
+	}
+
+	const int32 FreeSpace = CarryCapacity - GetCarriedOre();
+	if (FreeSpace <= 0)
+	{
+		RejectRequest(TEXT("bag full"));
 		return;
 	}
 
@@ -264,37 +277,39 @@ void ANSCharacter::ServerInteract_Implementation()
 	GetWorld()->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity, ObjectParams,
 	                                     FCollisionShape::MakeSphere(InteractRange), QueryParams);
 
-	ANSResourceNode* Nearest = nullptr;
-	double NearestDistSq = TNumericLimits<double>::Max();
+	TArray<ANSResourceNode*> Candidates;
 	for (const FOverlapResult& Overlap : Overlaps)
 	{
 		ANSResourceNode* Node = Cast<ANSResourceNode>(Overlap.GetActor());
-		if (!Node || !Node->IsAvailable())
+		if (Node && Node->IsAvailable())
 		{
-			continue;
-		}
-		const double DistSq = FVector::DistSquared(Node->GetActorLocation(), GetActorLocation());
-		if (DistSq < NearestDistSq)
-		{
-			NearestDistSq = DistSq;
-			Nearest = Node;
+			Candidates.AddUnique(Node);
 		}
 	}
 
-	if (Nearest && Nearest->TryHarvest(this))
+	// 가까운 순서로 시도. 금광(3개)을 담을 공간이 없으면 다음으로 가까운 노드를 캔다.
+	const FVector MyLocation = GetActorLocation();
+	Candidates.Sort([&MyLocation](const ANSResourceNode& A, const ANSResourceNode& B)
 	{
-		Inventory->AddItem_Server(Nearest->GetItemId(), Nearest->GetYield());
-	}
-	else
+		return FVector::DistSquared(A.GetActorLocation(), MyLocation) < FVector::DistSquared(B.GetActorLocation(), MyLocation);
+	});
+
+	for (ANSResourceNode* Node : Candidates)
 	{
-		++RejectedRequestCount;
-		UE_LOG(LogNetSample, Verbose, TEXT("[Server] Interact rejected: %s (no node in range)"), *GetName());
+		const int32 Taken = Node->Harvest_Server(this, FreeSpace);
+		if (Taken > 0)
+		{
+			Inventory->AddItem_Server(OreItemId, Taken);
+			return;
+		}
 	}
+
+	RejectRequest(TEXT("no node in range"));
 }
 
 void ANSCharacter::ServerAttack_Implementation()
 {
-	if (IsDead())
+	if (IsDead() || !IsMatchPlaying_Server())
 	{
 		return;
 	}
@@ -303,8 +318,7 @@ void ANSCharacter::ServerAttack_Implementation()
 	const double Now = GetWorld()->GetTimeSeconds();
 	if (Now - LastAttackServerTime < AttackCooldown * 0.9f)
 	{
-		++RejectedRequestCount;
-		UE_LOG(LogNetSample, Verbose, TEXT("[Server] Attack rejected: %s (cooldown)"), *GetName());
+		RejectRequest(TEXT("attack cooldown"));
 		return;
 	}
 	LastAttackServerTime = Now;
@@ -388,12 +402,41 @@ void ANSCharacter::OnRep_Health(float OldHealth)
 
 void ANSCharacter::HandleDeath_Server()
 {
+	// 들고 있던 광석은 그 자리에 떨군다 → 다른 플레이어가 주워 갈 수 있다
+	const int32 Carried = GetCarriedOre();
+	if (Carried > 0)
+	{
+		if (ANSGameMode* GameMode = GetWorld()->GetAuthGameMode<ANSGameMode>())
+		{
+			GameMode->SpawnDrop_Server(GetActorLocation(), Carried);
+		}
+		Inventory->Clear_Server();
+	}
+
 	GetWorldTimerManager().SetTimer(RespawnTimer, this, &ANSCharacter::Respawn_Server, RespawnDelay, false);
 }
 
 void ANSCharacter::Respawn_Server()
 {
-	TeleportTo(SpawnLocation, GetActorRotation());
+	ANSGameMode* GameMode = GetWorld()->GetAuthGameMode<ANSGameMode>();
+	const FVector Location = GameMode ? GameMode->PickRespawnLocation(GetController()) : SpawnLocation;
+
+	TeleportTo(Location, GetActorRotation());
+	SetHealth_Server(MaxHealth);
+}
+
+void ANSCharacter::ResetForRound_Server(const FVector& Location)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	GetWorldTimerManager().ClearTimer(RespawnTimer);
+	Inventory->Clear_Server();
+	LastAttackServerTime = -1000.0;
+
+	TeleportTo(Location, GetActorRotation());
 	SetHealth_Server(MaxHealth);
 }
 
@@ -418,26 +461,66 @@ void ANSCharacter::ApplyDeadState()
 
 void ANSCharacter::TickBot(float DeltaSeconds)
 {
+	const ANSGameMode* GameMode = GetWorld()->GetAuthGameMode<ANSGameMode>();
+	if (!GameMode || !GameMode->IsPlaying())
+	{
+		return;
+	}
+
+	const FVector MyLocation = GetActorLocation();
+	const FVector ToDeposit = GameMode->GetDepositLocation() - MyLocation;
+
+	// 판단은 0.5초마다. 매 프레임 RPC를 만들지 않는다.
+	BotDecisionTimer -= DeltaSeconds;
+	if (BotDecisionTimer <= 0.f)
+	{
+		BotDecisionTimer = 0.5f;
+
+		if (ANSCharacter* Enemy = FindNearbyEnemy_Server())
+		{
+			const FVector ToEnemy = Enemy->GetActorLocation() - MyLocation;
+			SetActorRotation(FRotator(0.f, ToEnemy.Rotation().Yaw, 0.f));
+			if (FMath::FRand() < 0.5f)
+			{
+				ServerAttack();
+			}
+		}
+
+		ServerInteract();   // 주변에 노드가 있으면 캔다 (판정은 서버 로직 그대로)
+	}
+
+	// 이동 방향: 가방이 70% 이상이면 납품, 맵 밖으로 나가면 중앙, 그 외엔 배회
 	BotRetargetTimer -= DeltaSeconds;
-	if (BotRetargetTimer <= 0.f)
+	if (GetCarriedOre() >= FMath::CeilToInt(CarryCapacity * 0.7f) || ToDeposit.Size2D() > GameMode->GetPlayRadius())
+	{
+		BotDirection = FVector2D(ToDeposit.GetSafeNormal2D());
+	}
+	else if (BotRetargetTimer <= 0.f)
 	{
 		const float Angle = FMath::FRandRange(0.f, 2.f * PI);
 		BotDirection = FVector2D(FMath::Cos(Angle), FMath::Sin(Angle));
 		BotRetargetTimer = FMath::FRandRange(2.f, 5.f);
-
-		// 이동 외에도 채집 / 공격 요청을 섞어 실제 플레이에 가까운 트래픽을 만든다.
-		const float Roll = FMath::FRand();
-		if (Roll < 0.3f)
-		{
-			ServerInteract();
-		}
-		else if (Roll < 0.4f)
-		{
-			ServerAttack();
-		}
 	}
 
 	AddMovementInput(FVector(BotDirection, 0.f));
+}
+
+ANSCharacter* ANSCharacter::FindNearbyEnemy_Server() const
+{
+	TArray<FOverlapResult> Overlaps;
+	const FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(NSFindEnemy), false, this);
+	GetWorld()->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity, FCollisionObjectQueryParams(ECC_Pawn),
+	                                     FCollisionShape::MakeSphere(AttackRange + AttackRadius), QueryParams);
+
+	for (const FOverlapResult& Overlap : Overlaps)
+	{
+		ANSCharacter* Other = Cast<ANSCharacter>(Overlap.GetActor());
+		if (Other && Other != this && !Other->IsDead())
+		{
+			return Other;
+		}
+	}
+	return nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -454,4 +537,32 @@ void ANSCharacter::PlayAttackFX(const FVector& Origin) const
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(), Origin, AttackRadius, 12, FColor::Red, false, 0.25f);
 #endif
+}
+
+int32 ANSCharacter::GetCarriedOre() const
+{
+	return Inventory ? Inventory->GetCount(OreItemId) : 0;
+}
+
+bool ANSCharacter::IsMatchPlaying_Server() const
+{
+	const ANSGameMode* GameMode = GetWorld()->GetAuthGameMode<ANSGameMode>();
+	return GameMode && GameMode->IsPlaying();
+}
+
+bool ANSCharacter::IsMatchPlaying_Local() const
+{
+	// 클라이언트에서 불필요한 RPC를 보내지 않기 위한 사전 확인. 최종 판정은 서버(IsMatchPlaying_Server).
+	const ANSGameState* GameState = GetWorld()->GetGameState<ANSGameState>();
+	return GameState == nullptr || GameState->GetPhase() == ENSMatchPhase::Playing;
+}
+
+void ANSCharacter::RejectRequest(const TCHAR* Reason)
+{
+	if (bIsBot)
+	{
+		return;   // 봇은 매 판단마다 채집을 시도하므로 거절 집계에서 제외
+	}
+	++RejectedRequestCount;
+	UE_LOG(LogNetSample, Verbose, TEXT("[Server] Request rejected: %s (%s)"), *GetName(), Reason);
 }

@@ -37,12 +37,17 @@ public:
 	float GetMaxHealth() const { return MaxHealth; }
 	bool IsDead() const { return Health <= 0.f; }
 	UNSInventoryComponent* GetInventory() const { return Inventory; }
+	int32 GetCarriedOre() const;
+	int32 GetCarryCapacity() const { return CarryCapacity; }
 
 	/** 서버 전용. GameMode가 봇을 스폰할 때 호출한다. */
 	void MarkAsBot() { bIsBot = true; }
 
 	/** 서버 전용. */
 	void ApplyDamage_Server(float Amount, AController* DamageInstigator);
+
+	/** 서버 전용. 새 라운드: 가방 비우기, 체력 회복, 지정 위치로 이동. */
+	void ResetForRound_Server(const FVector& Location);
 
 	/** 서버 전용. 검증에서 거절된 요청 수 (치트/지연 판단용 지표). */
 	int32 GetRejectedRequestCount() const { return RejectedRequestCount; }
@@ -84,6 +89,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NetSample|Gameplay")
 	float RespawnDelay = 3.f;
+
+	/** 한 번에 들 수 있는 광석 수. 가득 차면 납품하러 돌아가야 한다. */
+	UPROPERTY(EditDefaultsOnly, Category = "NetSample|Gameplay", meta = (ClampMin = "1"))
+	int32 CarryCapacity = 10;
 
 	// ---- Replicated state ----
 	UPROPERTY(ReplicatedUsing = OnRep_Health)
@@ -135,6 +144,10 @@ private:
 	void HandleDeath_Server();
 	void Respawn_Server();
 	void TickBot(float DeltaSeconds);
+	bool IsMatchPlaying_Server() const;
+	bool IsMatchPlaying_Local() const;
+	ANSCharacter* FindNearbyEnemy_Server() const;
+	void RejectRequest(const TCHAR* Reason);
 
 	// ---- Shared helpers ----
 	FVector GetAttackOrigin() const;
@@ -148,5 +161,6 @@ private:
 	FVector SpawnLocation = FVector::ZeroVector;
 	FVector2D BotDirection = FVector2D::ZeroVector;
 	float BotRetargetTimer = 0.f;
+	float BotDecisionTimer = 0.f;
 	FTimerHandle RespawnTimer;
 };
